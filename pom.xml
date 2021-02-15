@@ -25,7 +25,6 @@
     <version>0.2.1-SNAPSHOT</version>
     <name>KNX Logic</name>
     <description>Logic Engine for KNX</description>
-    <url>https://github.com/pitschr/knx-logic</url>
 
     <!-- Licenses -->
     <licenses>
@@ -41,8 +40,6 @@
         <developer>
             <name>Christoph Pitschmann</name>
             <email>github@pitschmann.li</email>
-            <organization>Pitschmann</organization>
-            <organizationUrl>https://github.com/pitschr</organizationUrl>
         </developer>
     </developers>
 
