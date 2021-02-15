@@ -49,7 +49,7 @@ public class ComponentScannerTest {
 
         final var allLogicClasses = ComponentScanner.scanByFileOrFolder(folderPath, Logic.class);
         final var allLogicClassNames = allLogicClasses.stream().map(Class::getName).toArray();
-        assertThat(allLogicClassNames).containsExactly(
+        assertThat(allLogicClassNames).containsExactlyInAnyOrder(
                 // from '/components/core-logic.jar'
                 "my.logic.bitwise.CoreLogicA",
                 "my.logic.bitwise.CoreLogicB",
