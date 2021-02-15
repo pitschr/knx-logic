@@ -1,0 +1,9 @@
+--
+-- PERFORMANCE
+--
+DROP TABLE IF EXISTS performance;
+CREATE TABLE performance
+(
+    id   INT AUTO_INCREMENT PRIMARY KEY,
+    text VARCHAR(4000)
+);
