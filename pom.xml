@@ -81,7 +81,7 @@
         <version.maven-release-plugin>2.5.3</version.maven-release-plugin> <!-- Apache 2.0 -->
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin> <!-- Apache 2.0 -->
         <!-- Dependency Versions and Licenses -->
-        <version.knx-core>0.2.0</version.knx-core> <!-- GPL 3.0 -->
+        <version.knx-core>0.3.0</version.knx-core> <!-- GPL 3.0 -->
         <version.h2database>1.4.200</version.h2database> <!-- EPL 1.0 / MPL 2.0 -->
         <version.jdbi>3.12.0</version.jdbi> <!-- Apache 2.0 -->
         <version.hikaricp>3.4.1</version.hikaricp> <!-- Apache 2.0 -->
