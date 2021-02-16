@@ -22,9 +22,9 @@
     <packaging>jar</packaging>
     <groupId>li.pitschmann</groupId>
     <artifactId>knx-logic</artifactId>
-    <version>0.2.1-SNAPSHOT</version>
+    <version>0.3.0-SNAPSHOT</version>
     <name>KNX Logic</name>
-    <description>Logic Engine for KNX</description>
+    <description>KNX Logic - A Java library for KNX for logic specific interactions</description>
 
     <!-- Licenses -->
     <licenses>
@@ -87,10 +87,8 @@
         <version.assertj-core>3.18.1</version.assertj-core> <!-- Apache 2.0 -->
         <version.junit-jupiter-engine>5.7.0</version.junit-jupiter-engine> <!-- EPL 2.0 -->
         <version.junit-platform-runner>1.7.0</version.junit-platform-runner> <!-- EPL 2.0 -->
-        <version.logback-classic>1.2.3</version.logback-classic> <!-- EPL 1.0, LGPL 2.1 -->
         <version.mockito-inline>3.5.15</version.mockito-inline> <!-- MIT -->
         <version.slf4j>1.7.30</version.slf4j> <!-- MIT -->
-        <version.equals-verifier>3.5.2</version.equals-verifier>
         <!-- Default Argument Line for Surefire for test stability -->
         <setting.surefire.default.argLine>
             -Duser.timezone=UTC
@@ -171,18 +169,6 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-inline</artifactId>
             <version>${version.mockito-inline}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>nl.jqno.equalsverifier</groupId>
-            <artifactId>equalsverifier</artifactId>
-            <version>${version.equals-verifier}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>${version.logback-classic}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
