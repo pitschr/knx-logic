@@ -52,7 +52,7 @@ class ComponentsWriteToDatabaseTest extends BaseDatabaseSuite {
         // ONLY ONE NEW ENTRY
         assertThat(dao(ComponentsDao.class).size()).isEqualTo(componentsSizeBefore + 1);
         final var model = componentsDao.getById(newComponentId);
-        DatabaseAssertions.assertThat(model).isNotNull().id(newComponentId).uid(logic).className(LogicA.class);
+        DatabaseAssertions.assertThat(model).isNotNull().id(newComponentId).uid(logic).className(LogicA.class.getName());
 
         // ------------------------------------
         // verify table: Connectors
@@ -93,7 +93,7 @@ class ComponentsWriteToDatabaseTest extends BaseDatabaseSuite {
         // ------------------------------------
         assertThat(dao(ComponentsDao.class).size()).isEqualTo(componentsSizeBefore + 1);
         final var model = componentsDao.getById(newComponentId);
-        assertThat(model).isNotNull().id(newComponentId).uid(logic).className(LogicJ.class);
+        assertThat(model).isNotNull().id(newComponentId).uid(logic).className(LogicJ.class.getName());
 
         // ------------------------------------
         // verify table: Connectors
@@ -139,7 +139,7 @@ class ComponentsWriteToDatabaseTest extends BaseDatabaseSuite {
         // ------------------------------------
         assertThat(dao(ComponentsDao.class).size()).isEqualTo(componentsSizeBefore + 1);
         final var model = componentsDao.getById(newComponentId);
-        assertThat(model).isNotNull().id(newComponentId).uid(logic).className(LogicH.class);
+        assertThat(model).isNotNull().id(newComponentId).uid(logic).className(LogicH.class.getName());
 
         // ------------------------------------
         // verify table: Connectors

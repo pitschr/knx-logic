@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
@@ -42,7 +43,7 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
     protected final DatabaseManager databaseManager;
 
     protected AbstractComponentPersistenceStrategy(final DatabaseManager databaseManager) {
-        this.databaseManager = databaseManager;
+        this.databaseManager = Objects.requireNonNull(databaseManager);
     }
 
     /**

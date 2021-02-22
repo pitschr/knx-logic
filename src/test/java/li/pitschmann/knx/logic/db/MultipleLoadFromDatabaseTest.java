@@ -1,11 +1,14 @@
 package li.pitschmann.knx.logic.db;
 
+import experimental.api.ComponentFactory;
+import li.pitschmann.knx.logic.db.loader.LogicComponentLoader;
 import org.junit.jupiter.api.RepeatedTest;
 import test.BaseDatabaseSuite;
 
 import java.io.File;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 /**
  * Test case for loading components concurrently/sequentially from database
@@ -24,14 +27,14 @@ class MultipleLoadFromDatabaseTest extends BaseDatabaseSuite {
     }
 
     /**
-     * Tests the <strong>sequential</strong> loading of same logic component (in this example the
-     * {@link ComponentId#LOGIC_C} component) multiple times. First and last repetition should be ignored because
-     * of database warm up and warm down.
+     * Tests the <strong>sequential</strong> loading of same logic component multiple times.
+     * First and last repetition should be ignored because of database warm up and tear down.
      */
     @RepeatedTest(10)
     void loadSequentially() {
+        final var loader = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class));
         for (int i = 0; i < TIMES; i++) {
-            final var logic = objectsDao().getLogicComponentById(1);
+            final var logic = loader.loadById(1);
             assertThat(logic).isNotNull();
         }
     }

@@ -1,26 +1,50 @@
-package li.pitschmann.knx.logic.db;
+/*
+ * Copyright (C) 2021 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
+package li.pitschmann.knx.logic.db.loader;
+
+import experimental.api.ComponentFactory;
+import li.pitschmann.knx.logic.db.DatabaseManager;
+import li.pitschmann.knx.logic.exceptions.NoLogicClassFound;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.BaseDatabaseSuite;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 
 /**
- * Test case for loading {@link li.pitschmann.knx.logic.components.LogicComponent} from database
+ * Test case for {@link LogicComponentLoader}
  *
  * @author PITSCHR
  */
-class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
+class LogicComponentLoaderTest extends BaseDatabaseSuite {
 
     @Override
     public void afterDatabaseStart(final DatabaseManager databaseManager) {
         databaseManager.executeSqlFile(new File(Sql.INSERT_LOGIC_COMPONENT_SAMPLES));
-        assertThat(componentsDao().size()).isEqualTo(9);
-        assertThat(connectorsDao().size()).isEqualTo(40);
-        assertThat(pinsDao().size()).isEqualTo(59);
+        assertThat(componentsDao().size()).isEqualTo(15);
+        assertThat(connectorsDao().size()).isEqualTo(57);
+        assertThat(pinsDao().size()).isEqualTo(91);
     }
 
     /**
@@ -31,7 +55,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic A: No Inputs, No Outputs")
     void testLogicA() {
-        final var logic = objectsDao().getLogicComponentById(1);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(1);
 
         assertThat(logic.getInputConnectors()).isEmpty();
         assertThat(logic.getInputPins()).isEmpty();
@@ -48,7 +73,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic B: 1 Static Input, No Outputs")
     void testLogicB() {
-        final var logic = objectsDao().getLogicComponentById(2);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(2);
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(1);
@@ -66,7 +92,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic C: 1 Static Input, 1 Static Output")
     void testLogicC() {
-        final var logic = objectsDao().getLogicComponentById(3);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(3);
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(1);
@@ -85,7 +112,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic E: 1 Dynamic Input, No Outputs")
     void testLogicE() {
-        final var logic = objectsDao().getLogicComponentById(4);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(4);
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(2);
@@ -104,7 +132,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic F: 1 Dynamic Input, 1 Dynamic Output")
     void testLogicF() {
-        final var logic = objectsDao().getLogicComponentById(5);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(5);
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(2);
@@ -125,7 +154,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic H: 8 Static Inputs, 9 Static Outputs")
     void testLogicH() {
-        final var logic = objectsDao().getLogicComponentById(6);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(6);
 
         assertThat(logic.getInputConnectors()).hasSize(8);
         assertThat(logic.getInputPins()).hasSize(8);
@@ -159,7 +189,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic I: 8 Dynamic Inputs, 1 Dynamic Output")
     void testLogicI() {
-        final var logic = objectsDao().getLogicComponentById(7);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(7);
 
         assertThat(logic.getInputConnectors()).hasSize(8);
         assertThat(logic.getInputPins()).hasSize(16);
@@ -194,7 +225,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic J: 2 Static Inputs, 2 Static Outputs")
     void testLogicJ() {
-        final var logic = objectsDao().getLogicComponentById(8);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(8);
 
         assertThat(logic.getInputConnectors()).hasSize(2);
         assertThat(logic.getInputPins()).hasSize(2);
@@ -215,7 +247,8 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic K: 2 Dynamic Inputs, 2 Dynamic Outputs")
     void testLogicK() {
-        final var logic = objectsDao().getLogicComponentById(9);
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(9);
 
         assertThat(logic.getInputConnectors()).hasSize(2);
         assertThat(logic.getInputPins()).hasSize(5);
@@ -233,5 +266,39 @@ class LogicComponentsLoadFromDatabaseTest extends BaseDatabaseSuite {
         assertThat(logic.getOutputPin("outputFirst[3]").getValue()).isEqualTo("Hoell");
         assertThat(logic.getOutputPin("outputSecond[0]").getValue()).isEqualTo("World");
         assertThat(logic.getOutputPin("outputSecond[1]").getValue()).isEqualTo("dlroW");
+    }
+
+    @Test
+    @DisplayName("Logic (JAR): JAR file not loaded/scanned yet, MyFooBarLogic is not present")
+    void testLogicFooBar_NotLoadedYet() {
+        final var componentFactory = new ComponentFactory();
+        final var loader = new LogicComponentLoader(databaseManager, componentFactory);
+
+        assertThatThrownBy(() -> loader.loadById(10))
+                .isInstanceOf(NoLogicClassFound.class)
+                .hasMessage("No Logic Class found: my.logic.MyFooBarLogic");
+    }
+
+    @Test
+    @DisplayName("Logic (JAR): JAR file scanned, MyFooBarLogic is present")
+    void testLogicFooBar_Loaded() throws IOException {
+        final var componentFactory = new ComponentFactory();
+        final var loader = new LogicComponentLoader(databaseManager, componentFactory);
+
+        // Step 1: load from JAR
+        componentFactory.getLogicRepository().scanLogicClasses(Paths.get("."));
+
+        // Step 2: Load from database and wrap the logic from JAR file
+        final var logic = loader.loadById(10);
+
+        assertThat(logic.getWrappedObject().getClass().getName()).isEqualTo("my.logic.MyFooBarLogic");
+
+        assertThat(logic.getInputConnectors()).hasSize(1);
+        assertThat(logic.getInputPins()).hasSize(1);
+        assertThat(logic.getInputPin("inputText").getValue()).isEqualTo("foo");
+
+        assertThat(logic.getOutputConnectors()).hasSize(1);
+        assertThat(logic.getOutputPins()).hasSize(1);
+        assertThat(logic.getOutputPin("outputText").getValue()).isEqualTo("bar");
     }
 }

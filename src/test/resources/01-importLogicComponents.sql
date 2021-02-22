@@ -11,10 +11,17 @@ INSERT INTO components (componentType, className, uid) VALUES (0, 'test.componen
 INSERT INTO components (componentType, className, uid) VALUES (0, 'test.components.LogicI', 'uid-component-logic-I'); -- component: 7  (8x dynamic input / 1x dynamic output)
 INSERT INTO components (componentType, className, uid) VALUES (0, 'test.components.LogicJ', 'uid-component-logic-J'); -- component: 8  (2x static input  / 2x static output )
 INSERT INTO components (componentType, className, uid) VALUES (0, 'test.components.LogicK', 'uid-component-logic-K'); -- component: 9  (2x dynamic input / 2x static output )
+INSERT INTO components (componentType, className, uid) VALUES (0, 'my.logic.MyFooBarLogic',        'uid-component-logic-foobar'); -- component: 10 (taken from foobar-logic.jar)
+INSERT INTO components (componentType, className, uid) VALUES (0, 'my.logic.bitwise.CoreLogicA',   'uid-component-logic-core-A'); -- component: 11 (taken from core-logic.jar)
+INSERT INTO components (componentType, className, uid) VALUES (0, 'my.logic.bitwise.CoreLogicB',   'uid-component-logic-core-B'); -- component: 12 (taken from core-logic.jar)
+INSERT INTO components (componentType, className, uid) VALUES (0, 'my.logic.general.CoreLogicC',   'uid-component-logic-core-C'); -- component: 13 (taken from core-logic.jar)
+INSERT INTO components (componentType, className, uid) VALUES (0, 'my.logic.subA.subB.CoreLogicD', 'uid-component-logic-core-D'); -- component: 14 (taken from core-logic.jar)
+INSERT INTO components (componentType, className, uid) VALUES (0, 'my.logic.text.CoreLogicE',      'uid-component-logic-core-E'); -- component: 15 (taken from core-logic.jar)
 
 --
 -- CONNECTORS
---   BindingType#STATIC (ordinal = 0), BindingType#DYNAMIC (ordinal = 1)
+--   BindingType#STATIC (ordinal = 0)
+--   BindingType#DYNAMIC (ordinal = 1)
 --
 -- Logic A
 -- (empty)
@@ -66,6 +73,29 @@ INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (9, 1, '
 INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (9, 1, 'inputSecond'            );     -- connector: 38
 INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (9, 1, 'outputFirst'            );     -- connector: 39
 INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (9, 1, 'outputSecond'           );     -- connector: 40
+-- Logic FooBar
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (10, 0, 'inputText'             );     -- connector: 41
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (10, 0, 'outputText'            );     -- connector: 42
+-- Logic Core A
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (11, 1, 'inputs'                );     -- connector: 43
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (11, 0, 'output'                );     -- connector: 44
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (11, 0, 'outputNegation'        );     -- connector: 45
+-- Logic Core B
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (12, 1, 'inputs'                );     -- connector: 46
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (12, 0, 'output'                );     -- connector: 47
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (12, 0, 'outputNegation'        );     -- connector: 48
+-- Logic Core C
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (13, 1, 'inputs'                );     -- connector: 49
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (13, 0, 'output'                );     -- connector: 50
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (13, 0, 'outputNegation'        );     -- connector: 51
+-- Logic Core D
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (14, 1, 'inputs'                );     -- connector: 52
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (14, 0, 'output'                );     -- connector: 53
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (14, 0, 'outputNegation'        );     -- connector: 54
+-- Logic Core E
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (15, 1, 'inputs'                );     -- connector: 55
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (15, 0, 'output'                );     -- connector: 56
+INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (15, 0, 'outputNegation'        );     -- connector: 57
 
 --
 -- PINS
@@ -200,3 +230,43 @@ INSERT INTO pins_history (pinId, value, valueType) VALUES (56, 'lloeH', 'java.la
 INSERT INTO pins_history (pinId, value, valueType) VALUES (57, 'Hoell', 'java.lang.String');
 INSERT INTO pins_history (pinId, value, valueType) VALUES (58, 'World', 'java.lang.String');
 INSERT INTO pins_history (pinId, value, valueType) VALUES (59, 'dlroW', 'java.lang.String');
+-- Logic FooBar
+INSERT INTO pins (connectorId, uid, index)         VALUES (41, 'uid-pin-logic-foobar#inputText',  0); -- pin: 60
+INSERT INTO pins (connectorId, uid, index)         VALUES (42, 'uid-pin-logic-foobar#outputText', 0); -- pin: 61
+INSERT INTO pins_history (pinId, value, valueType) VALUES (60, 'foo', 'java.lang.String');
+INSERT INTO pins_history (pinId, value, valueType) VALUES (61, 'bar', 'java.lang.String');
+-- Logic Core A
+INSERT INTO pins (connectorId, uid, index)         VALUES (43, 'uid-pin-logic-core-A#inputs[0]',      0); -- pin: 62
+INSERT INTO pins (connectorId, uid, index)         VALUES (43, 'uid-pin-logic-core-A#inputs[1]',      1); -- pin: 63
+INSERT INTO pins (connectorId, uid, index)         VALUES (44, 'uid-pin-logic-core-A#output',         0); -- pin: 64
+INSERT INTO pins (connectorId, uid, index)         VALUES (45, 'uid-pin-logic-core-A#outputNegation', 0); -- pin: 65
+-- Logic Core B
+INSERT INTO pins (connectorId, uid, index)         VALUES (46, 'uid-pin-logic-core-B#inputs[0]',      0); -- pin: 66
+INSERT INTO pins (connectorId, uid, index)         VALUES (46, 'uid-pin-logic-core-B#inputs[1]',      1); -- pin: 67
+INSERT INTO pins (connectorId, uid, index)         VALUES (46, 'uid-pin-logic-core-B#inputs[2]',      2); -- pin: 68
+INSERT INTO pins (connectorId, uid, index)         VALUES (47, 'uid-pin-logic-core-B#output',         0); -- pin: 69
+INSERT INTO pins (connectorId, uid, index)         VALUES (48, 'uid-pin-logic-core-B#outputNegation', 0); -- pin: 70
+-- Logic Core C
+INSERT INTO pins (connectorId, uid, index)         VALUES (49, 'uid-pin-logic-core-C#inputs[0]',      0); -- pin: 71
+INSERT INTO pins (connectorId, uid, index)         VALUES (49, 'uid-pin-logic-core-C#inputs[1]',      1); -- pin: 72
+INSERT INTO pins (connectorId, uid, index)         VALUES (49, 'uid-pin-logic-core-C#inputs[2]',      2); -- pin: 73
+INSERT INTO pins (connectorId, uid, index)         VALUES (49, 'uid-pin-logic-core-C#inputs[3]',      3); -- pin: 74
+INSERT INTO pins (connectorId, uid, index)         VALUES (50, 'uid-pin-logic-core-C#output',         0); -- pin: 75
+INSERT INTO pins (connectorId, uid, index)         VALUES (51, 'uid-pin-logic-core-C#outputNegation', 0); -- pin: 76
+-- Logic Core D
+INSERT INTO pins (connectorId, uid, index)         VALUES (52, 'uid-pin-logic-core-D#inputs[0]',      0); -- pin: 77
+INSERT INTO pins (connectorId, uid, index)         VALUES (52, 'uid-pin-logic-core-D#inputs[1]',      1); -- pin: 78
+INSERT INTO pins (connectorId, uid, index)         VALUES (52, 'uid-pin-logic-core-D#inputs[2]',      2); -- pin: 79
+INSERT INTO pins (connectorId, uid, index)         VALUES (52, 'uid-pin-logic-core-D#inputs[3]',      3); -- pin: 80
+INSERT INTO pins (connectorId, uid, index)         VALUES (52, 'uid-pin-logic-core-D#inputs[4]',      4); -- pin: 81
+INSERT INTO pins (connectorId, uid, index)         VALUES (53, 'uid-pin-logic-core-D#output',         0); -- pin: 82
+INSERT INTO pins (connectorId, uid, index)         VALUES (54, 'uid-pin-logic-core-D#outputNegation', 0); -- pin: 83
+-- Logic Core E
+INSERT INTO pins (connectorId, uid, index)         VALUES (55, 'uid-pin-logic-core-E#inputs[0]',      0); -- pin: 84
+INSERT INTO pins (connectorId, uid, index)         VALUES (55, 'uid-pin-logic-core-E#inputs[1]',      1); -- pin: 85
+INSERT INTO pins (connectorId, uid, index)         VALUES (55, 'uid-pin-logic-core-E#inputs[2]',      2); -- pin: 86
+INSERT INTO pins (connectorId, uid, index)         VALUES (55, 'uid-pin-logic-core-E#inputs[3]',      3); -- pin: 87
+INSERT INTO pins (connectorId, uid, index)         VALUES (55, 'uid-pin-logic-core-E#inputs[4]',      4); -- pin: 88
+INSERT INTO pins (connectorId, uid, index)         VALUES (55, 'uid-pin-logic-core-E#inputs[5]',      5); -- pin: 89
+INSERT INTO pins (connectorId, uid, index)         VALUES (56, 'uid-pin-logic-core-E#output',         0); -- pin: 90
+INSERT INTO pins (connectorId, uid, index)         VALUES (57, 'uid-pin-logic-core-E#outputNegation', 0); -- pin: 91

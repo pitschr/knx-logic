@@ -5,7 +5,6 @@ import li.pitschmann.knx.logic.db.H2DatabaseManager;
 import li.pitschmann.knx.logic.db.dao.ComponentsDao;
 import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
 import li.pitschmann.knx.logic.db.dao.EventKeyDao;
-import li.pitschmann.knx.logic.db.dao.ObjectsDao;
 import li.pitschmann.knx.logic.db.dao.PinsDao;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
@@ -69,10 +68,6 @@ public class BaseDatabaseSuite {
 
     protected PinsDao pinsDao() {
         return dao(PinsDao.class);
-    }
-
-    protected ObjectsDao objectsDao() {
-        return dao(ObjectsDao.class);
     }
 
     protected EventKeyDao eventKeyDao() {

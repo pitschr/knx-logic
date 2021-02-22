@@ -88,5 +88,5 @@ public interface DatabaseManager {
      *
      * @return schema name
      */
-    String getSchemaName();
+    String getSchema();
 }

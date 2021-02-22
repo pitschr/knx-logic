@@ -43,7 +43,7 @@ class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         final var componentModel = componentDao.getById(1);
         assertThat(componentModel)
                 .componentType(ComponentType.INBOX)
-                .className(VariableInbox.class);
+                .className(VariableInbox.class.getName());
         assertThat(componentModel.getUid()).isNotNull();
 
         // ---------------------------------

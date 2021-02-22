@@ -47,7 +47,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         final var componentModel = componentDao.getById(1);
         assertThat(componentModel)
                 .componentType(ComponentType.LOGIC)
-                .className(TextSizeLogic.class);
+                .className(TextSizeLogic.class.getName());
         assertThat(componentModel.getUid()).isNotNull();
 
         // ---------------------------------
@@ -94,7 +94,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorId(1)
                 .index(0);
         assertThat(pinTexts_1.getUid()).isNotNull();
-        assertThat((String)pinsDao.getLastValueById(1)).isEmpty();          // empty string because of initial value
+        assertThat((String) pinsDao.getLastValueById(1)).isEmpty();          // empty string because of initial value
 
         final var pinTexts_2 = pinsDao.getById(2);
         assertThat(pinTexts_2)
@@ -102,7 +102,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorId(1)
                 .index(1);
         assertThat(pinTexts_2.getUid()).isNotNull();
-        assertThat((String)pinsDao.getLastValueById(2)).isEmpty();          // empty string because of initial value
+        assertThat((String) pinsDao.getLastValueById(2)).isEmpty();          // empty string because of initial value
 
         final var pinTotalTextLength = pinsDao.getById(3);
         assertThat(pinTotalTextLength)
@@ -110,7 +110,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorId(2)
                 .index(0);
         assertThat(pinTotalTextLength.getUid()).isNotNull();
-        assertThat((Integer)pinsDao.getLastValueById(3)).isZero();          // zero because of initial value
+        assertThat((Integer) pinsDao.getLastValueById(3)).isZero();          // zero because of initial value
 
         final var pinNumberOfTexts = pinsDao.getById(4);
         assertThat(pinNumberOfTexts)
@@ -118,7 +118,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorId(3)
                 .index(0);
         assertThat(pinNumberOfTexts.getUid()).isNotNull();
-        assertThat((Integer)pinsDao.getLastValueById(4)).isZero();          // zero because of initial value
+        assertThat((Integer) pinsDao.getLastValueById(4)).isZero();          // zero because of initial value
 
         final var pinTextAverageSize = pinsDao.getById(5);
         assertThat(pinTextAverageSize)
@@ -151,9 +151,9 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(3);
         assertThat(pinsDao.size()).isEqualTo(3);
 
-        assertThat((Boolean)pinsDao.getLastValueById(1)).isFalse();
-        assertThat((Boolean)pinsDao.getLastValueById(2)).isTrue();
-        assertThat((Boolean)pinsDao.getLastValueById(3)).isFalse();
+        assertThat((Boolean) pinsDao.getLastValueById(1)).isFalse();
+        assertThat((Boolean) pinsDao.getLastValueById(2)).isTrue();
+        assertThat((Boolean) pinsDao.getLastValueById(3)).isFalse();
     }
 
     @Test
@@ -173,10 +173,10 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);
         assertThat(pinsDao.size()).isEqualTo(5);
 
-        assertThat((String)pinsDao.getLastValueById(1)).isEmpty(); // texts(index=0)
-        assertThat((String)pinsDao.getLastValueById(2)).isEmpty(); // texts(index=1)
-        assertThat((Integer)pinsDao.getLastValueById(3)).isZero(); // totalTextLength
-        assertThat((Integer)pinsDao.getLastValueById(4)).isZero(); // numberOfTexts
+        assertThat((String) pinsDao.getLastValueById(1)).isEmpty(); // texts(index=0)
+        assertThat((String) pinsDao.getLastValueById(2)).isEmpty(); // texts(index=1)
+        assertThat((Integer) pinsDao.getLastValueById(3)).isZero(); // totalTextLength
+        assertThat((Integer) pinsDao.getLastValueById(4)).isZero(); // numberOfTexts
         assertThat(pinsDao.getLastValueById(5)).isNull();          // textAverageSize
 
         // ---------------------------------
@@ -210,12 +210,12 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(pinsDao.getById(2)).index(1);
         assertThat(pinsDao.getById(6)).index(2);
 
-        assertThat((String)pinsDao.getLastValueById(1)).isEqualTo("Hello");                        // texts(index=0)
-        assertThat((String)pinsDao.getLastValueById(2)).isEqualTo("Everyone");                     // texts(index=1)
-        assertThat((Integer)pinsDao.getLastValueById(3)).isEqualTo(14);                            // totalTextLength
-        assertThat((Integer)pinsDao.getLastValueById(4)).isEqualTo(3);                             // numberOfTexts
-        assertThat((BigDecimal)pinsDao.getLastValueById(5)).isEqualTo(new BigDecimal("4.67")); // textAverageSize  (14 / 3 = 4.6666...)
-        assertThat((String)pinsDao.getLastValueById(6)).isEqualTo("!");                            // texts(index=2)
+        assertThat((String) pinsDao.getLastValueById(1)).isEqualTo("Hello");                        // texts(index=0)
+        assertThat((String) pinsDao.getLastValueById(2)).isEqualTo("Everyone");                     // texts(index=1)
+        assertThat((Integer) pinsDao.getLastValueById(3)).isEqualTo(14);                            // totalTextLength
+        assertThat((Integer) pinsDao.getLastValueById(4)).isEqualTo(3);                             // numberOfTexts
+        assertThat((BigDecimal) pinsDao.getLastValueById(5)).isEqualTo(new BigDecimal("4.67")); // textAverageSize  (14 / 3 = 4.6666...)
+        assertThat((String) pinsDao.getLastValueById(6)).isEqualTo("!");                            // texts(index=2)
 
         // ---------------------------------
         // Update Statement #2
@@ -237,12 +237,12 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(pinsDao.getById(1)).index(0);
         assertThat(pinsDao.getById(6)).index(1);
 
-        assertThat((String)pinsDao.getLastValueById(1)).isEqualTo("Hello");                        // texts(index=0)
+        assertThat((String) pinsDao.getLastValueById(1)).isEqualTo("Hello");                        // texts(index=0)
         assertThat(pinsDao.getLastValueById(2)).isNull();                                          // id = 2 has been deleted
-        assertThat((Integer)pinsDao.getLastValueById(3)).isEqualTo(6);                             // totalTextLength
-        assertThat((Integer)pinsDao.getLastValueById(4)).isEqualTo(2);                             // numberOfTexts
-        assertThat((BigDecimal)pinsDao.getLastValueById(5)).isEqualTo(new BigDecimal("3.00")); // textAverageSize (6 / 2 = 3.0)
-        assertThat((String)pinsDao.getLastValueById(6)).isEqualTo("!");                            // texts(index=1)
+        assertThat((Integer) pinsDao.getLastValueById(3)).isEqualTo(6);                             // totalTextLength
+        assertThat((Integer) pinsDao.getLastValueById(4)).isEqualTo(2);                             // numberOfTexts
+        assertThat((BigDecimal) pinsDao.getLastValueById(5)).isEqualTo(new BigDecimal("3.00")); // textAverageSize (6 / 2 = 3.0)
+        assertThat((String) pinsDao.getLastValueById(6)).isEqualTo("!");                            // texts(index=1)
 
         // ---------------------------------
         // Update Statement #3
@@ -271,14 +271,14 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(pinsDao.getById(7)).index(0);
         assertThat(pinsDao.getById(8)).index(3);
 
-        assertThat((String)pinsDao.getLastValueById(1)).isEqualTo("Hello");                        // texts(index=1)
+        assertThat((String) pinsDao.getLastValueById(1)).isEqualTo("Hello");                        // texts(index=1)
         assertThat(pinsDao.getLastValueById(2)).isNull();                                          // id = 2 has been deleted
-        assertThat((Integer)pinsDao.getLastValueById(3)).isEqualTo(8);                             // totalTextLength
-        assertThat((Integer)pinsDao.getLastValueById(4)).isEqualTo(4);                             // numberOfTexts
-        assertThat((BigDecimal)pinsDao.getLastValueById(5)).isEqualTo(new BigDecimal("2.00")); // textAverageSize (8 / 4 = 2.0)
-        assertThat((String)pinsDao.getLastValueById(6)).isEqualTo("!");                            // texts(index=2)
-        assertThat((String)pinsDao.getLastValueById(7)).isEqualTo("[");                            // texts(index=0)
-        assertThat((String)pinsDao.getLastValueById(8)).isEqualTo("]");                            // texts(index=3)
+        assertThat((Integer) pinsDao.getLastValueById(3)).isEqualTo(8);                             // totalTextLength
+        assertThat((Integer) pinsDao.getLastValueById(4)).isEqualTo(4);                             // numberOfTexts
+        assertThat((BigDecimal) pinsDao.getLastValueById(5)).isEqualTo(new BigDecimal("2.00")); // textAverageSize (8 / 4 = 2.0)
+        assertThat((String) pinsDao.getLastValueById(6)).isEqualTo("!");                            // texts(index=2)
+        assertThat((String) pinsDao.getLastValueById(7)).isEqualTo("[");                            // texts(index=0)
+        assertThat((String) pinsDao.getLastValueById(8)).isEqualTo("]");                            // texts(index=3)
     }
 
     @Test

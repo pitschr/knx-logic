@@ -78,6 +78,6 @@ public final class LogicRepository {
             LOG.debug("No logic class '{}' found in:\n{}", classAsString, logicMap);
         }
 
-        throw new NoLogicClassFound("The logic class could not be found: " + classAsString);
+        throw new NoLogicClassFound("No Logic Class found: " + classAsString);
     }
 }

@@ -42,7 +42,7 @@ class OutboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         final var componentModel = componentDao.getById(1);
         assertThat(componentModel)
                 .componentType(ComponentType.OUTBOX)
-                .className(VariableOutbox.class);
+                .className(VariableOutbox.class.getName());
         assertThat(componentModel.getUid()).isNotNull();
 
         // ---------------------------------

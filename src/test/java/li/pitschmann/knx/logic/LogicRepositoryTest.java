@@ -22,7 +22,7 @@ class LogicRepositoryTest {
         assertThat(repository.getAllLogicClasses()).isEmpty();
         assertThatThrownBy(() -> repository.findLogicClass("my.logic.NonExistentLogic"))
                 .isInstanceOf(NoLogicClassFound.class)
-                .hasMessage("The logic class could not be found: my.logic.NonExistentLogic");
+                .hasMessage("No Logic Class found: my.logic.NonExistentLogic");
     }
 
     @Test
@@ -46,7 +46,7 @@ class LogicRepositoryTest {
     @Test
     @DisplayName("Scan for Logic class in entire folder")
     void scanForOneFolderPathAndFind() throws Throwable {
-        final var folderPath = Paths.get(".");
+        final var folderPath = Paths.get(LogicRepositoryTest.class.getResource("/components").toURI());
 
         final var repository = new LogicRepository();
         repository.scanLogicClasses(folderPath);

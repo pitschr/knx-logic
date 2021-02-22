@@ -1,5 +1,23 @@
-package li.pitschmann.knx.logic.db;
+/*
+ * Copyright (C) 2021 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
+package li.pitschmann.knx.logic.db.loader;
+
+import li.pitschmann.knx.logic.db.DatabaseManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.BaseDatabaseSuite;
@@ -9,11 +27,11 @@ import java.io.File;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Test case for loading {@link li.pitschmann.knx.logic.components.OutboxComponent} components from database
+ * Test case for {@link OutboxComponentLoader}
  *
  * @author PITSCHR
  */
-class OutboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
+class OutboxComponentLoaderTest extends BaseDatabaseSuite {
 
     @Override
     public void afterDatabaseStart(final DatabaseManager databaseManager) {
@@ -23,11 +41,10 @@ class OutboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
         assertThat(pinsDao().size()).isEqualTo(4);
     }
 
-
     @Test
     @DisplayName("Outbox: KNX DPT-1 (bool value)")
     void testOutboxWithKnxDpt1() {
-        final var component = objectsDao().getOutboxComponentById(1);
+        final var component = new OutboxComponentLoader(databaseManager).loadById(1);
 
         assertThat(component.getUid()).hasToString("uid-component-outbox-A");
         assertThat(component.getInputConnectors()).hasSize(1);
@@ -43,7 +60,7 @@ class OutboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Outbox: KNX DPT-2 (controlled, bool value)")
     void testOutboxWithKnxDpt2() {
-        final var component = objectsDao().getOutboxComponentById(2);
+        final var component = new OutboxComponentLoader(databaseManager).loadById(2);
 
         assertThat(component.getUid()).hasToString("uid-component-outbox-B");
         assertThat(component.getInputConnectors()).hasSize(2);
@@ -61,7 +78,7 @@ class OutboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Outbox: VARIABLE (string)")
     void testOutboxWithVariableChannel() {
-        final var component = objectsDao().getOutboxComponentById(3);
+        final var component = new OutboxComponentLoader(databaseManager).loadById(3);
 
         assertThat(component.getUid()).hasToString("uid-component-outbox-C");
         assertThat(component.getInputConnectors()).hasSize(1);

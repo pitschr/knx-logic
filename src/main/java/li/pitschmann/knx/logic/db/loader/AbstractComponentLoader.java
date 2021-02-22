@@ -1,4 +1,21 @@
-package li.pitschmann.knx.logic.db.jdbi.mappers.row;
+/*
+ * Copyright (C) 2021 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package li.pitschmann.knx.logic.db.loader;
 
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.components.Component;
@@ -13,7 +30,6 @@ import li.pitschmann.knx.logic.exceptions.LoaderException;
 import li.pitschmann.knx.logic.pin.DynamicPin;
 import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.pin.StaticPin;
-import org.jdbi.v3.core.mapper.RowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,13 +49,22 @@ import java.util.stream.Collectors;
  *
  * @author PITSCHR
  */
-abstract class AbstractComponentMapper<T extends Component> implements RowMapper<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractComponentMapper.class);
+abstract class AbstractComponentLoader<T extends Component> {
+    private static final Logger LOG = LoggerFactory.getLogger(AbstractComponentLoader.class);
     protected final DatabaseManager databaseManager;
 
-    protected AbstractComponentMapper(final DatabaseManager databaseManager) {
-        this.databaseManager = databaseManager;
+    protected AbstractComponentLoader(final DatabaseManager databaseManager) {
+        this.databaseManager = Objects.requireNonNull(databaseManager);
     }
+
+    /**
+     * Loads the {@link Component} which is an instance of {@code T} from the
+     * database using the given primary key {@code id}
+     *
+     * @param id the primary key
+     * @return the loaded component
+     */
+    public abstract T loadById(final int id);
 
     /**
      * Maps the {@link Pin} / {@link Connector} from class with {@link ConnectorModel} from database.
@@ -163,7 +188,7 @@ abstract class AbstractComponentMapper<T extends Component> implements RowMapper
     protected <E> E loadClassAndCast(final String className, final Class<E> expectedClass) {
         final E instance;
         try {
-            final var loadedClass = Class.forName(className);
+            final var loadedClass = loadClass(className);
 
             // Meets requirements?
             if (!expectedClass.isAssignableFrom(loadedClass)) {
@@ -173,12 +198,19 @@ abstract class AbstractComponentMapper<T extends Component> implements RowMapper
             final var obj = loadedClass.getConstructor().newInstance();
             instance = expectedClass.cast(obj);
             LOG.debug("New instance created successfully: {}", instance);
-        } catch (final ClassNotFoundException e) {
-            throw new LoaderException("Could not find class: " + className, e);
         } catch (final ReflectiveOperationException e) {
             throw new LoaderException("Is class an interface or has no non-arg constructor? " +
                     "Could not load class: " + className, e);
         }
         return instance;
+    }
+
+    protected Class<?> loadClass(final String className) {
+        try {
+
+            return Class.forName(className);
+        } catch (final ClassNotFoundException e) {
+            throw new LoaderException("Could not find class: " + className, e);
+        }
     }
 }

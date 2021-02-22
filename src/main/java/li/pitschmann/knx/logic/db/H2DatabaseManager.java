@@ -12,9 +12,6 @@ import li.pitschmann.knx.logic.db.jdbi.mappers.column.ClassColumnMapper;
 import li.pitschmann.knx.logic.db.jdbi.mappers.column.ComponentTypeColumnMapper;
 import li.pitschmann.knx.logic.db.jdbi.mappers.column.EventKeyColumnMapper;
 import li.pitschmann.knx.logic.db.jdbi.mappers.column.UIDColumnMapper;
-import li.pitschmann.knx.logic.db.jdbi.mappers.row.InboxComponentMapper;
-import li.pitschmann.knx.logic.db.jdbi.mappers.row.LogicComponentMapper;
-import li.pitschmann.knx.logic.db.jdbi.mappers.row.OutboxComponentMapper;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.db.models.ConnectorModel;
 import li.pitschmann.knx.logic.db.models.EventKeyModel;
@@ -49,9 +46,9 @@ public final class H2DatabaseManager implements DatabaseManager {
     private static final Logger LOG = LoggerFactory.getLogger(H2DatabaseManager.class);
     private static final String[] DB_SETTINGS = new String[]{"AUTO_SERVER=TRUE", "AUTO_RECONNECT=TRUE"};
     private final AtomicBoolean running = new AtomicBoolean();
-    private final String dbHostname;
-    private final String dbSchemaName;
-    private final int dbPort;
+    private final String hostname;
+    private final String schema;
+    private final int port;
     private final JdbiDaoPool jdbiDaoPool;
     private final PersistenceManager persistenceManager;
     private Jdbi jdbi;
@@ -60,14 +57,14 @@ public final class H2DatabaseManager implements DatabaseManager {
     /**
      * Creates a new Database Manager
      *
-     * @param hostname   the hostname
-     * @param port       the port
-     * @param schemaName the schema name
+     * @param hostname the host name
+     * @param port     the port
+     * @param schema   the schema
      */
-    public H2DatabaseManager(final String hostname, final int port, final String schemaName) {
-        this.dbHostname = Objects.requireNonNull(hostname);
-        this.dbSchemaName = Objects.requireNonNull(schemaName);
-        this.dbPort = port;
+    public H2DatabaseManager(final String hostname, final int port, final String schema) {
+        this.hostname = Objects.requireNonNull(hostname);
+        this.schema = Objects.requireNonNull(schema);
+        this.port = port;
         this.jdbiDaoPool = new JdbiDaoPool(this);
 
         // register persistence strategies
@@ -97,7 +94,7 @@ public final class H2DatabaseManager implements DatabaseManager {
         if (!this.running.getAndSet(true)) {
             // start H2 database
             try {
-                final var startArguments = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", String.valueOf(this.dbPort)};
+                final var startArguments = new String[]{"-tcp", "-tcpAllowOthers", "-tcpPort", String.valueOf(this.port)};
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("DB Startup arguments: {}", Arrays.toString(startArguments));
                 }
@@ -112,7 +109,7 @@ public final class H2DatabaseManager implements DatabaseManager {
             }
 
             // connect to H2 database
-            final var jdbcUrl = String.format("jdbc:h2:file:~/%s;%s", dbSchemaName, String.join(";", DB_SETTINGS));
+            final var jdbcUrl = String.format("jdbc:h2:file:~/%s;%s", schema, String.join(";", DB_SETTINGS));
             LOG.debug("JDBC URL: {}", jdbcUrl);
 
             // Connection pooling for faster performance
@@ -130,10 +127,6 @@ public final class H2DatabaseManager implements DatabaseManager {
             jdbi.registerRowMapper(FieldMapper.factory(ConnectorModel.class));
             jdbi.registerRowMapper(FieldMapper.factory(PinModel.class));
             jdbi.registerRowMapper(FieldMapper.factory(EventKeyModel.class));
-
-            jdbi.registerRowMapper(new LogicComponentMapper(this));
-            jdbi.registerRowMapper(new InboxComponentMapper(this));
-            jdbi.registerRowMapper(new OutboxComponentMapper(this));
 
             jdbi.registerArgument(new UIDArgumentFactory());
             jdbi.registerArgument(new BindingTypeArgumentFactory());
@@ -173,7 +166,7 @@ public final class H2DatabaseManager implements DatabaseManager {
 
     @Override
     public Path createBackup() {
-        final var backupPath = Paths.get("backup/h2_" + dbSchemaName + "_backup" + System.currentTimeMillis() + ".zip");
+        final var backupPath = Paths.get("backup/h2_" + schema + "_backup" + System.currentTimeMillis() + ".zip");
         jdbi.useHandle(h -> h.execute("BACKUP TO '" + backupPath + "'"));
         return backupPath;
     }
@@ -199,16 +192,16 @@ public final class H2DatabaseManager implements DatabaseManager {
 
     @Override
     public String getHostname() {
-        return this.dbHostname;
+        return this.hostname;
     }
 
     @Override
     public int getPort() {
-        return this.dbPort;
+        return this.port;
     }
 
     @Override
-    public String getSchemaName() {
-        return this.dbSchemaName;
+    public String getSchema() {
+        return this.schema;
     }
 }

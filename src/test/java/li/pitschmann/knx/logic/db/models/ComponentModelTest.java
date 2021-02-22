@@ -26,12 +26,12 @@ public class ComponentModelTest {
 
         final var model = ComponentModel.builder()
                 .uid(uidMock)
-                .className(LogicA.class)
+                .className(LogicA.class.getName())
                 .componentType(ComponentType.LOGIC)
                 .build();
 
         assertThat(model.getUid()).isInstanceOf(StaticUID.class);
-        assertThat(model.getClassName()).isSameAs(LogicA.class);
+        assertThat(model.getClassName()).isEqualTo("test.components.LogicA");
         assertThat(model.getComponentType()).isSameAs(ComponentType.LOGIC);
         assertThat(model).hasToString("" + //
                 "ComponentModel{" + //

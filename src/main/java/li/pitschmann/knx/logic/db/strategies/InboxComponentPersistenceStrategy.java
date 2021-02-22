@@ -30,7 +30,7 @@ public class InboxComponentPersistenceStrategy extends AbstractComponentPersiste
 
         final var componentModel = ComponentModel.builder()
                 .uid(component.getUid())
-                .className(component.getWrappedObject().getClass())
+                .className(component.getWrappedObject().getClass().getName())
                 .componentType(ComponentType.INBOX)
                 .build();
 

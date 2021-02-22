@@ -1,19 +1,33 @@
-package li.pitschmann.knx.logic.db.jdbi.mappers.row;
+/*
+ * Copyright (C) 2021 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package li.pitschmann.knx.logic.db.loader;
 
 import li.pitschmann.knx.logic.components.OutboxComponent;
 import li.pitschmann.knx.logic.components.OutboxComponentImpl;
 import li.pitschmann.knx.logic.components.outbox.Outbox;
 import li.pitschmann.knx.logic.db.DatabaseManager;
+import li.pitschmann.knx.logic.db.dao.ComponentsDao;
 import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
 import li.pitschmann.knx.logic.db.dao.EventKeyDao;
 import li.pitschmann.knx.logic.event.EventKey;
-import li.pitschmann.knx.logic.uid.UIDFactory;
-import org.jdbi.v3.core.statement.StatementContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.Objects;
 
 /**
@@ -27,25 +41,27 @@ import java.util.Objects;
  * <li>pins</li>
  * </ul>
  */
-public class OutboxComponentMapper extends AbstractComponentMapper<OutboxComponent> {
-    private static final Logger LOG = LoggerFactory.getLogger(OutboxComponentMapper.class);
+public class OutboxComponentLoader extends AbstractComponentLoader<OutboxComponent> {
+    private static final Logger LOG = LoggerFactory.getLogger(OutboxComponentLoader.class);
 
-    public OutboxComponentMapper(final DatabaseManager databaseManager) {
+    public OutboxComponentLoader(final DatabaseManager databaseManager) {
         super(databaseManager);
     }
 
     @Override
-    public OutboxComponent map(final ResultSet rs, final StatementContext ctx) throws SQLException {
-        final var id = rs.getInt("id");
-        final var className = rs.getString("className");
-        final var uid = UIDFactory.createUid(rs.getString("uid"));
+    public OutboxComponent loadById(final int id) {
+        final var componentModel = databaseManager.dao(ComponentsDao.class).getById(id);
+        final var uid = componentModel.getUid();
+        final var className = componentModel.getClassName();
+
+        // load the suitable class
+        final Outbox outbox = loadClassAndCast(className, Outbox.class);
 
         // create event key
         final var eventKeyModel = Objects.requireNonNull(databaseManager.dao(EventKeyDao.class).getByComponentId(id));
         final var eventKey = new EventKey(eventKeyModel.getChannel(), eventKeyModel.getKey());
 
         // create new component, we will update/wrap in next steps
-        final Outbox outbox = loadClassAndCast(className, Outbox.class);
         final var component = new OutboxComponentImpl(eventKey, outbox);
 
         // set previous UID to make sure that we recognize it as same component

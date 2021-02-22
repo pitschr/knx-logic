@@ -1,5 +1,23 @@
-package li.pitschmann.knx.logic.db;
+/*
+ * Copyright (C) 2021 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 
+package li.pitschmann.knx.logic.db.loader;
+
+import li.pitschmann.knx.logic.db.DatabaseManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.BaseDatabaseSuite;
@@ -9,11 +27,11 @@ import java.io.File;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * Test case for loading {@link li.pitschmann.knx.logic.components.InboxComponent} components from database
+ * Test case for {@link InboxComponentLoader}
  *
  * @author PITSCHR
  */
-class InboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
+class InboxComponentLoaderTest extends BaseDatabaseSuite {
 
     @Override
     public void afterDatabaseStart(final DatabaseManager databaseManager) {
@@ -26,7 +44,7 @@ class InboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Inbox: KNX DPT-1 (bool value)")
     void testInboxWithKnxDpt1() {
-        final var component = objectsDao().getInboxComponentById(1);
+        final var component = new InboxComponentLoader(databaseManager).loadById(1);
 
         assertThat(component.getUid()).hasToString("uid-component-inbox-A");
         assertThat(component.getOutputConnectors()).hasSize(1);
@@ -42,7 +60,7 @@ class InboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Inbox: KNX DPT-2 (controlled, bool value)")
     void testInboxWithKnxDpt2() {
-        final var component = objectsDao().getInboxComponentById(2);
+        final var component = new InboxComponentLoader(databaseManager).loadById(2);
 
         assertThat(component.getUid()).hasToString("uid-component-inbox-B");
         assertThat(component.getOutputConnectors()).hasSize(2);
@@ -60,7 +78,7 @@ class InboxComponentLoadFromDatabaseTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Inbox: VARIABLE (string)")
     void testInboxWithVariableChannel() {
-        final var component = objectsDao().getInboxComponentById(3);
+        final var component = new InboxComponentLoader(databaseManager).loadById(3);
 
         assertThat(component.getUid()).hasToString("uid-component-inbox-C");
         assertThat(component.getOutputConnectors()).hasSize(1);

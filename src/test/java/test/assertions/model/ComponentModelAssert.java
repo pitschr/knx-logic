@@ -30,10 +30,10 @@ public final class ComponentModelAssert extends ModelAssert<ComponentModelAssert
     /**
      * Assert {@link ComponentModel#getClassName()}
      *
-     * @param className
+     * @param className the class name
      * @return myself
      */
-    public ComponentModelAssert className(final Class<?> className) {
+    public ComponentModelAssert className(final String className) {
         assertThat(this.actual.getClassName()).isEqualTo(className);
         return this.myself;
     }
