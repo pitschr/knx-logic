@@ -22,6 +22,7 @@ import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.StaticConnector;
 import li.pitschmann.knx.logic.db.jdbi.mappers.BindingType;
+import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.db.models.ConnectorModel;
 import li.pitschmann.knx.logic.descriptor.FieldDescriptor;
 import li.pitschmann.knx.logic.exceptions.LoaderException;
@@ -180,7 +181,7 @@ class AbstractComponentLoaderTest extends BaseDatabaseSuite {
         }
 
         @Override
-        public Component loadById(int id) {
+        public Component load(final ComponentModel model) {
             throw new UnsupportedOperationException(); // not subject to be tested here
         }
     }

@@ -45,7 +45,7 @@ public final class ValueHelper {
      * @return default value which belongs to {@code Class<T>}, otherwise {@code null}
      */
     @Nullable
-    public static final <T> T getDefaultValueFor(final Class<T> clazz) {
+    public static <T> T getDefaultValueFor(final Class<T> clazz) {
         Preconditions.checkNonNull(clazz, "No class provided");
         Preconditions.checkArgument(!clazz.isPrimitive(), "Class should not be a primitive");
 
@@ -79,7 +79,7 @@ public final class ValueHelper {
     }
 
     /**
-     * Returns the field value class for given {@code field}. In case the class is a primitive, the wrapper of primitive
+     * Returns the field type for given {@code field}. In case the class is a primitive, the wrapper of primitive
      * is returned.
      * <p>
      * Examples:<br>
@@ -88,15 +88,15 @@ public final class ValueHelper {
      * <code>private boolean test;</code> will return <code>java.lang.Boolean</code><br/>
      * <code>private List&lt;Boolean&gt; tests;</code> will return <code>java.lang.Boolean</code> as well.<br/>
      *
-     * @param field
+     * @param field the field
      * @return Class if found, otherwise null
      */
-    public static Class<?> getFieldValueClass(final Field field) {
-        return getFieldValueClass(field, 0);
+    public static Class<?> getFieldType(final Field field) {
+        return getFieldType(field, 0);
     }
 
     /**
-     * Returns the field value class from given {@code index} from {@code field}. In case the class is a primitive, the
+     * Returns the field type from given {@code index} from {@code field}. In case the class is a primitive, the
      * wrapper of primitive is returned.
      * <p>
      * Examples:<br>
@@ -105,11 +105,11 @@ public final class ValueHelper {
      * <code>private boolean test;</code> will return <code>java.lang.Boolean</code><br/>
      * <code>private List&lt;Boolean&gt; tests;</code> will return <code>java.lang.Boolean</code> as well.<br/>
      *
-     * @param field
-     * @param index
+     * @param field the field
+     * @param index the index of field
      * @return Class if found, otherwise null
      */
-    private static Class<?> getFieldValueClass(final Field field, final int index) {
+    private static Class<?> getFieldType(final Field field, final int index) {
         Class<?> clazz = null;
         final var genericType = field.getGenericType();
         if (genericType instanceof ParameterizedType) {

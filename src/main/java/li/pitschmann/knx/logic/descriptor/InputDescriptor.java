@@ -64,7 +64,7 @@ public final class InputDescriptor extends FieldDescriptor {
                 .add("owner", getOwner()) //
                 .add("name", getName()) //
                 .add("field", getField()) //
-                .add("fieldValueClass", getFieldValueClass()) //
+                .add("fieldType", getFieldType().getName()) //
                 .add("min", min) //
                 .add("max", max) //
                 .add("alwaysTrigger", alwaysTrigger) //

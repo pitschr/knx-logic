@@ -77,7 +77,7 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
         try {
             return databaseManager.jdbi().inTransaction(h -> {
                 final var dao = databaseManager.dao(ComponentsDao.class);
-                var model = dao.getByUid(component.getUid());
+                var model = dao.getByUID(component.getUid());
                 return model == null ? insert(component) : update(model, component);
             });
         } finally {

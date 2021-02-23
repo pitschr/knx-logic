@@ -69,7 +69,7 @@ public final class LogicRepository {
     public Class<Logic> findLogicClass(final String classAsString) {
         final var logicClass = logicMap.get(classAsString);
         if (logicClass != null) {
-            LOG.debug("Logic class '{}' found: {}", classAsString, logicClass);
+            LOG.debug("Logic class found: {}", logicClass.getName());
             return logicClass;
         }
 

@@ -11,11 +11,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Test for {@link ValueHelper}
  */
-public class ValueHelperTest {
+class ValueHelperTest {
 
     @Test
     @DisplayName("Get default values")
-    public void getDefaultValues() {
+    void getDefaultValues() {
         // objects
         assertThat(ValueHelper.getDefaultValueFor(Boolean.class)).isFalse();
         assertThat(ValueHelper.getDefaultValueFor(Short.class)).isZero();
@@ -45,45 +45,45 @@ public class ValueHelperTest {
 
     @Test
     @DisplayName("Get value type of field")
-    public void testValueType() throws NoSuchFieldException {
+    void testValueType() throws NoSuchFieldException {
         // int
         final var primitiveInt = TestObject.class.getDeclaredField("primitiveInt");
-        assertThat(ValueHelper.getFieldValueClass(primitiveInt)).isSameAs(Integer.class);
+        assertThat(ValueHelper.getFieldType(primitiveInt)).isSameAs(Integer.class);
 
         // Integer
         final var objectInt = TestObject.class.getDeclaredField("objectInt");
-        assertThat(ValueHelper.getFieldValueClass(objectInt)).isSameAs(Integer.class);
+        assertThat(ValueHelper.getFieldType(objectInt)).isSameAs(Integer.class);
 
         // List<Integer>
         final var listInt = TestObject.class.getDeclaredField("listInt");
-        assertThat(ValueHelper.getFieldValueClass(listInt)).isSameAs(Integer.class);
+        assertThat(ValueHelper.getFieldType(listInt)).isSameAs(Integer.class);
 
         // List<?>
         final var wildcard = TestObject.class.getDeclaredField("wildcard");
-        assertThatThrownBy(() -> ValueHelper.getFieldValueClass(wildcard))
+        assertThatThrownBy(() -> ValueHelper.getFieldType(wildcard))
                 .isInstanceOf(UnsupportedOperationException.class)
                 .hasMessage("No value class found for field '%s' and index '0'", wildcard);
 
         // <T>
         final var objGeneric = TestObjectWithGeneric.class.getDeclaredField("obj");
-        assertThat(ValueHelper.getFieldValueClass(objGeneric)).isSameAs(Object.class);
+        assertThat(ValueHelper.getFieldType(objGeneric)).isSameAs(Object.class);
 
         // List<T>
         final var listGeneric = TestObjectWithGeneric.class.getDeclaredField("list");
-        assertThat(ValueHelper.getFieldValueClass(listGeneric)).isSameAs(Object.class);
+        assertThat(ValueHelper.getFieldType(listGeneric)).isSameAs(Object.class);
 
         // <T extends Number>
         final var objNumberGeneric = TestObjectWithNumberGeneric.class.getDeclaredField("obj");
-        assertThat(ValueHelper.getFieldValueClass(objNumberGeneric)).isSameAs(Number.class);
+        assertThat(ValueHelper.getFieldType(objNumberGeneric)).isSameAs(Number.class);
 
         // List<T extends Number>
         final var listNumberGeneric = TestObjectWithNumberGeneric.class.getDeclaredField("list");
-        assertThat(ValueHelper.getFieldValueClass(listNumberGeneric)).isSameAs(Number.class);
+        assertThat(ValueHelper.getFieldType(listNumberGeneric)).isSameAs(Number.class);
     }
 
     @Test
     @DisplayName("Constructor not instantiable")
-    public void testConstructorNonInstantiable() {
+    void testConstructorNonInstantiable() {
         assertThatThrownBy(() -> {
             final var ctor = ValueHelper.class.getDeclaredConstructor();
             ctor.trySetAccessible();

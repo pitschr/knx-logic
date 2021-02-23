@@ -39,11 +39,11 @@ public class InputDescriptorTest {
                                 "owner=%s, " +  //
                                 "name=null, " + //
                                 "field=%s, " +  //
-                                "fieldValueClass=%s, " + //
+                                "fieldType=java.lang.String, " + //
                                 "min=1, " +
                                 "max=1, " +
                                 "alwaysTrigger=false}",
-                        componentMock, fieldMock, String.class)
+                        componentMock, fieldMock)
         );
     }
 
@@ -68,11 +68,11 @@ public class InputDescriptorTest {
                                 "owner=%s, " +  //
                                 "name=null, " + //
                                 "field=%s, " +  //
-                                "fieldValueClass=%s, " + //
+                                "fieldType=java.lang.Integer, " + //
                                 "min=13, " +
                                 "max=17, " +
                                 "alwaysTrigger=true}",
-                        componentMock, fieldMock, Integer.class)
+                        componentMock, fieldMock)
         );
     }
 

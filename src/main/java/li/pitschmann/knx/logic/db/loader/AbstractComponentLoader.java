@@ -23,8 +23,11 @@ import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.StaticConnector;
 import li.pitschmann.knx.logic.db.DatabaseManager;
+import li.pitschmann.knx.logic.db.dao.ComponentsDao;
+import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
 import li.pitschmann.knx.logic.db.dao.PinsDao;
 import li.pitschmann.knx.logic.db.jdbi.mappers.BindingType;
+import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.db.models.ConnectorModel;
 import li.pitschmann.knx.logic.exceptions.LoaderException;
 import li.pitschmann.knx.logic.pin.DynamicPin;
@@ -64,7 +67,44 @@ abstract class AbstractComponentLoader<T extends Component> {
      * @param id the primary key
      * @return the loaded component
      */
-    public abstract T loadById(final int id);
+    public T loadById(final int id) {
+        return load(databaseManager.dao(ComponentsDao.class).getById(id));
+    }
+
+    /**
+     * Loads the {@link Component} which is an instance of {@code T} from the
+     * database using the given {@link ComponentModel} which has already been
+     * read from database.
+     *
+     * @param model the component model
+     * @return the loaded component
+     */
+    public abstract T load(final ComponentModel model);
+
+    /**
+     * Returns the lost of connector models that is owned by the {@link ComponentModel}
+     *
+     * @param model the component model
+     * @return list of {@link ConnectorModel} owned by {@link ComponentModel}; may be empty
+     */
+    protected List<ConnectorModel> loadConnectors(final ComponentModel model) {
+        final var id = model.getId();
+        final var className = model.getClassName();
+
+        // update connectors (and pins inside)
+        final var connectorModels = databaseManager.dao(ConnectorsDao.class).getByComponentId(id);
+        if (connectorModels.isEmpty()) {
+            LOG.warn("No connectors found for logic component model?!?! Please double-check your component (id={}): {}", id, className);
+        } else if (LOG.isDebugEnabled()) {
+            connectorModels.forEach(c -> LOG.debug("Connector loaded for '{}' (id={}): {} (id={})",
+                    className, //
+                    c.getComponentId(), //
+                    c.getConnectorName(), //
+                    c.getId()) //
+            );
+        }
+        return connectorModels;
+    }
 
     /**
      * Maps the {@link Pin} / {@link Connector} from class with {@link ConnectorModel} from database.

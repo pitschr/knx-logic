@@ -21,9 +21,8 @@ import li.pitschmann.knx.logic.components.InboxComponent;
 import li.pitschmann.knx.logic.components.InboxComponentImpl;
 import li.pitschmann.knx.logic.components.inbox.Inbox;
 import li.pitschmann.knx.logic.db.DatabaseManager;
-import li.pitschmann.knx.logic.db.dao.ComponentsDao;
-import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
 import li.pitschmann.knx.logic.db.dao.EventKeyDao;
+import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.event.EventKey;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,10 +48,10 @@ public class InboxComponentLoader extends AbstractComponentLoader<InboxComponent
     }
 
     @Override
-    public InboxComponent loadById(final int id) {
-        final var componentModel = databaseManager.dao(ComponentsDao.class).getById(id);
-        final var uid = componentModel.getUid();
-        final var className = componentModel.getClassName();
+    public InboxComponent load(final ComponentModel model) {
+        final var id = model.getId();
+        final var uid = model.getUid();
+        final var className = model.getClassName();
 
         // load the suitable class
         final Inbox inbox = loadClassAndCast(className, Inbox.class);
@@ -68,17 +67,7 @@ public class InboxComponentLoader extends AbstractComponentLoader<InboxComponent
         component.setUid(uid);
 
         // update connectors (and pins inside)
-        final var connectorModels = databaseManager.dao(ConnectorsDao.class).getByComponentId(id);
-        if (connectorModels.isEmpty()) {
-            LOG.warn("No connectors found for inbox component model?!?! Please double-check your component (id={}): {}", id, className);
-        } else if (LOG.isDebugEnabled()) {
-            connectorModels.forEach(c -> LOG.debug("{}@{}: {}@{}",
-                    className, //
-                    c.getComponentId(), //
-                    c.getConnectorName(), //
-                    c.getId()) //
-            );
-        }
+        final var connectorModels = loadConnectors(model);
         updateConnectors(component.getConnectors(), connectorModels);
 
         return component;

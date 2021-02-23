@@ -376,7 +376,7 @@ final class RouterInternal {
     private Object convertValue(final Pin originPin,
                                 final Pin nextPin,
                                 final @Nullable Object value) {
-        final var nextValueClass = nextPin.getDescriptor().getFieldValueClass();
+        final var nextValueClass = nextPin.getDescriptor().getFieldType();
         if (value == null) {
             final var newValue = ValueHelper.getDefaultValueFor(nextValueClass);
             log.debug("Converted NULL value to '{}' for: originPin={}, nextPin={}", newValue, originPin.getUid(), nextPin.getUid());

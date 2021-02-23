@@ -42,7 +42,7 @@ public interface PinsDao {
      * @return {@link PinModel}
      */
     @SqlQuery("SELECT * FROM pins WHERE uid = ?")
-    PinModel getByUid(final UID uid);
+    PinModel getByUID(final UID uid);
 
     /**
      * Returns all {@link PinModel} for given connector {@code id} and order by it's index

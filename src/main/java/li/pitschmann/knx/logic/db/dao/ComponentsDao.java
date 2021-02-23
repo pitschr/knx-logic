@@ -7,6 +7,8 @@ import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import java.util.List;
+
 /**
  * DAO for components
  *
@@ -16,10 +18,18 @@ public interface ComponentsDao {
     /**
      * Returns the total size for all components
      *
-     * @return
+     * @return the total size of components
      */
     @SqlQuery("SELECT COUNT(*) FROM components")
     int size();
+
+    /**
+     * Returns all components
+     *
+     * @return list of {@link ComponentModel}
+     */
+    @SqlQuery("SELECT * FROM components")
+    List<ComponentModel> all();
 
     /**
      * Returns the component for given {@code id}
@@ -37,7 +47,7 @@ public interface ComponentsDao {
      * @return {@link ComponentModel}
      */
     @SqlQuery("SELECT * FROM components WHERE uid = ?")
-    ComponentModel getByUid(final UID uid);
+    ComponentModel getByUID(final UID uid);
 
     /**
      * Inserts a new {@link ComponentModel} into database

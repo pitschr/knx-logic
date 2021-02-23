@@ -21,7 +21,7 @@ public class ConnectorTest {
     @DisplayName("Test for compatibility")
     public void testCompatibility() {
         final var descriptorMock = mock(FieldDescriptor.class);
-        doReturn(Number.class).when(descriptorMock).getFieldValueClass();
+        doReturn(Number.class).when(descriptorMock).getFieldType();
 
         final var connector = mock(Connector.class);
         when(connector.getDescriptor()).thenReturn(descriptorMock);

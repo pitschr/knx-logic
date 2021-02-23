@@ -41,8 +41,9 @@ public final class StaticConnector extends AbstractConnector
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
-                .add("descriptor", getDescriptor()) //
-                .add("pin", this.pin) //
+                .add("fieldName", getDescriptor().getName()) //
+                .add("fieldType", getDescriptor().getFieldType().getName()) //
+                .add("pin", this.pin.getUid()) //
                 .toString();
     }
 }

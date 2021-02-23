@@ -1290,7 +1290,7 @@ class RouterTest {
         when(componentMock.getConnectors()).thenReturn(List.of(connectorMock));
 
         final var descriptorMock = mock(FieldDescriptor.class);
-        doReturn(Object.class).when(descriptorMock).getFieldValueClass();
+        doReturn(Object.class).when(descriptorMock).getFieldType();
 
         final var pinMock = mock(Pin.class);
         when(pinMock.getUid()).thenReturn(mock(UID.class));

@@ -101,7 +101,7 @@ public class StaticPinTest {
 
         // toString()
         assertThat(staticPin).hasToString(
-                String.format("StaticPin{uid=%s, fieldName=objectField, fieldClassName=java.lang.Object, value=null, refresh=true}", staticPin.getUid())
+                String.format("StaticPin{uid=%s, fieldName=objectField, fieldType=java.lang.Object, value=null, refresh=true}", staticPin.getUid())
         );
     }
 
@@ -136,7 +136,7 @@ public class StaticPinTest {
 
         // toString()
         assertThat(staticPin).hasToString(
-                String.format("StaticPin{uid=%s, fieldName=objectField, fieldClassName=java.lang.Object, value=bar, refresh=false}", staticPin.getUid())
+                String.format("StaticPin{uid=%s, fieldName=objectField, fieldType=java.lang.Object, value=bar, refresh=false}", staticPin.getUid())
         );
     }
 
@@ -152,7 +152,7 @@ public class StaticPinTest {
         when(descriptorMock.getOwner()).thenReturn(owner);
         when(descriptorMock.getField()).thenReturn(field);
         when(descriptorMock.getName()).thenReturn(field.getName());
-        doReturn(ValueHelper.getFieldValueClass(field)).when(descriptorMock).getFieldValueClass();
+        doReturn(ValueHelper.getFieldType(field)).when(descriptorMock).getFieldType();
 
         final var connectorMock = mock(StaticConnector.class);
         when(connectorMock.getDescriptor()).thenReturn(descriptorMock);

@@ -22,8 +22,7 @@ import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.components.LogicComponent;
 import li.pitschmann.knx.logic.components.LogicComponentImpl;
 import li.pitschmann.knx.logic.db.DatabaseManager;
-import li.pitschmann.knx.logic.db.dao.ComponentsDao;
-import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
+import li.pitschmann.knx.logic.db.models.ComponentModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,36 +52,25 @@ public class LogicComponentLoader extends AbstractComponentLoader<LogicComponent
     }
 
     @Override
-    public LogicComponent loadById(final int id) {
-        final var componentModel = databaseManager.dao(ComponentsDao.class).getById(id);
-        final var uid = componentModel.getUid();
-        final var className = componentModel.getClassName();
+    public LogicComponent load(final ComponentModel model) {
+        final var uid = model.getUid();
+        final var className = model.getClassName();
 
-        final var logic = loadClassAndCast(componentModel.getClassName(), Logic.class);
+        final var logic = loadClassAndCast(className, Logic.class);
         final var component = new LogicComponentImpl(logic);
 
         // set previous UID to make sure that we recognize it as same component
         component.setUid(uid);
 
         // update connectors (and pins inside)
-        final var connectorModels = databaseManager.dao(ConnectorsDao.class).getByComponentId(id);
-        if (connectorModels.isEmpty()) {
-            LOG.warn("No connectors found for logic component model?!?! Please double-check your component (id={}): {}", id, className);
-        } else if (LOG.isDebugEnabled()) {
-            connectorModels.forEach(c -> LOG.debug("{}@{}: {}@{}",
-                    className, //
-                    c.getComponentId(), //
-                    c.getConnectorName(), //
-                    c.getId()) //
-            );
-        }
+        final var connectorModels = loadConnectors(model);
         updateConnectors(component.getConnectors(), connectorModels);
 
         return component;
     }
 
     @Override
-    protected Class<?> loadClass(String className) {
+    protected Class<?> loadClass(final String className) {
         try {
             return super.loadClass(className);
         } catch (final Exception ex) {

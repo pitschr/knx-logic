@@ -73,26 +73,26 @@ class DynamicConnectorTest {
         assertThat(connector_a)
                 .isInstanceOf(DynamicConnector.class)
                 .hasToString( //
-                        String.format("DynamicConnector{" +                 //
-                                        "descriptor=%s, " +                 //
-                                        "defaultValue=0, " +                //
-                                        "internalPins=%s, " +               //
-                                        "dynamicListReference=[0]}", //
-                                connector_a.getDescriptor(),
-                                Arrays.toString(connector_a.getPinStream().toArray()))
+                        String.format("DynamicConnector{" +  //
+                                        "fieldName=a, " +    //
+                                        "fieldType=java.lang.Integer, " + //
+                                        "defaultValue=0, " + //
+                                        "pins=%s}",  //
+                                Arrays.toString(connector_a.getPinStream().map(Pin::getUid).toArray())
+                        )
                 );
 
         final var connector_e = logicComponent.getInputConnector(4);
         assertThat(connector_e)
                 .isInstanceOf(DynamicConnector.class)
                 .hasToString( //
-                        String.format("DynamicConnector{" +                        //
-                                        "descriptor=%s, " +                        //
-                                        "defaultValue=, " +                        // default value is empty string
-                                        "internalPins=%s, " +                      //
-                                        "dynamicListReference=[hello, world, !]}", //
-                                connector_e.getDescriptor(),
-                                Arrays.toString(connector_e.getPinStream().toArray()))
+                        String.format("DynamicConnector{" + //
+                                        "fieldName=e, " +    //
+                                        "fieldType=java.lang.String, " + //
+                                        "defaultValue=, " + // default value is empty string
+                                        "pins=%s}",         //
+                                Arrays.toString(connector_e.getPinStream().map(Pin::getUid).toArray())
+                        )
                 );
     }
 
