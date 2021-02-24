@@ -6,7 +6,6 @@ import experimental.api.v1.json.ComponentResponse;
 import experimental.api.v1.json.ConnectorResponse;
 import experimental.api.v1.json.CreateComponentRequest;
 import experimental.api.v1.json.PinResponse;
-import experimental.api.v1.json.UpdateConnectorRequest;
 import io.javalin.http.Context;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.components.Component;
@@ -15,10 +14,13 @@ import li.pitschmann.knx.logic.connector.ConnectorAware;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.InputConnectorAware;
 import li.pitschmann.knx.logic.connector.OutputConnectorAware;
+import li.pitschmann.knx.logic.db.DatabaseManager;
+import li.pitschmann.knx.logic.db.dao.ComponentsDao;
 import li.pitschmann.knx.logic.pin.DynamicPin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,10 +36,12 @@ public class ComponentController {
 
     private final UidRegistry uidRegistry;
     private final ComponentFactory componentFactory;
+    private final DatabaseManager dbManager;
 
-    public ComponentController(final UidRegistry uidRegistry, final ComponentFactory componentFactory) {
+    public ComponentController(final UidRegistry uidRegistry, final ComponentFactory componentFactory, final DatabaseManager dbManager) {
         this.uidRegistry = Objects.requireNonNull(uidRegistry);
         this.componentFactory = Objects.requireNonNull(componentFactory);
+        this.dbManager = Objects.requireNonNull(dbManager);
     }
 
     /**
@@ -116,6 +120,8 @@ public class ComponentController {
 
         // register the component
         uidRegistry.registerComponent(component);
+        LOG.debug("Component registered: {}", component);
+        dbManager.save(component);
         ctx.status(201);
         ctx.json(toComponentResponse(component));
     }
@@ -138,6 +144,9 @@ public class ComponentController {
             uidRegistry.deregisterComponent(component);
         }
 
+        final int pk = dbManager.dao(ComponentsDao.class).getByUID(component.getUid()).getId();
+        dbManager.dao(ComponentsDao.class).deleteById(pk);
+
         ctx.status(204);
     }
 
@@ -155,13 +164,13 @@ public class ComponentController {
         Preconditions.checkNonNull(connectorName, "Name of connector not provided.");
 
         final var component = uidRegistry.findComponentByUID(componentUid);
-        if (component == null) {
-            ctx.status(404);
+        if (!(component instanceof ConnectorAware)) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         // find connector
-        final var connector = getConnectorByName(component, connectorName);
+        final var connector =  getConnectorByName(component, connectorName);
         if (connector == null) {
             ctx.status(404);
         } else {
@@ -175,85 +184,98 @@ public class ComponentController {
      * E.g. adding a dynamic pin.
      *
      * @param ctx           context
-     * @param componentUid  the component uid containing connectors to be scanned
+     * @param componentUID  the component UID containing connectors to be scanned
      * @param connectorName the connector name to be updated
-     * @param request       request containing data what should be updated
+     * @param index         the index where pin should be added; may be null
      */
-    public void updateConnector(final Context ctx,
-                                final String componentUid,
-                                final String connectorName,
-                                final UpdateConnectorRequest request) {
-        LOG.trace("Update connector name '{}' for component UID: {}", connectorName, componentUid);
-        Preconditions.checkNonNull(componentUid, "UID for component update not provided.");
-        Preconditions.checkNonNull(connectorName, "Name of connector not provided.");
-        Preconditions.checkNonNull(request, "Update Connector Request not provided.");
-
-        final var component = uidRegistry.findComponentByUID(componentUid);
-        if (component == null) {
-            ctx.status(404);
+    public void updateConnectorAddPin(final Context ctx,
+                                      final String componentUID,
+                                      final String connectorName,
+                                      final Integer index) {
+        final var component = uidRegistry.findComponentByUID(componentUID);
+        if (!(component instanceof ConnectorAware)) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
         // find connector
         final var connector = getConnectorByName(component, connectorName);
         if (connector == null) {
-            ctx.status(404);
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        // action 'add-pin' will add a new pin to the connector
-        if ("add-pin".equalsIgnoreCase(request.getAction())) {
-            // verify if connector is dynamic
-            if (!(connector instanceof DynamicConnector)) {
-                ctx.status(403);
-                return;
-            }
-
-            // if index is provided, then add the pin at the defined index,
-            // otherwise add the pin at the end of connector
-            final var dynamicConnector = (DynamicConnector) connector;
-            final DynamicPin newPin;
-            if (request.getIndex() == null
-                    || request.getIndex() < 0
-                    || request.getIndex() >= dynamicConnector.size()) {
-                newPin = dynamicConnector.addPin();
-            } else {
-                newPin = dynamicConnector.addPin(request.getIndex());
-            }
-            uidRegistry.registerPin(newPin);
-
-            ctx.status(200);
-            ctx.json(toConnectorResponse(connector));
+        // verify if connector is dynamic
+        if (!(connector instanceof DynamicConnector)) {
+            ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
-        // action 'delete-pin' will delete an existing pin from connector
-        else if ("delete-pin".equalsIgnoreCase(request.getAction())) {
-            // verify if connector is dynamic
-            if (!(connector instanceof DynamicConnector)) {
-                ctx.status(403);
-                return;
-            }
 
-            // a valid index must be provided when deleted
-            final var dynamicConnector = (DynamicConnector) connector;
-            final DynamicPin deletedPin;
-            if (request.getIndex() == null
-                    || request.getIndex() < 0
-                    || request.getIndex() >= dynamicConnector.size()) {
-                ctx.status(400);
-                return;
-            } else {
-                deletedPin = dynamicConnector.removePin(request.getIndex());
-            }
-            uidRegistry.deregisterPin(deletedPin);
-
-            ctx.status(200);
-            ctx.json(toConnectorResponse(connector));
+        // if index is provided, then add the pin at the defined index,
+        // otherwise add the pin at the end of connector
+        final var dynamicConnector = (DynamicConnector) connector;
+        final DynamicPin newPin;
+        if (index == null || index < 0) {
+            LOG.debug("Add new pin for connector name '{}' and component uid: {}", connectorName, componentUID);
+            newPin = dynamicConnector.addPin();
         } else {
-            ctx.status(400);
-            throw new AssertionError(
-                    "Unsupported action: " + request.getAction() + ". Supported are: add-pin."
-            );
+
+            LOG.debug("Add new pin at index {} connector name '{}' and component uid: {}", index, connectorName, componentUID);
+            newPin = dynamicConnector.addPin(index);
         }
+        uidRegistry.registerPin(newPin);
+
+        ctx.status(HttpServletResponse.SC_CREATED);
+        ctx.json(toPinResponses(connector));
+    }
+
+    /**
+     * Updates the given component and {@code connectorName}.
+     * E.g. adding a dynamic pin.
+     *
+     * @param ctx           context
+     * @param componentUid  the component uid containing connectors to be scanned
+     * @param connectorName the connector name to be updated
+     * @param index         the index where pin should be added; may not null
+     */
+    public void updateConnectorDeletePin(final Context ctx,
+                                         final String componentUid,
+                                         final String connectorName,
+                                         final Integer index) {
+        LOG.trace("Update connector name '{}' for component UID: {}", connectorName, componentUid);
+
+        final var component = uidRegistry.findComponentByUID(componentUid);
+        if (!(component instanceof ConnectorAware)) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        // find connector
+        final var connector = getConnectorByName(component, connectorName);
+        if (connector == null) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        // verify if connector is dynamic
+            if (!(connector instanceof DynamicConnector)) {
+                ctx.status(HttpServletResponse.SC_FORBIDDEN);
+                return;
+            }
+        final var dynamicConnector = (DynamicConnector) connector;
+
+        // index must be valid
+        if (index == null || index < 0 || index >= dynamicConnector.size()) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        // a valid index must be provided when deleted
+        final var deletedPin = dynamicConnector.removePin(index);
+        uidRegistry.deregisterPin(deletedPin);
+
+        ctx.status(HttpServletResponse.SC_NO_CONTENT);
+        ctx.json(toConnectorResponse(connector));
     }
 
     private ComponentResponse toComponentResponse(final Component component) {
@@ -285,7 +307,7 @@ public class ComponentController {
     private ConnectorResponse toConnectorResponse(final Connector connector) {
         final var connectorResponse = new ConnectorResponse();
         connectorResponse.setName(connector.getDescriptor().getName());
-        connectorResponse.setPinType(connector.getDescriptor().getFieldValueClass().getSimpleName().toLowerCase());
+        connectorResponse.setPinType(connector.getDescriptor().getFieldType().getSimpleName().toLowerCase());
         connectorResponse.setPins(toPinResponses(connector));
         connectorResponse.setDynamic(connector instanceof DynamicConnector);
         return connectorResponse;

@@ -46,13 +46,23 @@ class LogicRepositoryTest {
     @Test
     @DisplayName("Scan for Logic class in entire folder")
     void scanForOneFolderPathAndFind() throws Throwable {
-        final var folderPath = Paths.get(LogicRepositoryTest.class.getResource("/components").toURI());
+        final var folderPath = Paths.get(getClass().getResource("/components").toURI());
 
         final var repository = new LogicRepository();
         repository.scanLogicClasses(folderPath);
 
         // should be multiple entries
         assertThat(repository.getAllLogicClasses()).hasSize(6);
+        assertThat(repository.getAllLogicClasses().stream().map(Class::getName)).containsExactlyInAnyOrder(
+                // from foobar-logic.jar
+                "my.logic.MyFooBarLogic",
+                // from core-logic.jar
+                "my.logic.bitwise.CoreLogicA",
+                "my.logic.bitwise.CoreLogicB",
+                "my.logic.general.CoreLogicC",
+                "my.logic.subA.subB.CoreLogicD",
+                "my.logic.text.CoreLogicE"
+        );
 
         // try finding it
         assertThat(repository.findLogicClass("my.logic.MyFooBarLogic")).isNotNull();

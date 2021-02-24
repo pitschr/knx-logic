@@ -50,17 +50,11 @@ final class RouterInternal {
 
     /**
      * <p>
-     * Defines the linking between the source {@link Pin} and the subscriber
-     * list of target {@link Pin}s. Source may be e.g. pin of {@link InboxComponent}
-     * or an <i>output</i> {@link Pin}
+     * Defines the linking between one {@link Pin} and other {@link Pin}s.
      * </p>
      * <p>
-     * This is the map to be used for usual routing to identify what are
-     * subsequent {@link Pin}s and call them (by setting value etc.).
-     * </p>
-     * <p>
-     * Key is an <strong>output</strong> {@link Pin}, Values is a set of
-     * <strong>input</strong> {@link Pin}s
+     * The map is bi-directional. By giving {@link Pin} as key we know to which other
+     * {@link Pin} it is connected.
      * </p>
      */
     private final Map<Pin, Set<Pin>> routingMap = Maps.newHashMap(1000);
@@ -130,7 +124,7 @@ final class RouterInternal {
                 .add(target);
 
         routingMap
-                .computeIfAbsent(target, key -> new HashSet<>())       // for reverse the ordering is not important
+                .computeIfAbsent(target, key -> new LinkedHashSet<>())
                 .add(source);
 
         // for detailed logging purposes only to see the mapping of source/target pins

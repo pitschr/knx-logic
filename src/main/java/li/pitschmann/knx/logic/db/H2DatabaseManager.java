@@ -150,7 +150,7 @@ public final class H2DatabaseManager implements DatabaseManager {
     public void stopServer() {
         if (this.running.getAndSet(false)) {
             try {
-                dbServer.shutdown();
+                dbServer.stop();
                 LOG.info("Database is stopped NOW!");
             } catch (final Exception e) {
                 LOG.error("Something went wrong during stopping the database!", e);

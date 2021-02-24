@@ -23,7 +23,7 @@ class ComponentFactoryTest {
 
     @Test
     @DisplayName("Test basic methods of ComponentFactory")
-    void createVariableInboxComponent() {
+    void testComponentFactory() {
         final var factory = new ComponentFactory();
 
         assertThat(factory.getLogicRepository()).isNotNull();
