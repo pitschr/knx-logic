@@ -9,7 +9,7 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 import java.util.List;
 
 /**
- * DAO for connectors
+ * DAO for 'connectors' table
  *
  * @author PITSCHR
  */
@@ -25,7 +25,7 @@ public interface ConnectorsDao {
     /**
      * Returns the connector for given {@code id}
      *
-     * @param id the id of connector to be returned
+     * @param id the identifier of connector
      * @return {@link ConnectorModel}
      */
     @SqlQuery("SELECT * FROM connectors WHERE id = ?")
@@ -34,7 +34,7 @@ public interface ConnectorsDao {
     /**
      * Returns all connectors for given component {@code id}
      *
-     * @param id
+     * @param id the identifier of component id
      * @return list of {@link ConnectorModel}
      */
     @SqlQuery("SELECT * FROM connectors WHERE componentId = ?")
@@ -61,7 +61,7 @@ public interface ConnectorsDao {
     /**
      * Deletes the {@link ConnectorModel} by id, the associated pins will be also deleted.
      *
-     * @param id the id of connector to be deleted
+     * @param id the model identifier
      */
     @SqlUpdate("DELETE connectors WHERE id = ?")
     int delete(final int id);

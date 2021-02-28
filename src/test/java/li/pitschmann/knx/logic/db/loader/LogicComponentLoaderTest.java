@@ -23,11 +23,19 @@ import li.pitschmann.knx.logic.exceptions.NoLogicClassFound;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.BaseDatabaseSuite;
+import test.components.LogicD;
+import test.components.LogicE;
+import test.components.LogicF;
+import test.components.LogicG;
+import test.components.LogicH;
+import test.components.LogicI;
+import test.components.LogicJ;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 
+import static li.pitschmann.knx.logic.uid.UIDFactory.createUid;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -41,10 +49,10 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
 
     @Override
     public void afterDatabaseStart(final DatabaseManager databaseManager) {
-        databaseManager.executeSqlFile(new File(Sql.INSERT_LOGIC_COMPONENT_SAMPLES));
-        assertThat(componentsDao().size()).isEqualTo(15);
-        assertThat(connectorsDao().size()).isEqualTo(57);
-        assertThat(pinsDao().size()).isEqualTo(91);
+        // databaseManager.executeSqlFile(new File(Sql.INSERT_LOGIC_COMPONENT_SAMPLES));
+        // assertThat(componentsDao().size()).isEqualTo(15);
+        // assertThat(connectorsDao().size()).isEqualTo(57);
+        // assertThat(pinsDao().size()).isEqualTo(91);
     }
 
     /**
@@ -55,8 +63,12 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic A: No Inputs, No Outputs")
     void testLogicA() {
+        executeSqlFile(new File(Sql.Logic.A));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
                 .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-A"));
 
         assertThat(logic.getInputConnectors()).isEmpty();
         assertThat(logic.getInputPins()).isEmpty();
@@ -73,12 +85,16 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic B: 1 Static Input, No Outputs")
     void testLogicB() {
+        executeSqlFile(new File(Sql.Logic.B));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(2);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-B"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(1);
-        assertThat(logic.getInputPin("i").getValue()).isEqualTo(true);
+        assertThat(logic.getInputPin("i").getUid()).isEqualTo(createUid("uid-pin-logic-B#i"));
 
         assertThat(logic.getOutputConnectors()).isEmpty();
         assertThat(logic.getOutputPins()).isEmpty();
@@ -92,189 +108,252 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic C: 1 Static Input, 1 Static Output")
     void testLogicC() {
+        executeSqlFile(new File(Sql.Logic.C));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(3);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-C"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(1);
-        assertThat(logic.getInputPin("i").getValue()).isEqualTo(true);
+        assertThat(logic.getInputPin("i").getUid()).isEqualTo(createUid("uid-pin-logic-C#i"));
 
         assertThat(logic.getOutputConnectors()).hasSize(1);
         assertThat(logic.getOutputPins()).hasSize(1);
-        assertThat(logic.getOutputPin("o").getValue()).isEqualTo(false);
+        assertThat(logic.getOutputPin("o").getUid()).isEqualTo(createUid("uid-pin-logic-C#o"));
     }
 
     /**
-     * {@link test.components.LogicE}
+     * {@link LogicD}
      * Input:  1 Dynamic (Boolean, Size=2)
      * Output: N/A
      */
     @Test
-    @DisplayName("Logic E: 1 Dynamic Input, No Outputs")
-    void testLogicE() {
+    @DisplayName("Logic D: 1 Dynamic Input, No Outputs")
+    void testLogicD() {
+        executeSqlFile(new File(Sql.Logic.D));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(4);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-D"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(2);
-        assertThat(logic.getInputPin("i[0]").getValue()).isEqualTo(true);
-        assertThat(logic.getInputPin("i[1]").getValue()).isEqualTo(false);
+        assertThat(logic.getInputPin("i[0]").getUid()).isEqualTo(createUid("uid-pin-logic-D#i[0]"));
+        assertThat(logic.getInputPin("i[1]").getUid()).isEqualTo(createUid("uid-pin-logic-D#i[1]"));
 
         assertThat(logic.getOutputConnectors()).isEmpty();
         assertThat(logic.getOutputPins()).isEmpty();
     }
 
     /**
-     * {@link test.components.LogicF}
+     * {@link LogicE}
      * Input:  1 Dynamic (Boolean, Size=2)
      * Output: 1 Dynamic (Boolean, Size=2)
      */
     @Test
-    @DisplayName("Logic F: 1 Dynamic Input, 1 Dynamic Output")
-    void testLogicF() {
+    @DisplayName("Logic E: 1 Dynamic Input, 1 Dynamic Output")
+    void testLogicE() {
+        executeSqlFile(new File(Sql.Logic.E));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(5);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-E"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(2);
-        assertThat(logic.getInputPin("i[0]").getValue()).isEqualTo(true);
-        assertThat(logic.getInputPin("i[1]").getValue()).isEqualTo(false);
+        assertThat(logic.getInputPin("i[0]").getUid()).isEqualTo(createUid("uid-pin-logic-E#i[0]"));
+        assertThat(logic.getInputPin("i[1]").getUid()).isEqualTo(createUid("uid-pin-logic-E#i[1]"));
 
         assertThat(logic.getOutputConnectors()).hasSize(1);
         assertThat(logic.getOutputPins()).hasSize(2);
-        assertThat(logic.getOutputPin("o[0]").getValue()).isEqualTo(false);
-        assertThat(logic.getOutputPin("o[1]").getValue()).isEqualTo(true);
+        assertThat(logic.getOutputPin("o[0]").getUid()).isEqualTo(createUid("uid-pin-logic-E#o[0]"));
+        assertThat(logic.getOutputPin("o[1]").getUid()).isEqualTo(createUid("uid-pin-logic-E#o[1]"));
     }
 
     /**
-     * {@link test.components.LogicH}
+     * {@link LogicF}
+     * Input:
+     * - 1 Static (String)
+     * - 1 Dynamic (String, Size=2)
+     * Output:
+     * - 1 Static (String)
+     * - 1 Dynamic (String, Size=3)
+     */
+    @Test
+    @DisplayName("Logic F: 1 Static Input, 1 Dynamic Input, 1 Static Output, 1 Dynamic Output")
+    void testLogicF() {
+        executeSqlFile(new File(Sql.Logic.F));
+
+        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-F"));
+
+        assertThat(logic.getInputConnectors()).hasSize(2);
+        assertThat(logic.getInputPins()).hasSize(3);
+        assertThat(logic.getInputPin("input").getUid()).isEqualTo(createUid("uid-pin-logic-F#input"));
+        assertThat(logic.getInputPin("inputs[0]").getUid()).isEqualTo(createUid("uid-pin-logic-F#inputs[0]"));
+        assertThat(logic.getInputPin("inputs[1]").getUid()).isEqualTo(createUid("uid-pin-logic-F#inputs[1]"));
+
+        assertThat(logic.getOutputConnectors()).hasSize(2);
+        assertThat(logic.getOutputPins()).hasSize(4);
+        assertThat(logic.getOutputPin("output").getUid()).isEqualTo(createUid("uid-pin-logic-F#output"));
+        assertThat(logic.getOutputPin("outputs[0]").getUid()).isEqualTo(createUid("uid-pin-logic-F#outputs[0]"));
+        assertThat(logic.getOutputPin("outputs[1]").getUid()).isEqualTo(createUid("uid-pin-logic-F#outputs[1]"));
+        assertThat(logic.getOutputPin("outputs[2]").getUid()).isEqualTo(createUid("uid-pin-logic-F#outputs[2]"));
+    }
+
+    /**
+     * {@link LogicG}
      * Input:  8 Static Inputs  (boolean, byte, char,      double, float, int,     long, short)
      * Output: 9 Static Outputs (Boolean, Byte, Character, Double, Float, Integer, Long, Short, String)
      */
     @Test
-    @DisplayName("Logic H: 8 Static Inputs, 9 Static Outputs")
-    void testLogicH() {
+    @DisplayName("Logic G: 8 Static Inputs, 9 Static Outputs")
+    void testLogicG() {
+        executeSqlFile(new File(Sql.Logic.G));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(6);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-G"));
 
         assertThat(logic.getInputConnectors()).hasSize(8);
         assertThat(logic.getInputPins()).hasSize(8);
-        assertThat(logic.getInputPin("inputBooleanPrimitive").getValue()).isEqualTo(true);
-        assertThat(logic.getInputPin("inputBytePrimitive").getValue()).isEqualTo(Byte.MAX_VALUE);
-        assertThat(logic.getInputPin("inputCharacterPrimitive").getValue()).isEqualTo(Character.MAX_VALUE);
-        assertThat(logic.getInputPin("inputDoublePrimitive").getValue()).isEqualTo(Double.MAX_VALUE);
-        assertThat(logic.getInputPin("inputFloatPrimitive").getValue()).isEqualTo(Float.MAX_VALUE);
-        assertThat(logic.getInputPin("inputIntegerPrimitive").getValue()).isEqualTo(Integer.MAX_VALUE);
-        assertThat(logic.getInputPin("inputLongPrimitive").getValue()).isEqualTo(Long.MAX_VALUE);
-        assertThat(logic.getInputPin("inputShortPrimitive").getValue()).isEqualTo(Short.MAX_VALUE);
+        assertThat(logic.getInputPin("inputBooleanPrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputBooleanPrimitive"));
+        assertThat(logic.getInputPin("inputBytePrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputBytePrimitive"));
+        assertThat(logic.getInputPin("inputCharacterPrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputCharacterPrimitive"));
+        assertThat(logic.getInputPin("inputDoublePrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputDoublePrimitive"));
+        assertThat(logic.getInputPin("inputFloatPrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputFloatPrimitive"));
+        assertThat(logic.getInputPin("inputIntegerPrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputIntegerPrimitive"));
+        assertThat(logic.getInputPin("inputLongPrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputLongPrimitive"));
+        assertThat(logic.getInputPin("inputShortPrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputShortPrimitive"));
 
         assertThat(logic.getOutputConnectors()).hasSize(9);
         assertThat(logic.getOutputPins()).hasSize(9);
-        assertThat(logic.getOutputPin("outputBooleanObject").getValue()).isEqualTo(Boolean.FALSE);
-        assertThat(logic.getOutputPin("outputByteObject").getValue()).isEqualTo(Byte.valueOf(Byte.MIN_VALUE));
-        assertThat(logic.getOutputPin("outputCharacterObject").getValue()).isEqualTo(Character.valueOf(Character.MIN_VALUE));
-        assertThat(logic.getOutputPin("outputDoubleObject").getValue()).isEqualTo(Double.valueOf(Double.MIN_VALUE));
-        assertThat(logic.getOutputPin("outputFloatObject").getValue()).isEqualTo(Float.valueOf(Float.MIN_VALUE));
-        assertThat(logic.getOutputPin("outputIntegerObject").getValue()).isEqualTo(Integer.valueOf(Integer.MIN_VALUE));
-        assertThat(logic.getOutputPin("outputLongObject").getValue()).isEqualTo(Long.valueOf(Long.MIN_VALUE));
-        assertThat(logic.getOutputPin("outputShortObject").getValue()).isEqualTo(Short.valueOf(Short.MIN_VALUE));
-        assertThat(logic.getOutputPin("outputString").getValue()).isEqualTo("Lorem Ipsum");
+        assertThat(logic.getOutputPin("outputBooleanObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputBooleanObject"));
+        assertThat(logic.getOutputPin("outputByteObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputByteObject"));
+        assertThat(logic.getOutputPin("outputCharacterObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputCharacterObject"));
+        assertThat(logic.getOutputPin("outputDoubleObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputDoubleObject"));
+        assertThat(logic.getOutputPin("outputFloatObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputFloatObject"));
+        assertThat(logic.getOutputPin("outputIntegerObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputIntegerObject"));
+        assertThat(logic.getOutputPin("outputLongObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputLongObject"));
+        assertThat(logic.getOutputPin("outputShortObject").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputShortObject"));
+        assertThat(logic.getOutputPin("outputString").getUid()).isEqualTo(createUid("uid-pin-logic-G#outputString"));
     }
 
     /**
-     * {@link test.components.LogicI}
+     * {@link LogicH}
      * Input:  8 Dynamic Inputs (Boolean, Byte, Character, Double, Float, Integer, Long, Short)
      * Output: 1 Dynamic Output (String, Size=2)
      */
     @Test
-    @DisplayName("Logic I: 8 Dynamic Inputs, 1 Dynamic Output")
-    void testLogicI() {
+    @DisplayName("Logic H: 8 Dynamic Inputs, 1 Dynamic Output")
+    void testLogicH() {
+        executeSqlFile(new File(Sql.Logic.H));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(7);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-H"));
 
         assertThat(logic.getInputConnectors()).hasSize(8);
         assertThat(logic.getInputPins()).hasSize(16);
-        assertThat(logic.getInputPin("booleans[0]").getValue()).isEqualTo(Boolean.FALSE);
-        assertThat(logic.getInputPin("booleans[1]").getValue()).isEqualTo(Boolean.TRUE);
-        assertThat(logic.getInputPin("bytes[0]").getValue()).isEqualTo(Byte.MIN_VALUE);
-        assertThat(logic.getInputPin("bytes[1]").getValue()).isEqualTo(Byte.MAX_VALUE);
-        assertThat(logic.getInputPin("chars[0]").getValue()).isEqualTo(Character.MIN_VALUE);
-        assertThat(logic.getInputPin("chars[1]").getValue()).isEqualTo(Character.MAX_VALUE);
-        assertThat(logic.getInputPin("doubles[0]").getValue()).isEqualTo(Double.MIN_VALUE);
-        assertThat(logic.getInputPin("doubles[1]").getValue()).isEqualTo(Double.MAX_VALUE);
-        assertThat(logic.getInputPin("floats[0]").getValue()).isEqualTo(Float.MIN_VALUE);
-        assertThat(logic.getInputPin("floats[1]").getValue()).isEqualTo(Float.MAX_VALUE);
-        assertThat(logic.getInputPin("integers[0]").getValue()).isEqualTo(Integer.MIN_VALUE);
-        assertThat(logic.getInputPin("integers[1]").getValue()).isEqualTo(Integer.MAX_VALUE);
-        assertThat(logic.getInputPin("longs[0]").getValue()).isEqualTo(Long.MIN_VALUE);
-        assertThat(logic.getInputPin("longs[1]").getValue()).isEqualTo(Long.MAX_VALUE);
-        assertThat(logic.getInputPin("shorts[0]").getValue()).isEqualTo(Short.MIN_VALUE);
-        assertThat(logic.getInputPin("shorts[1]").getValue()).isEqualTo(Short.MAX_VALUE);
+        assertThat(logic.getInputPin("booleans[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#booleans[0]"));
+        assertThat(logic.getInputPin("booleans[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#booleans[1]"));
+        assertThat(logic.getInputPin("bytes[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#bytes[0]"));
+        assertThat(logic.getInputPin("bytes[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#bytes[1]"));
+        assertThat(logic.getInputPin("chars[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#chars[0]"));
+        assertThat(logic.getInputPin("chars[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#chars[1]"));
+        assertThat(logic.getInputPin("doubles[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#doubles[0]"));
+        assertThat(logic.getInputPin("doubles[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#doubles[1]"));
+        assertThat(logic.getInputPin("floats[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#floats[0]"));
+        assertThat(logic.getInputPin("floats[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#floats[1]"));
+        assertThat(logic.getInputPin("integers[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#integers[0]"));
+        assertThat(logic.getInputPin("integers[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#integers[1]"));
+        assertThat(logic.getInputPin("longs[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#longs[0]"));
+        assertThat(logic.getInputPin("longs[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#longs[1]"));
+        assertThat(logic.getInputPin("shorts[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#shorts[0]"));
+        assertThat(logic.getInputPin("shorts[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#shorts[1]"));
 
         assertThat(logic.getOutputConnectors()).hasSize(1);
         assertThat(logic.getOutputPins()).hasSize(2);
-        assertThat(logic.getOutputPin("strings[0]").getValue()).isEqualTo("Lorem Ipsum");
-        assertThat(logic.getOutputPin("strings[1]").getValue()).isEqualTo("Dolor Sit Amet");
+        assertThat(logic.getOutputPin("strings[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#strings[0]"));
+        assertThat(logic.getOutputPin("strings[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#strings[1]"));
     }
 
     /**
-     * {@link test.components.LogicJ}
+     * {@link LogicI}
      * Input: 2x Static (int, int)
      * Output: 2x Static (String, String)
      */
     @Test
-    @DisplayName("Logic J: 2 Static Inputs, 2 Static Outputs")
-    void testLogicJ() {
+    @DisplayName("Logic I: 2 Static Inputs, 2 Static Outputs")
+    void testLogicI() {
+        executeSqlFile(new File(Sql.Logic.I));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(8);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-I"));
 
         assertThat(logic.getInputConnectors()).hasSize(2);
         assertThat(logic.getInputPins()).hasSize(2);
-        assertThat(logic.getInputPin("inputFirst").getValue()).isEqualTo(4711);
-        assertThat(logic.getInputPin("inputSecond").getValue()).isEqualTo(13);
+        assertThat(logic.getInputPin("inputFirst").getUid()).isEqualTo(createUid("uid-pin-logic-I#inputFirst"));
+        assertThat(logic.getInputPin("inputSecond").getUid()).isEqualTo(createUid("uid-pin-logic-I#inputSecond"));
 
         assertThat(logic.getOutputConnectors()).hasSize(2);
         assertThat(logic.getOutputPins()).hasSize(2);
-        assertThat(logic.getOutputPin("outputFirst").getValue()).isEqualTo("Hello");
-        assertThat(logic.getOutputPin("outputSecond").getValue()).isEqualTo("World");
+        assertThat(logic.getOutputPin("outputFirst").getUid()).isEqualTo(createUid("uid-pin-logic-I#outputFirst"));
+        assertThat(logic.getOutputPin("outputSecond").getUid()).isEqualTo(createUid("uid-pin-logic-I#outputSecond"));
     }
 
     /**
-     * Tests the loading of {@link test.components.LogicK} component
+     * Tests the loading of {@link LogicJ} component
      * Input: 2x Dynamic (Integer, Size=3 / Integer, Size=2)</li>
      * Output: 2x Dynamic (String, Size=4 / String, Size=2)</li>
      */
     @Test
-    @DisplayName("Logic K: 2 Dynamic Inputs, 2 Dynamic Outputs")
-    void testLogicK() {
+    @DisplayName("Logic J: 2 Dynamic Inputs, 2 Dynamic Outputs")
+    void testLogicJ() {
+        executeSqlFile(new File(Sql.Logic.J));
+
         final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
-                .loadById(9);
+                .loadById(1);
+
+        assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-J"));
 
         assertThat(logic.getInputConnectors()).hasSize(2);
         assertThat(logic.getInputPins()).hasSize(5);
-        assertThat(logic.getInputPin("inputFirst[0]").getValue()).isEqualTo(1024);
-        assertThat(logic.getInputPin("inputFirst[1]").getValue()).isEqualTo(4201);
-        assertThat(logic.getInputPin("inputFirst[2]").getValue()).isEqualTo(2014);
-        assertThat(logic.getInputPin("inputSecond[0]").getValue()).isEqualTo(17);
-        assertThat(logic.getInputPin("inputSecond[1]").getValue()).isEqualTo(71);
+        assertThat(logic.getInputPin("inputFirst[0]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputFirst[0]"));
+        assertThat(logic.getInputPin("inputFirst[1]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputFirst[1]"));
+        assertThat(logic.getInputPin("inputFirst[2]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputFirst[2]"));
+        assertThat(logic.getInputPin("inputSecond[0]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputSecond[0]"));
+        assertThat(logic.getInputPin("inputSecond[1]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputSecond[1]"));
 
         assertThat(logic.getOutputConnectors()).hasSize(2);
         assertThat(logic.getOutputPins()).hasSize(6);
-        assertThat(logic.getOutputPin("outputFirst[0]").getValue()).isEqualTo("Hello");
-        assertThat(logic.getOutputPin("outputFirst[1]").getValue()).isEqualTo("olleH");
-        assertThat(logic.getOutputPin("outputFirst[2]").getValue()).isEqualTo("lloeH");
-        assertThat(logic.getOutputPin("outputFirst[3]").getValue()).isEqualTo("Hoell");
-        assertThat(logic.getOutputPin("outputSecond[0]").getValue()).isEqualTo("World");
-        assertThat(logic.getOutputPin("outputSecond[1]").getValue()).isEqualTo("dlroW");
+        assertThat(logic.getOutputPin("outputFirst[0]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputFirst[0]"));
+        assertThat(logic.getOutputPin("outputFirst[1]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputFirst[1]"));
+        assertThat(logic.getOutputPin("outputFirst[2]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputFirst[2]"));
+        assertThat(logic.getOutputPin("outputFirst[3]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputFirst[3]"));
+        assertThat(logic.getOutputPin("outputSecond[0]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputSecond[0]"));
+        assertThat(logic.getOutputPin("outputSecond[1]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputSecond[1]"));
     }
 
     @Test
     @DisplayName("Logic (JAR): JAR file not loaded/scanned yet, MyFooBarLogic is not present")
     void testLogicFooBar_NotLoadedYet() {
+        executeSqlFile(new File(Sql.Logic.JAR_FOOBAR));
+
         final var componentFactory = new ComponentFactory();
         final var loader = new LogicComponentLoader(databaseManager, componentFactory);
 
-        assertThatThrownBy(() -> loader.loadById(10))
+        assertThatThrownBy(() -> loader.loadById(1))
                 .isInstanceOf(NoLogicClassFound.class)
                 .hasMessage("No Logic Class found: my.logic.MyFooBarLogic");
     }
@@ -282,6 +361,8 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Logic (JAR): JAR file scanned, MyFooBarLogic is present")
     void testLogicFooBar_Loaded() throws IOException {
+        executeSqlFile(new File(Sql.Logic.JAR_FOOBAR));
+
         final var componentFactory = new ComponentFactory();
         final var loader = new LogicComponentLoader(databaseManager, componentFactory);
 
@@ -289,16 +370,16 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         componentFactory.getLogicRepository().scanLogicClasses(Paths.get("."));
 
         // Step 2: Load from database and wrap the logic from JAR file
-        final var logic = loader.loadById(10);
+        final var logic = loader.loadById(1);
 
         assertThat(logic.getWrappedObject().getClass().getName()).isEqualTo("my.logic.MyFooBarLogic");
 
         assertThat(logic.getInputConnectors()).hasSize(1);
         assertThat(logic.getInputPins()).hasSize(1);
-        assertThat(logic.getInputPin("inputText").getValue()).isEqualTo("foo");
+        assertThat(logic.getInputPin("inputText")).isNotNull();
 
         assertThat(logic.getOutputConnectors()).hasSize(1);
         assertThat(logic.getOutputPins()).hasSize(1);
-        assertThat(logic.getOutputPin("outputText").getValue()).isEqualTo("bar");
+        assertThat(logic.getOutputPin("outputText")).isNotNull();
     }
 }

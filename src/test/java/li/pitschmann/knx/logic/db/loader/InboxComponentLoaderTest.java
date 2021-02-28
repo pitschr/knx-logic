@@ -17,7 +17,6 @@
 
 package li.pitschmann.knx.logic.db.loader;
 
-import li.pitschmann.knx.logic.db.DatabaseManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.BaseDatabaseSuite;
@@ -33,24 +32,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class InboxComponentLoaderTest extends BaseDatabaseSuite {
 
-    @Override
-    public void afterDatabaseStart(final DatabaseManager databaseManager) {
-        databaseManager.executeSqlFile(new File(Sql.INSERT_INBOX_COMPONENT_SAMPLES));
-        assertThat(componentsDao().size()).isEqualTo(3);
-        assertThat(connectorsDao().size()).isEqualTo(4);
-        assertThat(pinsDao().size()).isEqualTo(4);
-    }
-
     @Test
     @DisplayName("Inbox: KNX DPT-1 (bool value)")
     void testInboxWithKnxDpt1() {
+        executeSqlFile(new File(Sql.Inbox.DPT1));
+
         final var component = new InboxComponentLoader(databaseManager).loadById(1);
 
-        assertThat(component.getUid()).hasToString("uid-component-inbox-A");
+        assertThat(component.getUid()).hasToString("uid-component-inbox-DPT1");
         assertThat(component.getOutputConnectors()).hasSize(1);
         assertThat(component.getOutputPins()).hasSize(1);
-        assertThat(component.getOutputPin("boolValue").getValue()).isEqualTo(Boolean.TRUE);
-        assertThat(component.getOutputPin("boolValue").getUid()).hasToString("uid-pin-inbox-A#boolValue");
+        assertThat(component.getOutputPin("boolValue").getUid()).hasToString("uid-pin-inbox-DPT1#boolValue");
 
         // input specific
         assertThat(component.getEventKey().getChannel()).isEqualTo("knx");
@@ -60,15 +52,15 @@ class InboxComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Inbox: KNX DPT-2 (controlled, bool value)")
     void testInboxWithKnxDpt2() {
-        final var component = new InboxComponentLoader(databaseManager).loadById(2);
+        executeSqlFile(new File(Sql.Inbox.DPT2));
 
-        assertThat(component.getUid()).hasToString("uid-component-inbox-B");
+        final var component = new InboxComponentLoader(databaseManager).loadById(1);
+
+        assertThat(component.getUid()).hasToString("uid-component-inbox-DPT2");
         assertThat(component.getOutputConnectors()).hasSize(2);
         assertThat(component.getOutputPins()).hasSize(2);
-        assertThat(component.getOutputPin("controlled").getValue()).isEqualTo(Boolean.TRUE);
-        assertThat(component.getOutputPin("controlled").getUid()).hasToString("uid-pin-inbox-B#controlled");
-        assertThat(component.getOutputPin("boolValue").getValue()).isEqualTo(Boolean.FALSE);
-        assertThat(component.getOutputPin("boolValue").getUid()).hasToString("uid-pin-inbox-B#boolValue");
+        assertThat(component.getOutputPin("controlled").getUid()).hasToString("uid-pin-inbox-DPT2#controlled");
+        assertThat(component.getOutputPin("boolValue").getUid()).hasToString("uid-pin-inbox-DPT2#boolValue");
 
         // input specific
         assertThat(component.getEventKey().getChannel()).isEqualTo("knx");
@@ -78,13 +70,14 @@ class InboxComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Inbox: VARIABLE (string)")
     void testInboxWithVariableChannel() {
-        final var component = new InboxComponentLoader(databaseManager).loadById(3);
+        executeSqlFile(new File(Sql.Inbox.VAR));
 
-        assertThat(component.getUid()).hasToString("uid-component-inbox-C");
+        final var component = new InboxComponentLoader(databaseManager).loadById(1);
+
+        assertThat(component.getUid()).hasToString("uid-component-inbox-VAR");
         assertThat(component.getOutputConnectors()).hasSize(1);
         assertThat(component.getOutputPins()).hasSize(1);
-        assertThat(component.getOutputPin("data").getValue()).isEqualTo("Hello World");
-        assertThat(component.getOutputPin("data").getUid()).hasToString("uid-pin-inbox-C#data");
+        assertThat(component.getOutputPin("data").getUid()).hasToString("uid-pin-inbox-VAR#data");
 
         // input specific
         assertThat(component.getEventKey().getChannel()).isEqualTo("var");

@@ -142,10 +142,8 @@ public class ComponentController {
         if (component != null) {
             // TODO: check if component has at least one link -> protected?
             uidRegistry.deregisterComponent(component);
+            dbManager.dao(ComponentsDao.class).delete(component.getUid());
         }
-
-        final int pk = dbManager.dao(ComponentsDao.class).getByUID(component.getUid()).getId();
-        dbManager.dao(ComponentsDao.class).deleteById(pk);
 
         ctx.status(204);
     }

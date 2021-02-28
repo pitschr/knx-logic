@@ -24,15 +24,15 @@ public final class PinModel extends Model {
     }
 
     public int getConnectorId() {
-        return this.connectorId;
+        return connectorId;
     }
 
     public UID getUid() {
-        return this.uid;
+        return uid;
     }
 
     public int getIndex() {
-        return this.index;
+        return index;
     }
 
     @Override
@@ -71,7 +71,7 @@ public final class PinModel extends Model {
         }
 
         public PinModel build() {
-            PinModel model = new PinModel();
+            final var model = new PinModel();
             model.connectorId = this.connectorId;
             model.uid = this.uid;
             model.index = this.index;

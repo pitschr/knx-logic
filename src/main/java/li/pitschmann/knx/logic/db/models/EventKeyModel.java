@@ -1,9 +1,10 @@
 package li.pitschmann.knx.logic.db.models;
 
 import li.pitschmann.knx.core.utils.Strings;
+import li.pitschmann.knx.logic.event.EventKey;
 
 /**
- * Database model for {@link li.pitschmann.knx.logic.event.EventKey}
+ * Database model for {@link EventKey}
  * holding channel id and the identifier for event
  *
  * @author PITSCHR
@@ -26,24 +27,12 @@ public final class EventKeyModel extends Model {
         return componentId;
     }
 
-    public void setComponentId(int componentId) {
-        this.componentId = componentId;
-    }
-
     public String getChannel() {
         return channel;
     }
 
-    public void setChannel(final String channel) {
-        this.channel = channel;
-    }
-
     public String getKey() {
         return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
     }
 
     @Override

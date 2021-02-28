@@ -7,7 +7,7 @@ import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 /**
- * DAO for Event Key
+ * DAO for 'event_keys' table
  *
  * @author PITSCHR
  */

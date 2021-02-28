@@ -26,23 +26,23 @@ public final class ConnectorModel extends Model {
     }
 
     public int getComponentId() {
-        return this.componentId;
+        return componentId;
     }
 
     public BindingType getBindingType() {
-        return this.bindingType;
+        return bindingType;
     }
 
     public boolean isStatic() {
-        return this.bindingType == BindingType.STATIC;
+        return bindingType == BindingType.STATIC;
     }
 
     public boolean isDynamic() {
-        return this.bindingType == BindingType.DYNAMIC;
+        return bindingType == BindingType.DYNAMIC;
     }
 
     public String getConnectorName() {
-        return this.connectorName;
+        return connectorName;
     }
 
     @Override
@@ -72,17 +72,17 @@ public final class ConnectorModel extends Model {
 
         public Builder bindingType(final Connector connector) {
             if (connector instanceof StaticConnector) {
-                this.bindingType = BindingType.STATIC;
+                bindingType = BindingType.STATIC;
             } else if (connector instanceof DynamicConnector) {
-                this.bindingType = BindingType.DYNAMIC;
+                bindingType = BindingType.DYNAMIC;
             } else {
                 throw new IllegalArgumentException("Unsupported connector: " + connector);
             }
             return this;
         }
 
-        public Builder connectorName(final String name) {
-            this.connectorName = name;
+        public Builder connectorName(final String connectorName) {
+            this.connectorName = connectorName;
             return this;
         }
 

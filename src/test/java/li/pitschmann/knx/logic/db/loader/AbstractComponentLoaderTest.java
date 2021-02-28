@@ -108,9 +108,9 @@ class AbstractComponentLoaderTest extends BaseDatabaseSuite {
 
 
     @Test
-    @DisplayName("Update static ConnectorModel with more than 1 pin")
+    @DisplayName("[ERROR] Update static ConnectorModel with more than 1 pin")
     void testStaticConnectorModelWithMultiplePins() {
-        executeSqlFile(new File(Sql.STATIC_CONNECTOR_DYNAMIC_PINS));
+        executeSqlFile(new File(Sql.ErrorCases.STATIC_CONNECTOR_MODEL_MULTIPLE_PINS));
 
         final var descriptorMock = mock(FieldDescriptor.class);
         final var connectorMock = mock(StaticConnector.class);
@@ -129,9 +129,9 @@ class AbstractComponentLoaderTest extends BaseDatabaseSuite {
     }
 
     @Test
-    @DisplayName("Update Connector and ConnectorModel with incompatible connector types")
+    @DisplayName("[ERROR] Update Connector and ConnectorModel with incompatible connector types")
     void testUpdateWithIncompatibleConnectorTypes() {
-        executeSqlFile(new File(Sql.STATIC_CONNECTOR_DYNAMIC_CONNECTORMODEL));
+        executeSqlFile(new File(Sql.ErrorCases.DYNAMIC_CONNECTOR_MODEL_STATIC_CONNECTOR));
 
         // connector is static
         final var descriptorMock = mock(FieldDescriptor.class);

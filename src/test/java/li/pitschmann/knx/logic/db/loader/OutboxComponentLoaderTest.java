@@ -17,7 +17,6 @@
 
 package li.pitschmann.knx.logic.db.loader;
 
-import li.pitschmann.knx.logic.db.DatabaseManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.BaseDatabaseSuite;
@@ -33,24 +32,17 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 class OutboxComponentLoaderTest extends BaseDatabaseSuite {
 
-    @Override
-    public void afterDatabaseStart(final DatabaseManager databaseManager) {
-        databaseManager.executeSqlFile(new File(Sql.INSERT_OUTBOX_COMPONENT_SAMPLES));
-        assertThat(componentsDao().size()).isEqualTo(3);
-        assertThat(connectorsDao().size()).isEqualTo(4);
-        assertThat(pinsDao().size()).isEqualTo(4);
-    }
-
     @Test
     @DisplayName("Outbox: KNX DPT-1 (bool value)")
     void testOutboxWithKnxDpt1() {
+        executeSqlFile(new File(Sql.Outbox.DPT1));
+
         final var component = new OutboxComponentLoader(databaseManager).loadById(1);
 
-        assertThat(component.getUid()).hasToString("uid-component-outbox-A");
+        assertThat(component.getUid()).hasToString("uid-component-outbox-DPT1");
         assertThat(component.getInputConnectors()).hasSize(1);
         assertThat(component.getInputPins()).hasSize(1);
-        assertThat(component.getInputPin("boolValue").getValue()).isEqualTo(Boolean.FALSE);
-        assertThat(component.getInputPin("boolValue").getUid()).hasToString("uid-pin-outbox-A#boolValue");
+        assertThat(component.getInputPin("boolValue").getUid()).hasToString("uid-pin-outbox-DPT1#boolValue");
 
         // input specific
         assertThat(component.getEventKey().getChannel()).isEqualTo("knx");
@@ -60,15 +52,15 @@ class OutboxComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Outbox: KNX DPT-2 (controlled, bool value)")
     void testOutboxWithKnxDpt2() {
-        final var component = new OutboxComponentLoader(databaseManager).loadById(2);
+        executeSqlFile(new File(Sql.Outbox.DPT2));
 
-        assertThat(component.getUid()).hasToString("uid-component-outbox-B");
+        final var component = new OutboxComponentLoader(databaseManager).loadById(1);
+
+        assertThat(component.getUid()).hasToString("uid-component-outbox-DPT2");
         assertThat(component.getInputConnectors()).hasSize(2);
         assertThat(component.getInputPins()).hasSize(2);
-        assertThat(component.getInputPin("controlled").getValue()).isEqualTo(Boolean.FALSE);
-        assertThat(component.getInputPin("controlled").getUid()).hasToString("uid-pin-outbox-B#controlled");
-        assertThat(component.getInputPin("boolValue").getValue()).isEqualTo(Boolean.TRUE);
-        assertThat(component.getInputPin("boolValue").getUid()).hasToString("uid-pin-outbox-B#boolValue");
+        assertThat(component.getInputPin("controlled").getUid()).hasToString("uid-pin-outbox-DPT2#controlled");
+        assertThat(component.getInputPin("boolValue").getUid()).hasToString("uid-pin-outbox-DPT2#boolValue");
 
         // input specific
         assertThat(component.getEventKey().getChannel()).isEqualTo("knx");
@@ -78,13 +70,14 @@ class OutboxComponentLoaderTest extends BaseDatabaseSuite {
     @Test
     @DisplayName("Outbox: VARIABLE (string)")
     void testOutboxWithVariableChannel() {
-        final var component = new OutboxComponentLoader(databaseManager).loadById(3);
+        executeSqlFile(new File(Sql.Outbox.VAR));
 
-        assertThat(component.getUid()).hasToString("uid-component-outbox-C");
+        final var component = new OutboxComponentLoader(databaseManager).loadById(1);
+
+        assertThat(component.getUid()).hasToString("uid-component-outbox-VAR");
         assertThat(component.getInputConnectors()).hasSize(1);
         assertThat(component.getInputPins()).hasSize(1);
-        assertThat(component.getInputPin("data").getValue()).isEqualTo("Hello Earth");
-        assertThat(component.getInputPin("data").getUid()).hasToString("uid-pin-outbox-C#data");
+        assertThat(component.getInputPin("data").getUid()).hasToString("uid-pin-outbox-VAR#data");
 
         // input specific
         assertThat(component.getEventKey().getChannel()).isEqualTo("var");

@@ -49,9 +49,24 @@ CREATE TABLE pins
 );
 
 --
--- PINS HISTORY
+-- PINS LINKS
 --
-CREATE TABLE pins_history
+CREATE TABLE pin_links
+(
+    id            INT          AUTO_INCREMENT PRIMARY KEY,
+    pin1          INT          NOT NULL,
+    pin2          INT          NOT NULL,
+    creationTs    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modifiedTs    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (pin1) REFERENCES pins (id) ON DELETE CASCADE,
+    FOREIGN KEY (pin2) REFERENCES pins (id) ON DELETE CASCADE,
+    CONSTRAINT pin_links_unique UNIQUE (pin1, pin2)
+);
+
+--
+-- HISTORY for pins
+--
+CREATE TABLE pin_values
 (
     id            INT            AUTO_INCREMENT PRIMARY KEY,
     pinId         INT            NOT NULL,
@@ -60,6 +75,7 @@ CREATE TABLE pins_history
     creationTs    TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (pinId) REFERENCES pins (id) ON DELETE CASCADE
 );
+CREATE INDEX pin_values_desc_index ON pin_values (pinId, id DESC);
 
 --
 -- EVENT KEYS
@@ -80,7 +96,7 @@ CREATE TABLE event_keys
 --
 -- LOGIC DIAGRAM
 --
-CREATE TABLE diagram -- other names: logic_scheme
+CREATE TABLE diagrams -- other names: logic_scheme
 (
     id          INT            AUTO_INCREMENT PRIMARY KEY,
     name        VARCHAR(100)   NOT NULL,
@@ -96,13 +112,13 @@ CREATE TABLE diagram -- other names: logic_scheme
 CREATE TABLE diagram_components
 (
     id          INT            AUTO_INCREMENT PRIMARY KEY,
+    diagramId   INT            NOT NULL,
     componentId INT            NOT NULL,
-    layoutId    INT            NOT NULL,
-    position_x  INT            NOT NULL DEFAULT 0,
-    position_y  INT            NOT NULL DEFAULT 0,
+    positionX   INT            NOT NULL DEFAULT 0,
+    positionY   INT            NOT NULL DEFAULT 0,
     creationTs  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTs  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (layoutId) REFERENCES diagram (id) ON DELETE CASCADE,
+    FOREIGN KEY (diagramId) REFERENCES diagrams (id) ON DELETE CASCADE,
     FOREIGN KEY (componentId) REFERENCES components (id) ON DELETE CASCADE,
     CONSTRAINT diagram_components_uq UNIQUE (componentId)
 );
@@ -113,12 +129,12 @@ CREATE TABLE diagram_components
 CREATE TABLE diagram_links
 (
     id             INT            AUTO_INCREMENT PRIMARY KEY,
-    sourceUid      INT            NOT NULL,
-    targetUid      INT            NOT NULL,
-    svg_path_data  VARCHAR(500)   NOT NULL,  -- format: M 100 100 h 80 v80 ...
+    diagramId      INT            NOT NULL,
+    pinLinkId      INT            NOT NULL,
+    svgPath        VARCHAR(500)   NOT NULL,  -- format: M 100 100 h 80 v80 ...
     creationTs     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTs     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (sourceUid) REFERENCES pins (id) ON DELETE CASCADE,
-    FOREIGN KEY (targetUid) REFERENCES pins (id) ON DELETE CASCADE,
-    CONSTRAINT diagram_links_uq UNIQUE (sourceUid, targetUid)
-)
+    FOREIGN KEY (diagramId) REFERENCES diagrams (id) ON DELETE CASCADE,
+    FOREIGN KEY (pinLinkId) REFERENCES pin_links (id) ON DELETE CASCADE,
+    CONSTRAINT diagram_links_uq UNIQUE (diagramId, pinLinkId)
+);

@@ -1,11 +1,12 @@
 package li.pitschmann.knx.logic.db.models;
 
 import li.pitschmann.knx.core.utils.Strings;
+import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.db.jdbi.mappers.ComponentType;
 import li.pitschmann.knx.logic.uid.UID;
 
 /**
- * Database model for any {@link li.pitschmann.knx.logic.components.Component}
+ * Database model for any {@link Component}
  *
  * @author PITSCHR
  */

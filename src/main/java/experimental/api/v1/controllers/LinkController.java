@@ -87,7 +87,7 @@ public class LinkController {
             return;
         }
 
-        final var pinUids = router.getSubscribers(pin).stream().map(Pin::getUid).collect(Collectors.toList());
+        final var pinUids = router.getLinkedPins(pin).stream().map(Pin::getUid).collect(Collectors.toList());
         ctx.status(HttpServletResponse.SC_OK);
         ctx.json(pinUids);
     }

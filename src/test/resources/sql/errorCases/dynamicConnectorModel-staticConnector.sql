@@ -1,7 +1,9 @@
 --
 -- Test with wrong SQL data:
 --
--- Connector is a static but contains 3 pins
+-- Model Connector is dynamic
+--   BindingType#STATIC (ordinal = 0)
+--   BindingType#DYNAMIC (ordinal = 1)
 --
 INSERT INTO components (componentType, className, uid)           VALUES (1, 'li.pitschmann.knx.logic.components.inbox.DPT1Inbox', 'uid-component-static'); -- component: 1
 INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (1, 1, 'barName');                                                                 -- connector: 1

@@ -4,26 +4,62 @@ import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.annotations.Input;
 import li.pitschmann.knx.logic.annotations.Output;
 
-import java.util.List;
-
 /**
- * Logic Component with 1 static input, 1 dynamic input,
- * 1 static output and 1 dynamic output
+ * Logic Component with 8 static inputs, 9 static outputs
  *
  * @author PITSCHR
  */
-public final class LogicG implements Logic {
+public class LogicG implements Logic {
     @Input
-    private Boolean input;
-
-    @Input
-    private List<Boolean> inputs;
+    private boolean inputBooleanPrimitive; // Input #1, Total #1
 
     @Output
-    private boolean output;
+    private Boolean outputBooleanObject; // Output #1, Total #2
+
+    @Input
+    private byte inputBytePrimitive; // Input #2, Total #3
 
     @Output
-    private List<Boolean> outputs;
+    private Byte outputByteObject; // Output #2, Total #4
+
+    @Input
+    private char inputCharacterPrimitive; // Input #3, Total #5
+
+    @Output
+    private Character outputCharacterObject; // Output #3, Total #6
+
+    @Input
+    private double inputDoublePrimitive; // Input #4, Total #7
+
+    @Output
+    private Double outputDoubleObject; // Output #4, Total #8
+
+    @Input
+    private float inputFloatPrimitive; // Input #5, Total #9
+
+    @Output
+    private Float outputFloatObject; // Output #5, Total #10
+
+    @Input
+    private int inputIntegerPrimitive; // Input #6, Total #11
+
+    @Output
+    private Integer outputIntegerObject; // Output #6, Total #12
+
+    @Input
+    private long inputLongPrimitive; // Input #7, Total #13
+
+    @Output
+    private Long outputLongObject; // Output #7, Total #14
+
+    @Input
+    private short inputShortPrimitive; // Input #8, Total #15
+
+    @Output
+    private Short outputShortObject; // Output #8, Total #16
+
+    @Output
+    private String outputString; // Output #9, Total #17
 
     @Override
     public void logic() {

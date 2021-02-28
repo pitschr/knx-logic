@@ -38,7 +38,7 @@ class PerformanceDatabaseTest extends BaseDatabaseSuite {
         performanceDao = dao(PerformanceDao.class);
 
         // Prepare test
-        databaseManager.executeSqlFile(new File(Sql.PERFORMANCE_TEST));
+        databaseManager.executeSqlFile(new File(Sql.General.PERFORMANCE_TEST));
         assertThat(performanceDao.size()).isZero();
 
         // perform a warm-up

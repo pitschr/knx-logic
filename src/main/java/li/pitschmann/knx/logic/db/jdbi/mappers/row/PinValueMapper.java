@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Database mapper to return the value from {@code PINS_HISTORY} database table.
+ * Database mapper to return the value from {@code PIN_VALUES} database table.
  */
 public class PinValueMapper implements RowMapper<Object> {
 

@@ -19,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -57,7 +56,7 @@ final class RouterInternal {
      * {@link Pin} it is connected.
      * </p>
      */
-    private final Map<Pin, Set<Pin>> routingMap = Maps.newHashMap(1000);
+    private final Map<Pin, Set<Pin>> linkMap = Maps.newHashMap(1000);
 
     /**
      * <p>
@@ -119,19 +118,17 @@ final class RouterInternal {
      * @param target the target that should receive the value (e.g. input pin, ...)
      */
     public void link(final Pin source, final Pin target) {
-        routingMap
-                .computeIfAbsent(source, key -> new LinkedHashSet<>()) // linked to be used because of ordering guarantee
+        linkMap.computeIfAbsent(source, key -> new LinkedHashSet<>()) // linked to be used because of ordering guarantee
                 .add(target);
 
-        routingMap
-                .computeIfAbsent(target, key -> new LinkedHashSet<>())
+        linkMap.computeIfAbsent(target, key -> new LinkedHashSet<>())
                 .add(source);
 
         // for detailed logging purposes only to see the mapping of source/target pins
         if (log.isTraceEnabled()) {
             log.trace(
                     "LINK:\n{}",
-                    routingMap.entrySet()
+                    linkMap.entrySet()
                             .stream()
                             .map(e ->
                                     "Source: " + e.getKey().getUid() + ", Targets: " + e.getValue().stream().map(Pin::getUid).collect(Collectors.toList()))
@@ -149,7 +146,7 @@ final class RouterInternal {
      * @param pin the pin whose links should be unlinked
      */
     public void unlink(final Pin pin) {
-        final var otherPins = routingMap.get(pin);
+        final var otherPins = linkMap.get(pin);
         if (otherPins != null) {
             // copy of list because we change the routingMap in method 'unlink' (avoid ConcurrentModificationException)
             List.copyOf(otherPins).forEach(sourcePin -> unlink(sourcePin, pin));
@@ -159,7 +156,7 @@ final class RouterInternal {
         if (log.isTraceEnabled()) {
             log.trace(
                     "UNLINK:\n{}",
-                    routingMap.entrySet()
+                    linkMap.entrySet()
                             .stream()
                             .map(e -> "Source: " + e.getKey().getUid() + ", Targets: " + e.getValue().stream().map(Pin::getUid).collect(Collectors.toList()))
                             .collect(Collectors.joining(System.lineSeparator()))
@@ -176,19 +173,19 @@ final class RouterInternal {
      * @param target the target that should receive the value (e.g. input pin, ...)
      */
     public void unlink(final Pin source, final Pin target) {
-        final var subscribersBySource = routingMap.get(source);
-        if (subscribersBySource != null) {
-            subscribersBySource.remove(target);
-            if (subscribersBySource.isEmpty()) {
-                routingMap.remove(source); // remove the key when there are no targets available anymore
+        final var targets = linkMap.get(source);
+        if (targets != null) {
+            targets.remove(target);
+            if (targets.isEmpty()) {
+                linkMap.remove(source); // remove the key when there are no targets available anymore
             }
         }
 
-        final var subscribersByTarget = routingMap.get(target);
-        if (subscribersByTarget != null) {
-            subscribersByTarget.remove(source);
-            if (subscribersByTarget.isEmpty()) {
-                routingMap.remove(target); // remove the key when there are no targets available anymore
+        final var sources = linkMap.get(target);
+        if (sources != null) {
+            sources.remove(source);
+            if (sources.isEmpty()) {
+                linkMap.remove(target); // remove the key when there are no targets available anymore
             }
         }
 
@@ -196,15 +193,15 @@ final class RouterInternal {
     }
 
     /**
-     * Returns a list of subscribers by given {@link Pin}
+     * Returns a list of {@link Pin} that are linked with given {@link Pin}
      *
-     * @param pin the pin as a source to gather connected pins
-     * @return an immutable list of connected pins
+     * @param pin the given pin to gather linked pins
+     * @return an immutable list of linked pins
      */
-    public List<Pin> getSubscribers(final Pin pin) {
-        final var subscribers = routingMap.get(pin);
-        if (subscribers != null && !subscribers.isEmpty()) {
-            return List.copyOf(subscribers);
+    public List<Pin> getLinkedPins(final Pin pin) {
+        final var linkedPins = linkMap.get(pin);
+        if (linkedPins != null && !linkedPins.isEmpty()) {
+            return List.copyOf(linkedPins);
         }
         return List.of();
     }
@@ -240,31 +237,31 @@ final class RouterInternal {
      * The loop of forwarding that passed a value from component A to B.
      *
      * @param context      the context of routing
-     * @param origin       the current {@link UIDAware} (e.g. Pin) where the value comes from
+     * @param source       the current {@link UIDAware} (e.g. Pin) where the value comes from
      * @param value        the value to be processed; may be null
      * @param workflow     the workflow for pass-through
      * @param workflowList list of workflow to be collected and returned
      */
     private void forwardInternal(final RouterContext context,
-                                 final Pin origin,
+                                 final Pin source,
                                  final @Nullable Object value,
                                  final Workflow workflow,
                                  final List<Workflow> workflowList) {
-        final var subscribers = routingMap.get(origin);
-        if (subscribers == null || subscribers.isEmpty()) {
-            log.debug("Dead End for '{}': {}", origin, workflow);
+        final var targets = linkMap.get(source);
+        if (targets == null || targets.isEmpty()) {
+            log.debug("Dead End for '{}': {}", source, workflow);
             workflowList.add(workflow);
         } else {
-            for (final var subscriber : subscribers) {
+            for (final var target : targets) {
                 if (log.isDebugEnabled()) {
-                    log.debug("{} ==> {}", origin.getUid(), subscriber.getUid());
+                    log.debug("{} ==> {}", source.getUid(), target.getUid());
                 }
 
-                final var newWorkflow = workflow.add(subscriber, value);
+                final var newWorkflow = workflow.add(target, value);
 
                 // convert the value if necessary
-                final var newValue = convertValue(origin, subscriber, value);
-                forwardPin(context, subscriber, newValue, newWorkflow, workflowList);
+                final var newValue = convertValue(source, target, value);
+                forwardPin(context, target, newValue, newWorkflow, workflowList);
             }
         }
     }
@@ -361,54 +358,67 @@ final class RouterInternal {
      * <p>
      * In case the value could not be converted a {@link RouterException} will be thrown.
      *
-     * @param originPin the pin where the value comes from
-     * @param nextPin   the pin that should set with the value
+     * @param source the pin where the value comes from
+     * @param target   the pin that should set with the value
      * @param value     the given value; may be null
      * @return the value; may not be null
      * @throws RouterException in case the conversion was not possible
      */
-    private Object convertValue(final Pin originPin,
-                                final Pin nextPin,
+    private Object convertValue(final Pin source,
+                                final Pin target,
                                 final @Nullable Object value) {
-        final var nextValueClass = nextPin.getDescriptor().getFieldType();
+        final var targetFieldType = target.getDescriptor().getFieldType();
         if (value == null) {
-            final var newValue = ValueHelper.getDefaultValueFor(nextValueClass);
-            log.debug("Converted NULL value to '{}' for: originPin={}, nextPin={}", newValue, originPin.getUid(), nextPin.getUid());
+            final var newValue = ValueHelper.getDefaultValueFor(targetFieldType);
+            log.debug("Converted NULL value to '{}' (type: {}): source={}, target={}",
+                    newValue, targetFieldType, source.getUid(), target.getUid());
             return newValue;
         }
 
-        final var valueClass = value.getClass();
-        if (nextValueClass.equals(valueClass)) {
-            // OK, same class - no conversion required
+        final var valueType = value.getClass();
+
+        // OK, class is assignable - no conversion required
+        if (targetFieldType.isAssignableFrom(valueType)) {
+            log.debug("No conversion required for value '{}' (type: {}=>{}): source={}, target={}",
+                    value, valueType, targetFieldType, source.getUid(), target.getUid());
             return value;
-        } else if (nextValueClass.isAssignableFrom(valueClass)) {
-            // OK, class is assignable - no conversion required
-            log.debug("No conversion required for value '{}' (type: {}=>{}): originPin={}, nextPin={}",
-                    value, valueClass, nextValueClass, originPin.getUid(), nextPin.getUid());
-            return value;
-        } else {
-            // Conversion required, will try with conversion
+        }
+        // Conversion required, will try with conversion
+        else {
             Object convertedValue = null;
-            if (valueClass == Character.class) {
-                char castedValue = (char) value;
-                if (nextValueClass == String.class) {
-                    convertedValue = Character.toString(castedValue);
+            // Any object -> String
+            if (targetFieldType == String.class) {
+                convertedValue = String.valueOf(value);
+            }
+            // Boolean -> Number (1, 1.0)
+            else if (valueType == Boolean.class
+                    && Number.class.isAssignableFrom(targetFieldType)) {
+                convertedValue = Boolean.TRUE.equals(value) ? 1 : 0;
+            }
+            // Number (1, 1.0) -> Boolean
+            else if (Number.class.isAssignableFrom(valueType) && targetFieldType == Boolean.class) {
+                final var iValue = (int)value;
+                if (iValue == 0) {
+                    convertedValue = Boolean.FALSE;
+                } else if (iValue == 1) {
+                    convertedValue = Boolean.TRUE;
                 }
             }
 
             // Conversion was successful?
             if (convertedValue != null) {
-                log.debug("Converted from '{}' to '{}': {}", valueClass, nextValueClass, convertedValue);
+                log.debug("Converted from '{}' to '{}' (type: {}=>{}): source={}, target={}",
+                        value, convertedValue, valueType, targetFieldType, source.getUid(), target.getUid());
                 return convertedValue;
             }
         }
 
         // not compatible
-        throw new RouterException(String.format(
-                "The type of value '%s' (value: %s) is not compatible with '%s': " +
-                        "originPin=%s => nextPin=%s",
-                valueClass, value, nextValueClass,
-                originPin.getUid(), nextPin.getUid()
-        ));
+        throw new RouterException(
+                String.format(
+                        "The type of value '%s' (value: %s) is not compatible with '%s': source=%s => target=%s",
+                        valueType, value, targetFieldType, source.getUid(), target.getUid()
+                )
+        );
     }
 }

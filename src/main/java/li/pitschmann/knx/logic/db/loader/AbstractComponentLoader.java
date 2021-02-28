@@ -169,15 +169,9 @@ abstract class AbstractComponentLoader<T extends Component> {
         final var uid = Objects.requireNonNull(pinModel.getUid());
         pin.setUid(uid);
 
-        // set the last value, if found
-        final var lastValue = databaseManager.dao(PinsDao.class).getLastValueById(pinModel.getId());
-        if (lastValue != null) {
-            pin.setValue(lastValue);
-        }
-
         // log
-        LOG.trace("Static Pin {} (connectorId: {}, fieldId: {}, value: {})", pin.getUid(), connectorModel.getId(),
-                pinModel.getId(), lastValue);
+        LOG.trace("Static Pin {} (connectorId: {}, fieldId: {})", //
+                pin.getUid(), connectorModel.getId(), pinModel.getId());
     }
 
     /**
@@ -204,15 +198,9 @@ abstract class AbstractComponentLoader<T extends Component> {
             final var uid = Objects.requireNonNull(pinModel.getUid());
             pin.setUid(uid);
 
-            // set the last value, if found
-            final var lastValue = databaseManager.dao(PinsDao.class).getLastValueById(pinModel.getId());
-            if (lastValue != null) {
-                pin.setValue(lastValue);
-            }
-
             // log
-            LOG.trace("Dynamic Pin {} (connectorId: {}, fieldId: {}, index: {}, value: {})", pin.getUid(),
-                    connectorModel.getId(), pinModel.getId(), pinModel.getIndex(), lastValue);
+            LOG.trace("Dynamic Pin {} (connectorId: {}, fieldId: {}, index: {})", //
+                    pin.getUid(), connectorModel.getId(), pinModel.getId(), pinModel.getIndex());
         }
     }
 

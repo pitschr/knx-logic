@@ -4,62 +4,40 @@ import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.annotations.Input;
 import li.pitschmann.knx.logic.annotations.Output;
 
+import java.util.List;
+
 /**
- * Logic Component with 8 static inputs, 9 static outputs
+ * Logic Component with 8 dynamic inputs, 1 dynamic output
  *
  * @author PITSCHR
  */
 public class LogicH implements Logic {
     @Input
-    private boolean inputBooleanPrimitive; // Input #1, Total #1
-
-    @Output
-    private Boolean outputBooleanObject; // Output #1, Total #2
+    private List<Boolean> booleans; // Input #1, Total #1
 
     @Input
-    private byte inputBytePrimitive; // Input #2, Total #3
-
-    @Output
-    private Byte outputByteObject; // Output #2, Total #4
+    private List<Byte> bytes; // Input #2, Total #2
 
     @Input
-    private char inputCharacterPrimitive; // Input #3, Total #5
-
-    @Output
-    private Character outputCharacterObject; // Output #3, Total #6
+    private List<Character> chars; // Input #3, Total #3
 
     @Input
-    private double inputDoublePrimitive; // Input #4, Total #7
-
-    @Output
-    private Double outputDoubleObject; // Output #4, Total #8
+    private List<Double> doubles; // Input #4, Total #4
 
     @Input
-    private float inputFloatPrimitive; // Input #5, Total #9
-
-    @Output
-    private Float outputFloatObject; // Output #5, Total #10
+    private List<Float> floats; // Input #5, Total #5
 
     @Input
-    private int inputIntegerPrimitive; // Input #6, Total #11
-
-    @Output
-    private Integer outputIntegerObject; // Output #6, Total #12
+    private List<Integer> integers; // Input #6, Total #6
 
     @Input
-    private long inputLongPrimitive; // Input #7, Total #13
-
-    @Output
-    private Long outputLongObject; // Output #7, Total #14
+    private List<Long> longs; // Input #7, Total #7
 
     @Input
-    private short inputShortPrimitive; // Input #8, Total #15
+    private List<Short> shorts; // Input #8, Total #8
 
     @Output
-    private Short outputShortObject; // Output #8, Total #16
-
-    @Output
-    private String outputString; // Output #9, Total #17
+    private List<String> strings; // Output #1, Total #9
 
     @Override
     public void logic() {

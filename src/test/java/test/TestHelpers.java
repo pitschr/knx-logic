@@ -14,6 +14,8 @@ import li.pitschmann.knx.logic.components.outbox.VariableOutbox;
 import li.pitschmann.knx.logic.event.Event;
 import li.pitschmann.knx.logic.event.EventKey;
 import li.pitschmann.knx.logic.event.VariableEventChannel;
+import li.pitschmann.knx.logic.uid.UID;
+import li.pitschmann.knx.logic.uid.UIDFactory;
 
 import java.util.UUID;
 
