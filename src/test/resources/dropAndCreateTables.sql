@@ -60,7 +60,8 @@ CREATE TABLE pin_links
     modifiedTs    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (pin1) REFERENCES pins (id) ON DELETE CASCADE,
     FOREIGN KEY (pin2) REFERENCES pins (id) ON DELETE CASCADE,
-    CONSTRAINT pin_links_unique UNIQUE (pin1, pin2)
+    CONSTRAINT pin_links_unique UNIQUE (pin1, pin2),
+    CONSTRAINT pin_links_integrity CHECK (pin1 < pin2)  -- ensures that pin1 id has lower value than pin2 id
 );
 
 --
@@ -103,7 +104,7 @@ CREATE TABLE diagrams -- other names: logic_scheme
     description VARCHAR(4000),
     creationTs  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTs  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT diagram_uq UNIQUE (name)
+    CONSTRAINT diagram_unique UNIQUE (name)
 );
 
 --
@@ -120,7 +121,7 @@ CREATE TABLE diagram_components
     modifiedTs  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (diagramId) REFERENCES diagrams (id) ON DELETE CASCADE,
     FOREIGN KEY (componentId) REFERENCES components (id) ON DELETE CASCADE,
-    CONSTRAINT diagram_components_uq UNIQUE (componentId)
+    CONSTRAINT diagram_components_unique UNIQUE (componentId)
 );
 
 --
@@ -136,5 +137,5 @@ CREATE TABLE diagram_links
     modifiedTs     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (diagramId) REFERENCES diagrams (id) ON DELETE CASCADE,
     FOREIGN KEY (pinLinkId) REFERENCES pin_links (id) ON DELETE CASCADE,
-    CONSTRAINT diagram_links_uq UNIQUE (diagramId, pinLinkId)
+    CONSTRAINT diagram_links_unique UNIQUE (diagramId, pinLinkId)
 );

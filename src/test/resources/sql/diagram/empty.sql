@@ -7,7 +7,8 @@
 --  Diagram
 -- -----------------------------------------------------------------
 -- Diagram: Layout
-INSERT INTO diagrams (name, description) VALUES ("Diagram - Empty", "Diagram Description - Empty");
+INSERT INTO diagrams (name, description) VALUES
+    ('Diagram - Empty', 'Diagram Description - Empty');
 
 -- Diagram: Components
 -- N/A
