@@ -1,9 +1,10 @@
 package li.pitschmann.knx.logic.db;
 
-import org.jdbi.v3.core.Handle;
 import org.jdbi.v3.sqlobject.statement.SqlBatch;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.RepeatedTest;
 import test.BaseDatabaseSuite;
 
@@ -16,11 +17,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Database Performance Test for INSERTS (difference between each query, handle and batch)
- *
- * @author PITSCHR
  */
-// @Disabled // To enable it - just remove the @Disabled
-class PerformanceDatabaseTest extends BaseDatabaseSuite {
+@Disabled
+class PerformanceInsertTest extends BaseDatabaseSuite {
     private static final int NUMBER_OF_ITERATIONS = 1000;
     private static final int NUMBER_OF_REPEATED_TESTS = 5;
     private static final int NUMBER_OF_WARM_UP_ITERATIONS = 3;
@@ -61,28 +60,22 @@ class PerformanceDatabaseTest extends BaseDatabaseSuite {
         assertThat(performanceDao.size()).isEqualTo(totalSizeWarmUp + NUMBER_OF_ITERATIONS);
     }
 
-    /**
-     * Performance Test with execute SQL query every time
-     */
     @RepeatedTest(NUMBER_OF_REPEATED_TESTS)
+    @DisplayName("Performance Test: QUERIES.forEach(DatabaseManager::executeSqlQuery)")
     void testSqlQueryPerformance() {
         QUERIES.forEach(databaseManager::executeSqlQuery);
     }
 
-    /**
-     * Performance Test with execute SQL queries using {@link Handle}
-     */
     @RepeatedTest(NUMBER_OF_REPEATED_TESTS)
+    @DisplayName("Performance Test with Handle: QUERIES.forEach(Handle::execute)")
     void testHandlePerformance() {
         try (final var h = jdbi().open()) {
             QUERIES.forEach(h::execute);
         }
     }
 
-    /**
-     * Batch Performance Test
-     */
     @RepeatedTest(NUMBER_OF_REPEATED_TESTS)
+    @DisplayName("Batch Performance Test: QUERIES.forEach(Batch::add)")
     void testBatchPerformance() {
         try (final var h = jdbi().open()) {
             final var batch = h.createBatch();
@@ -91,26 +84,20 @@ class PerformanceDatabaseTest extends BaseDatabaseSuite {
         }
     }
 
-    /**
-     * DAO Performance Test
-     */
     @RepeatedTest(NUMBER_OF_REPEATED_TESTS)
+    @DisplayName("DAO Performance Test: QUERIES.forEach(DAO::insert)")
     void testDaoWithForEachInsertPerformance() {
         QUERIES.forEach(performanceDao::insert);
     }
 
-    /**
-     * DAO Batch Performance Test
-     */
     @RepeatedTest(NUMBER_OF_REPEATED_TESTS)
+    @DisplayName("DAO Batch Performance Test: DAO.insertBatch(QUERIES)")
     void testDaoWithInsertBatchPerformance() {
         performanceDao.insertBatch(QUERIES);
     }
 
     /**
      * Performance DAO
-     *
-     * @author PITSCHR
      */
     public interface PerformanceDao {
         @SqlQuery("SELECT COUNT(*) FROM performance")
