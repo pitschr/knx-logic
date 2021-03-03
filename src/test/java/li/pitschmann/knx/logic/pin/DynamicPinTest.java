@@ -50,13 +50,13 @@ public class DynamicPinTest {
 
         // toString()
         assertThat(dynamicPin_0).hasToString(
-                String.format("DynamicPin{uid=%s, fieldName=inputFields, fieldClassName=java.lang.Integer, index=0, value=23, refresh=true}", dynamicPin_0.getUid())
+                String.format("DynamicPin{uid=%s, fieldName=inputFields[0], fieldType=java.lang.Integer, value=23, refresh=true}", dynamicPin_0.getUid())
         );
         assertThat(dynamicPin_1).hasToString(
-                String.format("DynamicPin{uid=%s, fieldName=inputFields, fieldClassName=java.lang.Integer, index=1, value=29, refresh=true}", dynamicPin_1.getUid())
+                String.format("DynamicPin{uid=%s, fieldName=inputFields[1], fieldType=java.lang.Integer, value=29, refresh=true}", dynamicPin_1.getUid())
         );
         assertThat(dynamicPin_2).hasToString(
-                String.format("DynamicPin{uid=%s, fieldName=inputFields, fieldClassName=java.lang.Integer, index=2, value=31, refresh=true}", dynamicPin_2.getUid())
+                String.format("DynamicPin{uid=%s, fieldName=inputFields[2], fieldType=java.lang.Integer, value=31, refresh=true}", dynamicPin_2.getUid())
         );
     }
 
@@ -91,7 +91,7 @@ public class DynamicPinTest {
 
         // toString()
         assertThat(dynamicPin).hasToString(
-                String.format("DynamicPin{uid=%s, fieldName=inputFields, fieldClassName=java.lang.Integer, index=1, value=37, refresh=false}", dynamicPin.getUid())
+                String.format("DynamicPin{uid=%s, fieldName=inputFields[1], fieldType=java.lang.Integer, value=37, refresh=false}", dynamicPin.getUid())
         );
     }
 
@@ -116,7 +116,7 @@ public class DynamicPinTest {
         when(descriptorMock.getOwner()).thenReturn(owner);
         when(descriptorMock.getField()).thenReturn(field);
         when(descriptorMock.getName()).thenReturn(field.getName());
-        doReturn(Integer.class).when(descriptorMock).getFieldValueClass();
+        doReturn(Integer.class).when(descriptorMock).getFieldType();
 
         final var connectorMock = mock(DynamicConnector.class);
         when(connectorMock.getDescriptor()).thenReturn(descriptorMock);

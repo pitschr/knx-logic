@@ -7,8 +7,10 @@ import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
+import java.util.List;
+
 /**
- * DAO for components
+ * DAO for 'components' table
  *
  * @author PITSCHR
  */
@@ -16,15 +18,23 @@ public interface ComponentsDao {
     /**
      * Returns the total size for all components
      *
-     * @return
+     * @return the total size of components
      */
     @SqlQuery("SELECT COUNT(*) FROM components")
     int size();
 
     /**
+     * Returns all components
+     *
+     * @return list of {@link ComponentModel}
+     */
+    @SqlQuery("SELECT * FROM components")
+    List<ComponentModel> all();
+
+    /**
      * Returns the component for given {@code id}
      *
-     * @param id primary key of component
+     * @param id the identifier of component
      * @return {@link ComponentModel}
      */
     @SqlQuery("SELECT * FROM components WHERE id = ?")
@@ -37,7 +47,7 @@ public interface ComponentsDao {
      * @return {@link ComponentModel}
      */
     @SqlQuery("SELECT * FROM components WHERE uid = ?")
-    ComponentModel getByUid(final UID uid);
+    ComponentModel getByUID(final UID uid);
 
     /**
      * Inserts a new {@link ComponentModel} into database
@@ -61,9 +71,8 @@ public interface ComponentsDao {
     /**
      * Deletes an existing {@link ComponentModel} from database
      *
-     * @param id the identifier / primary key of component
-     * @return if delete was sucecssful
+     * @param uid UID of model to be deleted
      */
-    @SqlUpdate("DELETE FROM components WHERE id = :id")
-    void deleteById(final int id);
+    @SqlUpdate("DELETE FROM components WHERE uid = :uid")
+    void delete(final UID uid);
 }

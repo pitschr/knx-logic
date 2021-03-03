@@ -42,7 +42,7 @@ class OutboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         final var componentModel = componentDao.getById(1);
         assertThat(componentModel)
                 .componentType(ComponentType.OUTBOX)
-                .className(VariableOutbox.class);
+                .className(VariableOutbox.class.getName());
         assertThat(componentModel.getUid()).isNotNull();
 
         // ---------------------------------
@@ -65,8 +65,6 @@ class OutboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorId(1)
                 .index(0);
         assertThat(pin.getUid()).isNotNull();
-
-        assertThat(pinsDao.getLastValueById(1)).isNull();
 
         // ---------------------------------
         // Verification: EventKey
@@ -97,13 +95,8 @@ class OutboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(pinsDao.size()).isEqualTo(1);
         assertThat(eventKeyDao().size()).isEqualTo(1);
 
-        assertThat(pinsDao.getLastValueById(1)).isNull(); // not set yet!
-
         // ---------------------------------
         // Update Statement #1
-        //   * Submit a value to the outbox component
-        //
-        // Here we expect that the last value has been stored correctly
         // ---------------------------------
         outbox.getInputPin("data").setValue("updateValueChangeValue");
         save(outbox);
@@ -113,25 +106,6 @@ class OutboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(1);
         assertThat(pinsDao.size()).isEqualTo(1);
         assertThat(eventKeyDao.size()).isEqualTo(1);
-
-        assertThat(pinsDao.getLastValueById(1)).isEqualTo("updateValueChangeValue");
-
-        // ---------------------------------
-        // Update Statement #2
-        //   * Submit a value to the outbox component
-        //
-        // Here we expect that the last value has been stored correctly
-        // ---------------------------------
-        outbox.getInputPin("data").setValue("updateValueChangeValue_2");
-        save(outbox);
-
-        // Verification after 1st update
-        assertThat(componentDao.size()).isEqualTo(1);
-        assertThat(connectorsDao.size()).isEqualTo(1);
-        assertThat(pinsDao.size()).isEqualTo(1);
-        assertThat(eventKeyDao.size()).isEqualTo(1);
-
-        assertThat(pinsDao.getLastValueById(1)).isEqualTo("updateValueChangeValue_2");
     }
 
 }

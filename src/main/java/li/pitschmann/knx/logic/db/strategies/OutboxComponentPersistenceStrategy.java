@@ -30,7 +30,7 @@ public class OutboxComponentPersistenceStrategy extends AbstractComponentPersist
 
         final var componentModel = ComponentModel.builder()
                 .uid(component.getUid())
-                .className(component.getWrappedObject().getClass())
+                .className(component.getWrappedObject().getClass().getName())
                 .componentType(ComponentType.OUTBOX)
                 .build();
 

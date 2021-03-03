@@ -20,12 +20,6 @@ import java.util.List;
 public class PlanController {
     private static final Logger LOG = LoggerFactory.getLogger(PlanController.class);
 
-    private final ComponentFactory componentFactory;
-
-    public PlanController(final ComponentFactory componentFactory) {
-        this.componentFactory = componentFactory;
-    }
-
     /**
      * Returns all plans
      *

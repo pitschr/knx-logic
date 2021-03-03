@@ -4,17 +4,19 @@ import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.annotations.Input;
 import li.pitschmann.knx.logic.annotations.Output;
 
+import java.util.List;
+
 /**
- * Logic Component with 2 static inputs, 2 static output
+ * Logic Component with 2 dynamic inputs, 2 dynamic output
  *
  * @author PITSCHR
  */
 public class LogicJ implements Logic {
     @Input
-    private int inputFirst, inputSecond;
+    private List<Integer> inputFirst, inputSecond;
 
     @Output
-    private String outputFirst, outputSecond;
+    private List<String> outputFirst, outputSecond;
 
     @Override
     public void logic() {

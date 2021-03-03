@@ -1,6 +1,7 @@
 package experimental.api.v1.strategies;
 
 import li.pitschmann.knx.logic.LogicRepository;
+import li.pitschmann.knx.logic.exceptions.NoLogicClassFound;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.components.LogicC;
@@ -45,11 +46,11 @@ public class LogicCreateStrategyTest {
     @DisplayName("Create Logic Component for an unregistered Logic")
     public void createLogicComponentForUnregistered() {
         final var logicRepositoryMock = mock(LogicRepository.class);
-        doThrow(new NoSuchElementException()).when(logicRepositoryMock).findLogicClass(anyString());
+        doThrow(new NoLogicClassFound("")).when(logicRepositoryMock).findLogicClass(anyString());
 
         final var data = Map.of("class", "logic.mockClass");
 
         final var strategy = new LogicCreateStrategy(logicRepositoryMock);
-        assertThatThrownBy(() -> strategy.apply(data)).isInstanceOf(NoSuchElementException.class);
+        assertThatThrownBy(() -> strategy.apply(data)).isInstanceOf(NoLogicClassFound.class);
     }
 }

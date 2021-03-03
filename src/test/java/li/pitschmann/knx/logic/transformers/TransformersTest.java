@@ -26,7 +26,7 @@ public class TransformersTest {
 
         assertThatThrownBy(() -> Transformers.transform("", Class.class))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Could not find a matching transformer for: class java.lang.Class");
+                .hasMessage("Could not find a matching transformer for: java.lang.Class");
 
     }
 

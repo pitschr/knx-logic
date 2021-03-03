@@ -14,7 +14,7 @@ import java.util.Objects;
 public class FieldDescriptor implements Descriptor {
     private final Object owner;
     private final Field field;
-    private final Class<?> fieldValueClass;
+    private final Class<?> fieldType;
 
     /**
      * Package-private Constructor for {@link FieldDescriptor}
@@ -25,7 +25,7 @@ public class FieldDescriptor implements Descriptor {
     FieldDescriptor(final Object owner, final Field field) {
         this.owner = Objects.requireNonNull(owner);
         this.field = Objects.requireNonNull(field);
-        this.fieldValueClass = Objects.requireNonNull(ValueHelper.getFieldValueClass(field));
+        this.fieldType = Objects.requireNonNull(ValueHelper.getFieldType(field));
     }
 
     /**
@@ -55,10 +55,10 @@ public class FieldDescriptor implements Descriptor {
      * {@code private List<Boolean> myField;} would be {@code Boolean}<br>
      * {@code private Boolean myField;}would be {@code Boolean}<br>
      *
-     * @return class of field value; may not be null
+     * @return type of field value; may not be null
      */
-    public Class<?> getFieldValueClass() {
-        return fieldValueClass;
+    public Class<?> getFieldType() {
+        return fieldType;
     }
 
     /**
@@ -75,7 +75,7 @@ public class FieldDescriptor implements Descriptor {
         return Strings.toStringHelper(this)
                 .add("owner", owner) //
                 .add("field", field) //
-                .add("fieldValueClass", fieldValueClass) //
+                .add("fieldType", fieldType) //
                 .toString();
     }
 }

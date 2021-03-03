@@ -53,9 +53,8 @@ class StaticConnectorTest {
         assertThat(pin.getDescriptor()).isSameAs(connector.getDescriptor());
         assertThat(pin.getValue()).isEqualTo(false); // default instantiated value
 
-        final var descriptor = connector.getDescriptor();
         assertThat(connector).hasToString(
-                String.format("StaticConnector{descriptor=%s, pin=%s}", descriptor, pin)
+                String.format("StaticConnector{fieldName=i, fieldType=java.lang.Boolean, pin=%s}", pin.getUid())
         );
     }
 

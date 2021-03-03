@@ -4,40 +4,17 @@ import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.annotations.Input;
 import li.pitschmann.knx.logic.annotations.Output;
 
-import java.util.List;
-
 /**
- * Logic Component with 8 dynamic inputs, 1 dynamic output
+ * Logic Component with 2 static inputs, 2 static output
  *
  * @author PITSCHR
  */
 public class LogicI implements Logic {
     @Input
-    private List<Boolean> booleans; // Input #1, Total #1
-
-    @Input
-    private List<Byte> bytes; // Input #2, Total #2
-
-    @Input
-    private List<Character> chars; // Input #3, Total #3
-
-    @Input
-    private List<Double> doubles; // Input #4, Total #4
-
-    @Input
-    private List<Float> floats; // Input #5, Total #5
-
-    @Input
-    private List<Integer> integers; // Input #6, Total #6
-
-    @Input
-    private List<Long> longs; // Input #7, Total #7
-
-    @Input
-    private List<Short> shorts; // Input #8, Total #8
+    private int inputFirst, inputSecond;
 
     @Output
-    private List<String> strings; // Output #1, Total #9
+    private String outputFirst, outputSecond;
 
     @Override
     public void logic() {

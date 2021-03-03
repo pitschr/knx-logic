@@ -43,7 +43,7 @@ class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         final var componentModel = componentDao.getById(1);
         assertThat(componentModel)
                 .componentType(ComponentType.INBOX)
-                .className(VariableInbox.class);
+                .className(VariableInbox.class.getName());
         assertThat(componentModel.getUid()).isNotNull();
 
         // ---------------------------------
@@ -65,8 +65,6 @@ class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorId(1)
                 .index(0);
         assertThat(pin.getUid()).isNotNull();
-
-        assertThat(pinsDao.getLastValueById(1)).isNull(); // not set yet!
 
         // ---------------------------------
         // Verification: EventKey
@@ -97,41 +95,17 @@ class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(pinsDao.size()).isEqualTo(1);
         assertThat(eventKeyDao().size()).isEqualTo(1);
 
-        assertThat(pinsDao.getLastValueById(1)).isNull(); // not set yet!
-
         // ---------------------------------
         // Update Statement #1
-        //   * Submit a value to the inbox component
-        //
-        // Here we expect that the last value has been stored correctly
         // ---------------------------------
         inbox.onNext("updateValueChangeValue");
         save(inbox);
 
-        // Verification after 1st update
+        // Verification after 1st update - should remain same
         assertThat(componentDao.size()).isEqualTo(1);
         assertThat(connectorsDao.size()).isEqualTo(1);
         assertThat(pinsDao.size()).isEqualTo(1);
         assertThat(eventKeyDao.size()).isEqualTo(1);
-
-        assertThat(pinsDao.getLastValueById(1)).isEqualTo("updateValueChangeValue");
-
-        // ---------------------------------
-        // Update Statement #2
-        //   * Submit a value to the inbox component
-        //
-        // Here we expect that the last value has been stored correctly
-        // ---------------------------------
-        inbox.onNext("updateValueChangeValue_2");
-        save(inbox);
-
-        // Verification after 1st update
-        assertThat(componentDao.size()).isEqualTo(1);
-        assertThat(connectorsDao.size()).isEqualTo(1);
-        assertThat(pinsDao.size()).isEqualTo(1);
-        assertThat(eventKeyDao.size()).isEqualTo(1);
-
-        assertThat(pinsDao.getLastValueById(1)).isEqualTo("updateValueChangeValue_2");
     }
 
 }

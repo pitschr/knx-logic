@@ -50,7 +50,7 @@ public interface Connector {
      * @return {@code true} if compatible, otherwise {@code false}
      */
     default boolean isCompatibleWith(final Class<?> compatibleClass) {
-        return getDescriptor().getFieldValueClass().isAssignableFrom(compatibleClass);
+        return getDescriptor().getFieldType().isAssignableFrom(compatibleClass);
     }
 
     /**

@@ -60,7 +60,7 @@ public final class Transformers {
 
         @SuppressWarnings("unchecked") final var transformer = (Transformer<T>) TRANSFORMERS.get(targetClass);
         if (transformer == null) {
-            throw new IllegalArgumentException("Could not find a matching transformer for: " + targetClass);
+            throw new IllegalArgumentException("Could not find a matching transformer for: " + targetClass.getName());
         }
         return transformer.transform(value);
     }

@@ -1,17 +1,18 @@
 package li.pitschmann.knx.logic.db.models;
 
 import li.pitschmann.knx.core.utils.Strings;
+import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.db.jdbi.mappers.ComponentType;
 import li.pitschmann.knx.logic.uid.UID;
 
 /**
- * Database model for any {@link li.pitschmann.knx.logic.components.Component}
+ * Database model for any {@link Component}
  *
  * @author PITSCHR
  */
 public final class ComponentModel extends Model {
     private UID uid;
-    private Class<?> className; // cannot rename to 'class' :-(
+    private String className;
     private ComponentType componentType;
 
     /**
@@ -27,7 +28,7 @@ public final class ComponentModel extends Model {
         return uid;
     }
 
-    public Class<?> getClassName() {
+    public String getClassName() {
         return className;
     }
 
@@ -39,7 +40,7 @@ public final class ComponentModel extends Model {
     public String toString() {
         return Strings.toStringHelper(this) //
                 .add("uid", uid) //
-                .add("className", className.getName()) //
+                .add("className", className) //
                 .add("componentType", componentType) //
                 .toString();
     }
@@ -51,7 +52,7 @@ public final class ComponentModel extends Model {
      */
     public static class Builder {
         private UID uid;
-        private Class<?> className;
+        private String className;
         private ComponentType componentType;
 
         public Builder uid(final UID uid) {
@@ -59,7 +60,7 @@ public final class ComponentModel extends Model {
             return this;
         }
 
-        public Builder className(final Class<?> className) {
+        public Builder className(final String className) {
             this.className = className;
             return this;
         }

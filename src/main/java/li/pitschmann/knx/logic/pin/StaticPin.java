@@ -37,7 +37,7 @@ public final class StaticPin extends AbstractPin<StaticConnector> {
         final var descriptor = getDescriptor();
         final var obj = ReflectHelper.getInternalValue(descriptor.getOwner(), descriptor.getField());
         if (obj == null) {
-            final var defaultValue = ValueHelper.getDefaultValueFor(descriptor.getFieldValueClass());
+            final var defaultValue = ValueHelper.getDefaultValueFor(descriptor.getFieldType());
             ReflectHelper.setInternalValue(descriptor.getOwner(), descriptor.getField(), defaultValue);
             LOG.debug("Static Pin '{}' initialized with default value: {}", getUid(), defaultValue);
         } else {
@@ -58,7 +58,7 @@ public final class StaticPin extends AbstractPin<StaticConnector> {
         final var valueChanged = !Objects.equals(oldValue, newValue);
         if (valueChanged || isAlwaysTrigger()) {
             if (newValue == null) {
-                ReflectHelper.setInternalValue(getDescriptor().getOwner(), getDescriptor().getField(), ValueHelper.getDefaultValueFor(getDescriptor().getFieldValueClass()));
+                ReflectHelper.setInternalValue(getDescriptor().getOwner(), getDescriptor().getField(), ValueHelper.getDefaultValueFor(getDescriptor().getFieldType()));
             } else {
                 ReflectHelper.setInternalValue(getDescriptor().getOwner(), getDescriptor().getField(), newValue);
             }
@@ -76,7 +76,7 @@ public final class StaticPin extends AbstractPin<StaticConnector> {
         return Strings.toStringHelper(this) //
                 .add("uid", getUid()) //
                 .add("fieldName", getDescriptor().getName()) //
-                .add("fieldClassName", getDescriptor().getFieldValueClass().getName()) //
+                .add("fieldType", getDescriptor().getFieldType().getName()) //
                 .add("value", getValue()) //
                 .add("refresh", isRefresh()) //
                 .toString();

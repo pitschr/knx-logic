@@ -20,6 +20,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -44,7 +45,7 @@ public final class DynamicConnector extends AbstractConnector
     private static final int FIELD_INITIAL_SIZE = 16; // hopefully big enough for most cases!
 
     private final AtomicReference<List<Object>> dynamicListReference = new AtomicReference<>();
-    private final List<DynamicPin> internalPins = new ArrayList<>(FIELD_INITIAL_SIZE);
+    private final List<DynamicPin> pins = new ArrayList<>(FIELD_INITIAL_SIZE);
     private final ReentrantReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = this.readWriteLock.readLock();
     private final Lock writeLock = this.readWriteLock.writeLock();
@@ -59,7 +60,7 @@ public final class DynamicConnector extends AbstractConnector
         super(descriptor);
 
         // set the default value for each (new) dynamic pins
-        defaultValue = ValueHelper.getDefaultValueFor(descriptor.getFieldValueClass());
+        defaultValue = ValueHelper.getDefaultValueFor(descriptor.getFieldType());
 
         initializeDynamicPins(descriptor);
         integrityDynamicPinCheck();
@@ -112,7 +113,7 @@ public final class DynamicConnector extends AbstractConnector
     public List<DynamicPin> getPins() {
         this.readLock.lock();
         try {
-            return List.copyOf(this.internalPins);
+            return List.copyOf(this.pins);
         } finally {
             integrityDynamicPinCheck();
             this.readLock.unlock();
@@ -124,7 +125,7 @@ public final class DynamicConnector extends AbstractConnector
     public DynamicPin getPin(final int index) {
         this.readLock.lock();
         try {
-            return this.internalPins.get(index);
+            return this.pins.get(index);
         } finally {
             integrityDynamicPinCheck();
             this.readLock.unlock();
@@ -155,12 +156,14 @@ public final class DynamicConnector extends AbstractConnector
 
             // create new
             final var newPin = new DynamicPin(this, index);
-            this.internalPins.add(index, newPin);
+            this.pins.add(index, newPin);
 
             // verify&correct index
-            this.correctIndex(this.internalPins);
+            this.correctIndex(this.pins);
 
-            LOG.debug("New dynamic pin added at index {}: {}", index, newPin);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("New dynamic pin added: {}[{}] (owner={})", getDescriptor().getName(), index, getDescriptor().getOwner());
+            }
             return newPin;
         } finally {
             integrityDynamicPinCheck();
@@ -183,7 +186,9 @@ public final class DynamicConnector extends AbstractConnector
                 for (int i = 0; i < delta; i++) {
                     tmpPins.add(addPin());
                 }
-                LOG.debug("New dynamic pin added: {}", tmpPins);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("{} new dynamic pin added for: {}", tmpPins.size(), getDescriptor().getOwner());
+                }
                 return List.copyOf(tmpPins);
             }
         } finally {
@@ -208,11 +213,11 @@ public final class DynamicConnector extends AbstractConnector
             }
 
             this.dynamicListReference.get().remove(index);
-            final var oldPin = this.internalPins.remove(index);
+            final var oldPin = this.pins.remove(index);
             LOG.debug("Dynamic pin removed from list index {}: {}", index, oldPin.getUid());
 
             // verify&correct index
-            this.correctIndex(this.internalPins);
+            this.correctIndex(this.pins);
 
             return oldPin;
         } finally {
@@ -226,7 +231,7 @@ public final class DynamicConnector extends AbstractConnector
         this.writeLock.lock();
         try {
             this.dynamicListReference.get().clear();
-            this.internalPins.clear();
+            this.pins.clear();
 
             tryIncrease(minimumOfOccurrences());
         } finally {
@@ -273,17 +278,17 @@ public final class DynamicConnector extends AbstractConnector
         }
 
         if (corrected) {
-            LOG.debug("Index order of 'internalPins' now: {}", this.internalPins);
+            LOG.debug("Index order of 'internalPins' now: {}", this.pins);
         }
     }
 
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
-                .add("descriptor", getDescriptor()) //
+                .add("fieldName", getDescriptor().getName()) //
+                .add("fieldType", getDescriptor().getFieldType().getName()) //
                 .add("defaultValue", defaultValue) //
-                .add("internalPins", internalPins) //
-                .add("dynamicListReference", dynamicListReference) //
+                .add("pins", pins.stream().map(DynamicPin::getUid).collect(Collectors.toList())) //
                 .toString();
     }
 
@@ -294,26 +299,26 @@ public final class DynamicConnector extends AbstractConnector
     private void integrityDynamicPinCheck() {
         this.readLock.lock();
         try {
-            final var checkInternalPins = List.copyOf(this.internalPins);
+            final var checkPins = List.copyOf(this.pins);
             final var checkDynamicListValues = new ArrayList<>(this.dynamicListReference.get()); // as it may contain null values
 
             // verify if the size of internalPins and dynamicPinReferences matches
-            Preconditions.checkState(checkDynamicListValues.size() == checkInternalPins.size(),
-                    "Size of 'dynamicListReference' and 'internalPins' doesn't match! (dynamicListReference: {}, internalPins: {})",
-                    checkDynamicListValues.size(), checkInternalPins.size());
+            Preconditions.checkState(checkDynamicListValues.size() == checkPins.size(),
+                    "Size of 'dynamicListReference' and 'pins' doesn't match! (dynamicListReference: {}, pins: {})",
+                    checkDynamicListValues.size(), checkPins.size());
 
             // deep check (value check, index check)
             if (FIELD_SYNC_DEEP_CHECK) {
-                for (var i = 0; i < checkInternalPins.size(); i++) {
-                    final var internalVal = checkInternalPins.get(i).getValue();
+                for (var i = 0; i < checkPins.size(); i++) {
+                    final var internalVal = checkPins.get(i).getValue();
                     final var referenceVal = checkDynamicListValues.get(i);
 
-                    Preconditions.checkState(checkInternalPins.get(i).getIndex() == i,
-                            "Index of 'internalPins' doesn't match with current index '{}'! (internalPins.index: {})", i,
-                            checkInternalPins.get(i).getIndex());
+                    Preconditions.checkState(checkPins.get(i).getIndex() == i,
+                            "Index of 'pins' doesn't match with current index '{}'! (pins.index: {})", i,
+                            checkPins.get(i).getIndex());
 
                     Preconditions.checkState(Objects.equals(internalVal, referenceVal),
-                            "Value of 'dynamicListReference' and 'internalPins' doesn't match! (dynamicListReference[{}]: {}, internalPins[{}]: {})",
+                            "Value of 'dynamicListReference' and 'pins' doesn't match! (dynamicListReference[{}]: {}, pins[{}]: {})",
                             i, referenceVal, i, internalVal);
                 }
             }

@@ -37,11 +37,11 @@ public class OutputDescriptorTest {
                                 "owner=%s, " +  //
                                 "name=null, " + //
                                 "field=%s, " +  //
-                                "fieldValueClass=%s, " + //
+                                "fieldType=java.lang.String, " + //
                                 "min=1, " + //
                                 "max=1, " + //
                                 "alwaysTrigger=false}",
-                        objectMock, fieldMock, String.class)
+                        objectMock, fieldMock)
         );
     }
 
@@ -64,11 +64,11 @@ public class OutputDescriptorTest {
                                 "owner=%s, " +  //
                                 "name=null, " + //
                                 "field=%s, " +  //
-                                "fieldValueClass=%s, " + //
+                                "fieldType=java.lang.Long, " + //
                                 "min=19, " + //
                                 "max=21, " + //
                                 "alwaysTrigger=true}",
-                        componentMock, fieldMock, Long.class)
+                        componentMock, fieldMock)
         );
     }
 

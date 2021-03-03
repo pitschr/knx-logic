@@ -69,7 +69,7 @@ public final class LogicRepository {
     public Class<Logic> findLogicClass(final String classAsString) {
         final var logicClass = logicMap.get(classAsString);
         if (logicClass != null) {
-            LOG.debug("Logic class '{}' found: {}", classAsString, logicClass);
+            LOG.debug("Logic class found: {}", logicClass.getName());
             return logicClass;
         }
 
@@ -78,6 +78,6 @@ public final class LogicRepository {
             LOG.debug("No logic class '{}' found in:\n{}", classAsString, logicMap);
         }
 
-        throw new NoLogicClassFound("The logic class could not be found: " + classAsString);
+        throw new NoLogicClassFound("No Logic Class found: " + classAsString);
     }
 }

@@ -8,15 +8,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Test for {@link EventKeyModel}
  */
-public class EventKeyModelTest {
+class EventKeyModelTest {
 
     @Test
     @DisplayName("Basic Test for EventKeyModel")
-    public void test() {
-        final var model = new EventKeyModel();
-        model.setComponentId(6458);
-        model.setChannel("CHANNEL");
-        model.setKey("KEY");
+    void test() {
+        final var model = EventKeyModel.builder()
+                .componentId(6458)
+                .channel("CHANNEL")
+                .key("KEY")
+                .build();
 
         assertThat(model.getChannel()).isEqualTo("CHANNEL");
         assertThat(model.getKey()).isEqualTo("KEY");

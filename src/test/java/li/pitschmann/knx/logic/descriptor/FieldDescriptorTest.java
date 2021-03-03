@@ -13,11 +13,11 @@ import static org.mockito.Mockito.when;
 /**
  * Test for {@link FieldDescriptor}
  */
-public class FieldDescriptorTest {
+class FieldDescriptorTest {
 
     @Test
     @DisplayName("Test the Field Descriptor")
-    public void testDescriptor() {
+    void testDescriptor() {
         final var objectMock = mock(Object.class);
         final var fieldMock = mock(Field.class);
         when(fieldMock.getName()).thenReturn("FIELD-NAME");
@@ -27,12 +27,12 @@ public class FieldDescriptorTest {
         assertThat(descriptor.getOwner()).isSameAs(objectMock);
         assertThat(descriptor.getName()).isEqualTo("FIELD-NAME");
         assertThat(descriptor.getField()).isSameAs(fieldMock);
-        assertThat(descriptor.getFieldValueClass()).isEqualTo(String.class);
+        assertThat(descriptor.getFieldType()).isEqualTo(String.class);
         assertThat(descriptor).hasToString( //
                 String.format("FieldDescriptor{" + //
                                 "owner=%s, " +  //
                                 "field=%s, " +  //
-                                "fieldValueClass=%s}", //
+                                "fieldType=%s}", //
                         objectMock, fieldMock, String.class) //
         );
     }

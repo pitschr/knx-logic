@@ -183,13 +183,13 @@ public final class Router {
     }
 
     /**
-     * Returns a list of subscribers by given {@link Pin}
+     * Returns a list of {@link Pin} that are linked with given {@link Pin}
      *
-     * @param pin the pin as a source to gather connected pins
-     * @return an immutable list of connected pins
+     * @param pin the given pin to gather linked pins
+     * @return an immutable list of linked pins
      */
-    public List<Pin> getSubscribers(final Pin pin) {
-        return routerInternal.getSubscribers(pin);
+    public List<Pin> getLinkedPins(final Pin pin) {
+        return routerInternal.getLinkedPins(pin);
     }
 
     /**
