@@ -235,7 +235,6 @@ abstract class AbstractComponentLoader<T extends Component> {
 
     protected Class<?> loadClass(final String className) {
         try {
-
             return Class.forName(className);
         } catch (final ClassNotFoundException e) {
             throw new LoaderException("Could not find class: " + className, e);
