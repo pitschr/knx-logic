@@ -1,7 +1,7 @@
 package li.pitschmann.knx.logic.db;
 
 import li.pitschmann.knx.core.utils.Preconditions;
-import li.pitschmann.knx.logic.db.strategies.PersistenceStrategy;
+import li.pitschmann.knx.logic.db.persistence.PersistenceStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,8 +24,10 @@ public final class PersistenceManager {
      * @param persistenceStrategy the strategy implementation for persistence
      */
     public final void addPersistenceStrategy(final PersistenceStrategy<?> persistenceStrategy) {
-        strategies.put(persistenceStrategy.compatibleClass(), persistenceStrategy);
-        LOG.debug("Persistence Strategy for type '{}' added.", persistenceStrategy.compatibleClass());
+        for (final var clazz : persistenceStrategy.compatibleClasses()) {
+            strategies.put(clazz, persistenceStrategy);
+            LOG.debug("Persistence Strategy added for type: {}", clazz);
+        }
     }
 
     /**

@@ -4,23 +4,19 @@ import li.pitschmann.knx.logic.uid.StaticUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static li.pitschmann.knx.logic.uid.UIDFactory.createUid;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link PinModel}
  */
-public class PinModelTest {
+class PinModelTest {
 
     @Test
     @DisplayName("Test conversion from Pin to a PinModel")
-    public void test() {
-        final var uidMock = mock(StaticUID.class);
-        when(uidMock.toString()).thenReturn("PIN-UID");
-
+    void test() {
         final var model = PinModel.builder() //
-                .uid(uidMock) //
+                .uid(createUid("PIN-UID")) //
                 .connectorId(21) //
                 .index(23) //
                 .build();
@@ -31,8 +27,8 @@ public class PinModelTest {
 
         assertThat(model).hasToString("PinModel{" + //
                 "id=-1, " + // -1 because of not persisted
-                "connectorId=21, " + //
                 "uid=PIN-UID, " + //
+                "connectorId=21, " + //
                 "index=23" + //
                 "}"
         );

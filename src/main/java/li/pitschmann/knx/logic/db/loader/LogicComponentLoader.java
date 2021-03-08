@@ -72,8 +72,9 @@ public class LogicComponentLoader extends AbstractComponentLoader<LogicComponent
     @Override
     protected Class<?> loadClass(final String className) {
         try {
-            return super.loadClass(className);
-        } catch (final Exception ex) {
+            return Class.forName(className);
+        } catch (final ClassNotFoundException e) {
+            LOG.debug("Search for logic class in the logic repository: {}", className);
             return componentFactory.getLogicRepository().findLogicClass(className);
         }
     }

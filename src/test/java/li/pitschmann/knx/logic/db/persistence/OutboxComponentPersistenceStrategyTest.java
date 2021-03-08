@@ -1,6 +1,6 @@
-package li.pitschmann.knx.logic.db.strategies;
+package li.pitschmann.knx.logic.db.persistence;
 
-import li.pitschmann.knx.logic.components.inbox.VariableInbox;
+import li.pitschmann.knx.logic.components.outbox.VariableOutbox;
 import li.pitschmann.knx.logic.db.jdbi.mappers.BindingType;
 import li.pitschmann.knx.logic.db.jdbi.mappers.ComponentType;
 import li.pitschmann.knx.logic.event.VariableEventChannel;
@@ -12,23 +12,22 @@ import test.TestHelpers;
 import static test.assertions.model.DatabaseAssertions.assertThat;
 
 /**
- * Test case for writing inbox components to database
- * {@link InboxComponentPersistenceStrategy}
+ * Test case for writing outbox components to database
+ * {@link OutboxComponentPersistenceStrategy}
  *
  * @author PITSCHR
  */
-class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
+class OutboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
 
     @Test
-    @DisplayName("Test the INSERT persistence of Inbox Component")
+    @DisplayName("Test the INSERT persistence of Outbox Component")
     void testInsert() {
         final var componentDao = componentsDao();
         final var connectorsDao = connectorsDao();
         final var pinsDao = pinsDao();
-        final var eventKeyDao = eventKeyDao();
 
-        final var inbox = TestHelpers.createInboxComponent("inboxInsertKey");
-        save(inbox);
+        final var outbox = TestHelpers.createOutboxComponent("outboxInsertKey");
+        save(outbox);
 
         // ---------------------------------
         // Verification: Table Size
@@ -40,26 +39,27 @@ class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Verification: Component
         // ---------------------------------
-        final var componentModel = componentDao.getById(1);
+        final var componentModel = componentDao.find(1);
         assertThat(componentModel)
-                .componentType(ComponentType.INBOX)
-                .className(VariableInbox.class.getName());
+                .componentType(ComponentType.OUTBOX)
+                .className(VariableOutbox.class.getName());
         assertThat(componentModel.getUid()).isNotNull();
 
         // ---------------------------------
         // Verification: Connectors
         // ---------------------------------
-        final var connectorTexts = connectorsDao.getById(1);
+        final var connectorTexts = connectorsDao.find(1);
         assertThat(connectorTexts)
                 .id(1)
                 .componentId(1)
                 .bindingType(BindingType.STATIC)
                 .connectorName("data");
+        assertThat(pinsDao.getByConnectorId(1)).hasSize(1);
 
         // ---------------------------------
         // Verification: Pins
         // ---------------------------------
-        final var pin = pinsDao.getById(1);
+        final var pin = pinsDao.find(1);
         assertThat(pin)
                 .id(1)
                 .connectorId(1)
@@ -69,23 +69,23 @@ class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Verification: EventKey
         // ---------------------------------
-        final var eventKey = eventKeyDao.getByComponentId(1);
+        final var eventKey = eventKeyDao().getByComponentId(1);
         assertThat(eventKey).isNotNull();
         assertThat(eventKey.getComponentId()).isEqualTo(1);
         assertThat(eventKey.getChannel()).isEqualTo(VariableEventChannel.CHANNEL_ID);
-        assertThat(eventKey.getKey()).isEqualTo("inboxInsertKey");
+        assertThat(eventKey.getKey()).isEqualTo("outboxInsertKey");
     }
 
     @Test
-    @DisplayName("Test the UPDATE persistence of Inbox Component")
+    @DisplayName("Test the UPDATE persistence of Outbox Component")
     void testUpdate() {
         final var componentDao = componentsDao();
         final var connectorsDao = connectorsDao();
         final var pinsDao = pinsDao();
         final var eventKeyDao = eventKeyDao();
 
-        final var inbox = TestHelpers.createInboxComponent();
-        save(inbox);
+        final var outbox = TestHelpers.createOutboxComponent();
+        save(outbox);
 
         // ---------------------------------
         // Verification before update (initial values)
@@ -98,10 +98,10 @@ class InboxComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Update Statement #1
         // ---------------------------------
-        inbox.onNext("updateValueChangeValue");
-        save(inbox);
+        outbox.getInputPin("data").setValue("updateValueChangeValue");
+        save(outbox);
 
-        // Verification after 1st update - should remain same
+        // Verification after 1st update
         assertThat(componentDao.size()).isEqualTo(1);
         assertThat(connectorsDao.size()).isEqualTo(1);
         assertThat(pinsDao.size()).isEqualTo(1);

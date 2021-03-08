@@ -3,6 +3,8 @@ package li.pitschmann.knx.logic.connector;
 import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.annotations.Input;
 import li.pitschmann.knx.logic.annotations.Output;
+import li.pitschmann.knx.logic.exceptions.MaximumBoundException;
+import li.pitschmann.knx.logic.exceptions.MinimumBoundException;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -127,8 +129,12 @@ class DynamicConnectorTest {
         assertThat(connector.getPins()).containsExactly(pin4, pin1, pin5, pin2, pin3);
 
         // add more pin (will cause issue because max=5)
-        assertThatThrownBy(connector::addPin).isInstanceOf(ArrayIndexOutOfBoundsException.class);
-        assertThatThrownBy(() -> connector.addPin(2)).isInstanceOf(ArrayIndexOutOfBoundsException.class);
+        assertThatThrownBy(connector::addPin)
+                .isInstanceOf(MaximumBoundException.class)
+                .hasMessageStartingWith("Maximum number of pin already reached for connector");
+        assertThatThrownBy(() -> connector.addPin(2))
+                .isInstanceOf(MaximumBoundException.class)
+                .hasMessageStartingWith("Maximum number of pin already reached for connector");
     }
 
     @Test
@@ -194,7 +200,9 @@ class DynamicConnectorTest {
         assertPins(0, connector);
 
         // try to remove one more pin
-        assertThatThrownBy(() -> connector.removePin(0)).isInstanceOf(ArrayIndexOutOfBoundsException.class);
+        assertThatThrownBy(() -> connector.removePin(0))
+                .isInstanceOf(MinimumBoundException.class)
+            .hasMessageStartingWith("Minimum number of pins already reached for connector");
     }
 
     @Test

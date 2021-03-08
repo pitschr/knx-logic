@@ -9,8 +9,8 @@ DROP ALL OBJECTS;
 CREATE TABLE components
 (
     id            INT          AUTO_INCREMENT PRIMARY KEY,
+    uid           VARCHAR(100) NOT NULL DEFAULT CAST(RANDOM_UUID() AS VARCHAR),
     componentType TINYINT      NOT NULL, -- 0=logic, 1=inbox, 2=outbox
-    uid           VARCHAR(100) NOT NULL,
     className     VARCHAR(500) NOT NULL,
     creationTs    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTs    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -23,13 +23,15 @@ CREATE TABLE components
 CREATE TABLE connectors
 (
     id                 INT          AUTO_INCREMENT PRIMARY KEY,
+    uid                VARCHAR(100) NOT NULL DEFAULT CAST(RANDOM_UUID() AS VARCHAR),
     componentId        INT          NOT NULL,
     bindingType        TINYINT      NOT NULL, -- 0=static, 1=dynamic
     connectorName      VARCHAR(100) NOT NULL, -- unique name of connector
     creationTs         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTs         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (componentId) REFERENCES components (id) ON DELETE CASCADE,
-    CONSTRAINT connectors_unique UNIQUE (componentId, connectorName)
+    CONSTRAINT connectors_unique UNIQUE (componentId, connectorName),
+    CONSTRAINT connectors_unique_2 UNIQUE (uid)
 );
 
 --
@@ -38,8 +40,8 @@ CREATE TABLE connectors
 CREATE TABLE pins
 (
     id            INT          AUTO_INCREMENT PRIMARY KEY,
+    uid           VARCHAR(100) NOT NULL DEFAULT CAST(RANDOM_UUID() AS VARCHAR),
     connectorId   INT          NOT NULL,
-    uid           VARCHAR(100) NOT NULL UNIQUE,
     index         TINYINT      NOT NULL DEFAULT 0, -- used for dynamic only
     creationTs    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTs    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,

@@ -4,47 +4,47 @@
 --   Inputs: 8x Dynamic
 --   Outputs: 1x Dynamic
 --
-INSERT INTO components (componentType, className, uid) VALUES
-    (0, 'test.components.LogicH', 'uid-component-logic-H');
+INSERT INTO components (uid, componentType, className) VALUES
+    ('uid-component-logic-H', 0, 'test.components.LogicH');
 
 --
 -- CONNECTORS
 --   BindingType#STATIC (ordinal = 0)
 --   BindingType#DYNAMIC (ordinal = 1)
 --
-INSERT INTO connectors (componentId, bindingType, connectorName) VALUES
-    (1, 1, 'booleans'), -- connectors.id: 1
-    (1, 1, 'bytes'   ), -- connectors.id: 2
-    (1, 1, 'chars'   ), -- connectors.id: 3
-    (1, 1, 'doubles' ), -- connectors.id: 4
-    (1, 1, 'floats'  ), -- connectors.id: 5
-    (1, 1, 'integers'), -- connectors.id: 6
-    (1, 1, 'longs'   ), -- connectors.id: 7
-    (1, 1, 'shorts'  ), -- connectors.id: 8
-    (1, 1, 'strings' ); -- connectors.id: 9
+INSERT INTO connectors (uid, componentId, bindingType, connectorName) VALUES
+    ('uid-connector-logic-H#booleans', 1, 1, 'booleans'), -- connectors.id: 1
+    ('uid-connector-logic-H#bytes',    1, 1, 'bytes'   ), -- connectors.id: 2
+    ('uid-connector-logic-H#chars',    1, 1, 'chars'   ), -- connectors.id: 3
+    ('uid-connector-logic-H#doubles',  1, 1, 'doubles' ), -- connectors.id: 4
+    ('uid-connector-logic-H#floats',   1, 1, 'floats'  ), -- connectors.id: 5
+    ('uid-connector-logic-H#integers', 1, 1, 'integers'), -- connectors.id: 6
+    ('uid-connector-logic-H#longs',    1, 1, 'longs'   ), -- connectors.id: 7
+    ('uid-connector-logic-H#shorts',   1, 1, 'shorts'  ), -- connectors.id: 8
+    ('uid-connector-logic-H#strings',  1, 1, 'strings' ); -- connectors.id: 9
 
 --
 -- PINS
 --
-INSERT INTO pins (connectorId, uid, index) VALUES
-    (1, 'uid-pin-logic-H#booleans[0]', 0), -- pins.id: 1
-    (1, 'uid-pin-logic-H#booleans[1]', 1), -- pins.id: 2
-    (2, 'uid-pin-logic-H#bytes[0]',    0), -- pins.id: 3
-    (2, 'uid-pin-logic-H#bytes[1]',    1), -- pins.id: 4
-    (3, 'uid-pin-logic-H#chars[0]',    0), -- pins.id: 5
-    (3, 'uid-pin-logic-H#chars[1]',    1), -- pins.id: 6
-    (4, 'uid-pin-logic-H#doubles[0]',  0), -- pins.id: 7
-    (4, 'uid-pin-logic-H#doubles[1]',  1), -- pins.id: 8
-    (5, 'uid-pin-logic-H#floats[0]',   0), -- pins.id: 9
-    (5, 'uid-pin-logic-H#floats[1]',   1), -- pins.id: 10
-    (6, 'uid-pin-logic-H#integers[0]', 0), -- pins.id: 11
-    (6, 'uid-pin-logic-H#integers[1]', 1), -- pins.id: 12
-    (7, 'uid-pin-logic-H#longs[0]',    0), -- pins.id: 13
-    (7, 'uid-pin-logic-H#longs[1]',    1), -- pins.id: 14
-    (8, 'uid-pin-logic-H#shorts[0]',   0), -- pins.id: 15
-    (8, 'uid-pin-logic-H#shorts[1]',   1), -- pins.id: 16
-    (9, 'uid-pin-logic-H#strings[0]',  0), -- pins.id: 17
-    (9, 'uid-pin-logic-H#strings[1]',  1); -- pins.id: 18
+INSERT INTO pins (uid, connectorId, index) VALUES
+    ('uid-pin-logic-H#booleans[0]', 1, 0), -- pins.id: 1
+    ('uid-pin-logic-H#booleans[1]', 1, 1), -- pins.id: 2
+    ('uid-pin-logic-H#bytes[0]',    2, 0), -- pins.id: 3
+    ('uid-pin-logic-H#bytes[1]',    2, 1), -- pins.id: 4
+    ('uid-pin-logic-H#chars[0]',    3, 0), -- pins.id: 5
+    ('uid-pin-logic-H#chars[1]',    3, 1), -- pins.id: 6
+    ('uid-pin-logic-H#doubles[0]',  4, 0), -- pins.id: 7
+    ('uid-pin-logic-H#doubles[1]',  4, 1), -- pins.id: 8
+    ('uid-pin-logic-H#floats[0]',   5, 0), -- pins.id: 9
+    ('uid-pin-logic-H#floats[1]',   5, 1), -- pins.id: 10
+    ('uid-pin-logic-H#integers[0]', 6, 0), -- pins.id: 11
+    ('uid-pin-logic-H#integers[1]', 6, 1), -- pins.id: 12
+    ('uid-pin-logic-H#longs[0]',    7, 0), -- pins.id: 13
+    ('uid-pin-logic-H#longs[1]',    7, 1), -- pins.id: 14
+    ('uid-pin-logic-H#shorts[0]',   8, 0), -- pins.id: 15
+    ('uid-pin-logic-H#shorts[1]',   8, 1), -- pins.id: 16
+    ('uid-pin-logic-H#strings[0]',  9, 0), -- pins.id: 17
+    ('uid-pin-logic-H#strings[1]',  9, 1); -- pins.id: 18
 INSERT INTO pin_values (pinId, value, valueType) VALUES
     (1,  '0',                       'java.lang.Boolean'  ),
     (2,  '1',                       'java.lang.Boolean'  ),

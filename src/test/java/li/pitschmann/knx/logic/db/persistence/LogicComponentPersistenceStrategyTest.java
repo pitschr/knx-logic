@@ -1,4 +1,4 @@
-package li.pitschmann.knx.logic.db.strategies;
+package li.pitschmann.knx.logic.db.persistence;
 
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.db.jdbi.mappers.BindingType;
@@ -10,14 +10,12 @@ import test.components.AndLogicBooleanPrimitive;
 import test.components.logic.EmptyLogic;
 import test.components.logic.TextSizeLogic;
 
-import java.math.BigDecimal;
-
 import static test.TestHelpers.createLogicComponent;
 import static test.assertions.model.DatabaseAssertions.assertThat;
 
 /**
  * Test case for writing logic components to database
- * {@link li.pitschmann.knx.logic.db.strategies.LogicComponentPersistenceStrategy}
+ * {@link LogicComponentPersistenceStrategy}
  *
  * @author PITSCHR
  */
@@ -45,7 +43,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Verification: Component
         // ---------------------------------
-        final var componentModel = componentsDao.getById(1);
+        final var componentModel = componentsDao.find(1);
         assertThat(componentModel)
                 .componentType(ComponentType.LOGIC)
                 .className(EmptyLogic.class.getName());
@@ -74,7 +72,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Verification: Component
         // ---------------------------------
-        final var componentModel = componentsDao.getById(1);
+        final var componentModel = componentsDao.find(1);
         assertThat(componentModel)
                 .componentType(ComponentType.LOGIC)
                 .className(TextSizeLogic.class.getName());
@@ -83,7 +81,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Verification: Connectors
         // ---------------------------------
-        final var connectorTexts = connectorsDao.getById(1);
+        final var connectorTexts = connectorsDao.find(1);
         assertThat(connectorTexts)
                 .id(1)
                 .componentId(1)
@@ -91,7 +89,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorName("texts");
         assertThat(pinsDao.getByConnectorId(1)).hasSize(2);
 
-        final var connectorTotalTextLength = connectorsDao.getById(2);
+        final var connectorTotalTextLength = connectorsDao.find(2);
         assertThat(connectorTotalTextLength)
                 .id(2)
                 .componentId(1)
@@ -99,7 +97,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorName("totalTextLength");
         assertThat(pinsDao.getByConnectorId(2)).hasSize(1);
 
-        final var connectorNumberOfTexts = connectorsDao.getById(3);
+        final var connectorNumberOfTexts = connectorsDao.find(3);
         assertThat(connectorNumberOfTexts)
                 .id(3)
                 .componentId(1)
@@ -107,7 +105,7 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
                 .connectorName("numberOfTexts");
         assertThat(pinsDao.getByConnectorId(3)).hasSize(1);
 
-        final var connectorTextAverageSize = connectorsDao.getById(4);
+        final var connectorTextAverageSize = connectorsDao.find(4);
         assertThat(connectorTextAverageSize)
                 .id(4)
                 .componentId(1)
@@ -118,35 +116,35 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Verification: Pins
         // ---------------------------------
-        final var pinTexts_1 = pinsDao.getById(1);
+        final var pinTexts_1 = pinsDao.find(1);
         assertThat(pinTexts_1)
                 .id(1)
                 .connectorId(1)
                 .index(0);
         assertThat(pinTexts_1.getUid()).isNotNull();
 
-        final var pinTexts_2 = pinsDao.getById(2);
+        final var pinTexts_2 = pinsDao.find(2);
         assertThat(pinTexts_2)
                 .id(2)
                 .connectorId(1)
                 .index(1);
         assertThat(pinTexts_2.getUid()).isNotNull();
 
-        final var pinTotalTextLength = pinsDao.getById(3);
+        final var pinTotalTextLength = pinsDao.find(3);
         assertThat(pinTotalTextLength)
                 .id(3)
                 .connectorId(2)
                 .index(0);
         assertThat(pinTotalTextLength.getUid()).isNotNull();
 
-        final var pinNumberOfTexts = pinsDao.getById(4);
+        final var pinNumberOfTexts = pinsDao.find(4);
         assertThat(pinNumberOfTexts)
                 .id(4)
                 .connectorId(3)
                 .index(0);
         assertThat(pinNumberOfTexts.getUid()).isNotNull();
 
-        final var pinTextAverageSize = pinsDao.getById(5);
+        final var pinTextAverageSize = pinsDao.find(5);
         assertThat(pinTextAverageSize)
                 .id(5)
                 .connectorId(4)
@@ -220,9 +218,9 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);
         assertThat(pinsDao.size()).isEqualTo(6);
 
-        assertThat(pinsDao.getById(1)).index(0);    // texts(index=0)
-        assertThat(pinsDao.getById(2)).index(1);    // texts(index=1)
-        assertThat(pinsDao.getById(6)).index(2);    // texts(index=2)
+        assertThat(pinsDao.find(1)).index(0);    // texts(index=0)
+        assertThat(pinsDao.find(2)).index(1);    // texts(index=1)
+        assertThat(pinsDao.find(6)).index(2);    // texts(index=2)
 
         // ---------------------------------
         // Update Statement #2
@@ -239,8 +237,8 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);
         assertThat(pinsDao.size()).isEqualTo(5);
 
-        assertThat(pinsDao.getById(1)).index(0);    // texts(index=0)
-        assertThat(pinsDao.getById(6)).index(1);    // texts(index=1)
+        assertThat(pinsDao.find(1)).index(0);    // texts(index=0)
+        assertThat(pinsDao.find(6)).index(1);    // texts(index=1)
 
         // ---------------------------------
         // Update Statement #3
@@ -262,10 +260,10 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);
         assertThat(pinsDao.size()).isEqualTo(7);
 
-        assertThat(pinsDao.getById(1)).index(1);    // texts(index=1)
-        assertThat(pinsDao.getById(6)).index(2);    // texts(index=2)
-        assertThat(pinsDao.getById(7)).index(0);    // texts(index=0)
-        assertThat(pinsDao.getById(8)).index(3);    // texts(index=3)
+        assertThat(pinsDao.find(1)).index(1);    // texts(index=1)
+        assertThat(pinsDao.find(6)).index(2);    // texts(index=2)
+        assertThat(pinsDao.find(7)).index(0);    // texts(index=0)
+        assertThat(pinsDao.find(8)).index(3);    // texts(index=3)
     }
 
     @Test
@@ -285,19 +283,19 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);
         assertThat(pinsDao.size()).isEqualTo(5);
 
-        assertThat(connectorsDao.getById(1).getConnectorName()).isEqualTo("texts");
-        assertThat(connectorsDao.getById(2).getConnectorName()).isEqualTo("totalTextLength");
-        assertThat(connectorsDao.getById(3).getConnectorName()).isEqualTo("numberOfTexts");
-        assertThat(connectorsDao.getById(4).getConnectorName()).isEqualTo("textAverageSize");
-        assertThat(connectorsDao.getById(5)).isNull(); // doesn't exists yet
+        assertThat(connectorsDao.find(1).getConnectorName()).isEqualTo("texts");
+        assertThat(connectorsDao.find(2).getConnectorName()).isEqualTo("totalTextLength");
+        assertThat(connectorsDao.find(3).getConnectorName()).isEqualTo("numberOfTexts");
+        assertThat(connectorsDao.find(4).getConnectorName()).isEqualTo("textAverageSize");
+        assertThat(connectorsDao.find(5)).isNull(); // doesn't exists yet
 
-        assertThat(pinsDao.getById(3).getUid()).isEqualTo(logic.getPin("totalTextLength").getUid());
-        assertThat(pinsDao.getById(6)).isNull(); // doesn't exists yet
+        assertThat(pinsDao.find(3).getUid()).isEqualTo(logic.getPin("totalTextLength").getUid());
+        assertThat(pinsDao.find(6)).isNull(); // doesn't exists yet
 
         // ---------------------------------
         // Remove the 'totalTextLength' static connector
         // ---------------------------------
-        final var connectorIdToBeRemoved = connectorsDao.getByComponentId(newComponentId)
+        final var connectorIdToBeRemoved = connectorsDao.byComponentId(newComponentId)
                 .stream()
                 .filter(c -> "totalTextLength".equalsIgnoreCase(c.getConnectorName()))
                 .findFirst().orElseThrow().getId();
@@ -307,14 +305,14 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(3); // 4-1 (one connector removed)
         assertThat(pinsDao.size()).isEqualTo(4);       // 5-1 (one pin removed)
 
-        assertThat(connectorsDao.getById(1).getConnectorName()).isEqualTo("texts");
-        assertThat(connectorsDao.getById(2)).isNull(); // has been removed
-        assertThat(connectorsDao.getById(3).getConnectorName()).isEqualTo("numberOfTexts");
-        assertThat(connectorsDao.getById(4).getConnectorName()).isEqualTo("textAverageSize");
-        assertThat(connectorsDao.getById(5)).isNull(); // doesn't exists yet
+        assertThat(connectorsDao.find(1).getConnectorName()).isEqualTo("texts");
+        assertThat(connectorsDao.find(2)).isNull(); // has been removed
+        assertThat(connectorsDao.find(3).getConnectorName()).isEqualTo("numberOfTexts");
+        assertThat(connectorsDao.find(4).getConnectorName()).isEqualTo("textAverageSize");
+        assertThat(connectorsDao.find(5)).isNull(); // doesn't exists yet
 
-        assertThat(pinsDao.getById(3)).isNull(); // pin 'totalTextLength' has been deleted
-        assertThat(pinsDao.getById(6)).isNull(); // doesn't exists yet
+        assertThat(pinsDao.find(3)).isNull(); // pin 'totalTextLength' has been deleted
+        assertThat(pinsDao.find(6)).isNull(); // doesn't exists yet
 
         // ---------------------------------
         // Update the logic, expected is that the connector 'totalTextLength'
@@ -326,14 +324,14 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);  // 3+1 (one connector added)
         assertThat(pinsDao.size()).isEqualTo(5);        // 4+1 (one pin added)
 
-        assertThat(connectorsDao.getById(1).getConnectorName()).isEqualTo("texts");
-        assertThat(connectorsDao.getById(2)).isNull(); // has been removed
-        assertThat(connectorsDao.getById(3).getConnectorName()).isEqualTo("numberOfTexts");
-        assertThat(connectorsDao.getById(4).getConnectorName()).isEqualTo("textAverageSize");
-        assertThat(connectorsDao.getById(5).getConnectorName()).isEqualTo("totalTextLength"); // new one!
+        assertThat(connectorsDao.find(1).getConnectorName()).isEqualTo("texts");
+        assertThat(connectorsDao.find(2)).isNull(); // has been removed
+        assertThat(connectorsDao.find(3).getConnectorName()).isEqualTo("numberOfTexts");
+        assertThat(connectorsDao.find(4).getConnectorName()).isEqualTo("textAverageSize");
+        assertThat(connectorsDao.find(5).getConnectorName()).isEqualTo("totalTextLength"); // new one!
 
-        assertThat(pinsDao.getById(3)).isNull(); // remain null, pin 'totalTextLength' will get a new primary key
-        assertThat(pinsDao.getById(6).getUid()).isEqualTo(logic.getPin("totalTextLength").getUid()); // new static pin
+        assertThat(pinsDao.find(3)).isNull(); // remain null, pin 'totalTextLength' will get a new primary key
+        assertThat(pinsDao.find(6).getUid()).isEqualTo(logic.getPin("totalTextLength").getUid()); // new static pin
     }
 
     @Test
@@ -353,22 +351,22 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);
         assertThat(pinsDao.size()).isEqualTo(5);
 
-        assertThat(connectorsDao.getById(1).getConnectorName()).isEqualTo("texts");
-        assertThat(connectorsDao.getById(2).getConnectorName()).isEqualTo("totalTextLength");
-        assertThat(connectorsDao.getById(3).getConnectorName()).isEqualTo("numberOfTexts");
-        assertThat(connectorsDao.getById(4).getConnectorName()).isEqualTo("textAverageSize");
-        assertThat(connectorsDao.getById(6)).isNull(); // doesn't exists yet
+        assertThat(connectorsDao.find(1).getConnectorName()).isEqualTo("texts");
+        assertThat(connectorsDao.find(2).getConnectorName()).isEqualTo("totalTextLength");
+        assertThat(connectorsDao.find(3).getConnectorName()).isEqualTo("numberOfTexts");
+        assertThat(connectorsDao.find(4).getConnectorName()).isEqualTo("textAverageSize");
+        assertThat(connectorsDao.find(6)).isNull(); // doesn't exists yet
 
-        assertThat(pinsDao.getById(1).getUid()).isEqualTo(logic.getPin("texts[0]").getUid());
-        assertThat(pinsDao.getById(2).getUid()).isEqualTo(logic.getPin("texts[1]").getUid());
-        assertThat(pinsDao.getById(6)).isNull(); // doesn't exists yet
-        assertThat(pinsDao.getById(7)).isNull(); // doesn't exists yet
+        assertThat(pinsDao.find(1).getUid()).isEqualTo(logic.getPin("texts[0]").getUid());
+        assertThat(pinsDao.find(2).getUid()).isEqualTo(logic.getPin("texts[1]").getUid());
+        assertThat(pinsDao.find(6)).isNull(); // doesn't exists yet
+        assertThat(pinsDao.find(7)).isNull(); // doesn't exists yet
 
         // ---------------------------------
         // Remove the 'texts' connector
         //   This will also remove the associated pins: texts[0] and texts[1]
         // ---------------------------------
-        final var connectorIdToBeRemoved = connectorsDao.getByComponentId(newComponentId)
+        final var connectorIdToBeRemoved = connectorsDao.byComponentId(newComponentId)
                 .stream()
                 .filter(c -> "texts".equalsIgnoreCase(c.getConnectorName()))
                 .findFirst().orElseThrow().getId();
@@ -378,16 +376,16 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(3); // 4-1 (one connector removed)
         assertThat(pinsDao.size()).isEqualTo(3);       // 5-2 (two pins removed)
 
-        assertThat(connectorsDao.getById(1)).isNull(); // has been removed
-        assertThat(connectorsDao.getById(2).getConnectorName()).isEqualTo("totalTextLength");
-        assertThat(connectorsDao.getById(3).getConnectorName()).isEqualTo("numberOfTexts");
-        assertThat(connectorsDao.getById(4).getConnectorName()).isEqualTo("textAverageSize");
-        assertThat(connectorsDao.getById(5)).isNull(); // doesn't exists yet
+        assertThat(connectorsDao.find(1)).isNull(); // has been removed
+        assertThat(connectorsDao.find(2).getConnectorName()).isEqualTo("totalTextLength");
+        assertThat(connectorsDao.find(3).getConnectorName()).isEqualTo("numberOfTexts");
+        assertThat(connectorsDao.find(4).getConnectorName()).isEqualTo("textAverageSize");
+        assertThat(connectorsDao.find(5)).isNull(); // doesn't exists yet
 
-        assertThat(pinsDao.getById(1)).isNull(); // 'texts[0]' has been deleted
-        assertThat(pinsDao.getById(2)).isNull(); // 'texts[0]' has been deleted
-        assertThat(pinsDao.getById(6)).isNull(); // doesn't exists yet
-        assertThat(pinsDao.getById(7)).isNull(); // doesn't exists yet
+        assertThat(pinsDao.find(1)).isNull(); // 'texts[0]' has been deleted
+        assertThat(pinsDao.find(2)).isNull(); // 'texts[0]' has been deleted
+        assertThat(pinsDao.find(6)).isNull(); // doesn't exists yet
+        assertThat(pinsDao.find(7)).isNull(); // doesn't exists yet
 
         // ---------------------------------
         // Update the logic, expected is that the connector 'texts'
@@ -399,16 +397,16 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         assertThat(connectorsDao.size()).isEqualTo(4);  // 3+1 (one connector added)
         assertThat(pinsDao.size()).isEqualTo(5);        // 3+2 (two pins added)
 
-        assertThat(connectorsDao.getById(1)).isNull();
-        assertThat(connectorsDao.getById(2).getConnectorName()).isEqualTo("totalTextLength");
-        assertThat(connectorsDao.getById(3).getConnectorName()).isEqualTo("numberOfTexts");
-        assertThat(connectorsDao.getById(4).getConnectorName()).isEqualTo("textAverageSize");
-        assertThat(connectorsDao.getById(5).getConnectorName()).isEqualTo("texts");
+        assertThat(connectorsDao.find(1)).isNull();
+        assertThat(connectorsDao.find(2).getConnectorName()).isEqualTo("totalTextLength");
+        assertThat(connectorsDao.find(3).getConnectorName()).isEqualTo("numberOfTexts");
+        assertThat(connectorsDao.find(4).getConnectorName()).isEqualTo("textAverageSize");
+        assertThat(connectorsDao.find(5).getConnectorName()).isEqualTo("texts");
 
-        assertThat(pinsDao.getById(1)).isNull(); // remain null, texts[0] will get a new primary key
-        assertThat(pinsDao.getById(2)).isNull(); // remain null, texts[1] will get a new primary key
-        assertThat(pinsDao.getById(6).getUid()).isEqualTo(logic.getPin("texts[0]").getUid()); // new pin #1
-        assertThat(pinsDao.getById(7).getUid()).isEqualTo(logic.getPin("texts[1]").getUid()); // new pin #2
+        assertThat(pinsDao.find(1)).isNull(); // remain null, texts[0] will get a new primary key
+        assertThat(pinsDao.find(2)).isNull(); // remain null, texts[1] will get a new primary key
+        assertThat(pinsDao.find(6).getUid()).isEqualTo(logic.getPin("texts[0]").getUid()); // new pin #1
+        assertThat(pinsDao.find(7).getUid()).isEqualTo(logic.getPin("texts[1]").getUid()); // new pin #2
     }
 
 }

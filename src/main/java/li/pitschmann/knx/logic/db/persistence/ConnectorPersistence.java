@@ -1,49 +1,58 @@
-package li.pitschmann.knx.logic.db.strategies;
+/*
+ * Copyright (C) 2021 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package li.pitschmann.knx.logic.db.persistence;
 
 import li.pitschmann.knx.core.annotations.Nullable;
 import li.pitschmann.knx.core.utils.Preconditions;
-import li.pitschmann.knx.logic.components.Component;
-import li.pitschmann.knx.logic.components.InboxComponentImpl;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.StaticConnector;
 import li.pitschmann.knx.logic.db.DatabaseManager;
-import li.pitschmann.knx.logic.db.dao.ComponentsDao;
 import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
-import li.pitschmann.knx.logic.db.dao.EventKeyDao;
 import li.pitschmann.knx.logic.db.dao.PinsDao;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.db.models.ConnectorModel;
-import li.pitschmann.knx.logic.db.models.EventKeyModel;
 import li.pitschmann.knx.logic.db.models.PinModel;
-import li.pitschmann.knx.logic.event.EventKey;
 import li.pitschmann.knx.logic.pin.DynamicPin;
 import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.uid.UID;
-import org.jdbi.v3.sqlobject.transaction.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Abstract {@link PersistenceStrategy} implementation for {@link Component}
+ * Persist the {@link Connector} to {@link ConnectorModel} in database
  *
  * @author PITSCHR
  */
-abstract class AbstractComponentPersistenceStrategy<T extends Component> implements PersistenceStrategy<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(AbstractComponentPersistenceStrategy.class);
-    private static final Lock LOCK = new ReentrantLock();
-    protected final DatabaseManager databaseManager;
+class ConnectorPersistence {
+    private static final Logger LOG = LoggerFactory.getLogger(ConnectorPersistence.class);
+    private final DatabaseManager databaseManager;
+    private final PinPersistence pinPersistence;
 
-    protected AbstractComponentPersistenceStrategy(final DatabaseManager databaseManager) {
+    ConnectorPersistence(final DatabaseManager databaseManager) {
         this.databaseManager = Objects.requireNonNull(databaseManager);
+        this.pinPersistence = new PinPersistence(databaseManager);
     }
 
     /**
@@ -66,78 +75,6 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
     }
 
     /**
-     * Inserts or updates the {@link InboxComponentImpl}.
-     *
-     * @param component
-     */
-    @Transaction
-    @Override
-    public int save(final T component) {
-        LOCK.lock();
-        try {
-            return databaseManager.jdbi().inTransaction(h -> {
-                final var dao = databaseManager.dao(ComponentsDao.class);
-                var model = dao.getByUID(component.getUid());
-                return model == null ? insert(component) : update(model, component);
-            });
-        } finally {
-            LOCK.unlock();
-        }
-    }
-
-    /**
-     * Persists given {@link Component} to the database
-     *
-     * @param component component as source to create a model and insert it
-     * @return the new id of component
-     */
-    protected abstract int insert(final T component);
-
-    /**
-     * Persists given {@link Component} to the database
-     *
-     * @param model     model to be updated
-     * @param component component as source to update the model
-     * @return the new primary key of component
-     */
-    protected abstract int update(final ComponentModel model, final T component);
-
-    /**
-     * Persists given {@link EventKey} to the database
-     *
-     * @param componentId the id of component that is used as owner for connector; may not be zero or negative
-     * @param eventKey    the event key to be persisted; may not be null
-     * @return the new primary key of event key
-     */
-    protected int insertEventKey(final int componentId,
-                                 final EventKey eventKey) {
-        Preconditions.checkArgument(componentId > 0);
-        final var eventKeyModel = EventKeyModel.builder()
-                .componentId(componentId)
-                .channel(eventKey.getChannel())
-                .key(eventKey.getIdentifier())
-                .build();
-        return verifyAutoGeneratedKey(databaseManager.dao(EventKeyDao.class).insert(eventKeyModel));
-    }
-
-    /**
-     * Updates the given {@link EventKey} to the database
-     *
-     * @param componentModel the {@link ComponentModel} as owner for {@link EventKey}; may not be null
-     * @param eventKey       the event key to be updated; may not be null
-     */
-    protected void updateEventKey(final ComponentModel componentModel,
-                                  final EventKey eventKey) {
-        Preconditions.checkArgument(componentModel.getId() > 0);
-        final var eventKeyModel = EventKeyModel.builder()
-                .componentId(componentModel.getId())
-                .channel(eventKey.getChannel())
-                .key(eventKey.getIdentifier())
-                .build();
-        databaseManager.dao(EventKeyDao.class).update(eventKeyModel);
-    }
-
-    /**
      * Inserts list of {@link Connector} for the given component id.
      * <p>
      * It will simply iterate through all connectors and persists
@@ -146,8 +83,9 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
      * @param componentId the id of component that is used as owner for connectors
      * @param connectors  list of connectors that should be considered for persistence; may not be null
      */
-    protected void insertConnectors(final int componentId, final List<Connector> connectors) {
-        Preconditions.checkArgument(componentId > 0);
+    public void insertConnectors(final int componentId, final List<Connector> connectors) {
+        Preconditions.checkArgument(componentId > 0,
+                "Component ID must be positive, but was: {}", componentId);
         for (var connector : connectors) {
             insertConnector(componentId, connector);
         }
@@ -158,20 +96,13 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
      *
      * @param componentId the id of component that is used as owner for connector
      * @param connector   the new connector from component to be updated
-     * @return new primary key of persisted connector
      */
-    private int insertConnector(final int componentId, final Connector connector) {
-        final var descriptor = connector.getDescriptor();
-        final var connectorModel = ConnectorModel.builder()
-                .componentId(componentId)
-                .bindingType(connector)
-                .connectorName(descriptor.getName())
-                .build();
-        final var pins = connector.getPinStream().collect(Collectors.toList());
+    private void insertConnector(final int componentId, final Connector connector) {
+        final var connectorModel = toModel(componentId, connector);
+        final var connectorId = databaseManager.dao(ConnectorsDao.class).insert(connectorModel);
 
-        final var connectorId = verifyAutoGeneratedKey(databaseManager.dao(ConnectorsDao.class).insert(connectorModel));
-        insertPins(connectorId, pins);
-        return connectorId;
+        final var pins = connector.getPinStream().collect(Collectors.toList());
+        pinPersistence.insertPins(connectorId, pins);
     }
 
     /**
@@ -185,12 +116,14 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
      * otherwise it will be updated.
      * </p>
      *
-     * @param componentModel the {@link ComponentModel} that should own the connectors; may not be null
-     * @param connectors     list of connectors to be saved; may not be null
+     * @param componentId the identifier of component model
+     * @param connectors  list of connectors to be saved; may not be null
      */
-    protected void updateConnectors(final ComponentModel componentModel, final List<Connector> connectors) {
+    public void updateConnectors(final int componentId, final List<Connector> connectors) {
+        Preconditions.checkArgument(componentId > 0,
+                "Component ID must be positive, but was: {}", componentId);
         final var connectorModels = databaseManager.dao(ConnectorsDao.class)
-                .getByComponentId(componentModel.getId()).stream()
+                .byComponentId(componentId).stream()
                 .collect(
                         Collectors.toUnmodifiableMap(ConnectorModel::getConnectorName, Function.identity())
                 );
@@ -200,7 +133,7 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
 
             // connector doesn't exists in database -> insert connector and pins
             if (connectorModel == null) {
-                insertConnector(componentModel.getId(), connector);
+                insertConnector(componentId, connector);
             }
             // dynamic connector exists in database and in component -> update connector and pins
             else if (connector instanceof DynamicConnector) {
@@ -215,9 +148,6 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
         }
     }
 
-    /*
-     * Logic to update the static connector the static {@link Connector}
-     */
     private void updateStaticConnector(final ConnectorModel connectorModel,
                                        final StaticConnector connector) {
         Preconditions.checkArgument(connectorModel.isStatic());
@@ -226,22 +156,8 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
         final var pinModels = pinsDao.getByConnectorId(connectorModel.getId());
         Preconditions.checkState(pinModels.size() == 1,
                 "It is expected that static connector has only one pin, but got: " + pinModels);
-
-        final var pin = connector.getPin();
-        final var pinModel = pinModels.get(0);
-
-        LOG.debug("Value of Static Pin '{}' (value: {}) to be updated for connector id '{}' (name: {}): {}",
-                pin.getUid(), //
-                pin.getValue(), //
-                connectorModel.getId(), //
-                connectorModel.getConnectorName(), //
-                pin);
     }
 
-    /*
-     * Logic to update the dynamic connector and also takes care about the
-     * re-indexing if position of pins have been changed.
-     */
     private void updateDynamicConnector(final ConnectorModel connectorModel,
                                         final DynamicConnector connector) {
         Preconditions.checkArgument(connectorModel.isDynamic());
@@ -271,14 +187,6 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
                     // index has been changed -> add new index to the map for batch update
                     newPinIndexMap.put(pinModel.getId(), pin.getIndex());
                 }
-
-                // update the last value
-                LOG.debug("Value of Dynamic Pin '{}' (value: {}) to be updated for connector id '{}' (name: {}): {}",
-                        pin.getUid(), //
-                        pin.getValue(), //
-                        connectorModel.getId(), //
-                        connectorModel.getConnectorName(), //
-                        pin);
             }
         }
 
@@ -303,8 +211,7 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
         // --------------------------------------------
         // Insert pins which exists in component but not in database
         // --------------------------------------------
-        final var pinModelUIDs = databaseManager.dao(PinsDao.class).getByConnectorId(connectorModel.getId())
-                .stream()
+        final var pinModelUIDs = pinModels.stream()
                 .map(PinModel::getUid)
                 .collect(Collectors.toUnmodifiableSet());
 
@@ -318,40 +225,24 @@ abstract class AbstractComponentPersistenceStrategy<T extends Component> impleme
                     connectorModel.getConnectorName(),
                     pinsToBeAdded
             );
-            insertPins(connectorModel.getId(), pinsToBeAdded);
+            pinPersistence.insertPins(connectorModel.getId(), pinsToBeAdded);
         }
     }
 
     /**
-     * Saves the list of {@link Pin} for given connector id
+     * Creates a new {@link ConnectorModel} based on {@code componentId}
+     * and {@link Connector} data
      *
-     * @param connectorId the primary key of connector in database
-     * @param pins        list of {@link Pin} to be saved
+     * @param componentId the identifier of component in database
+     * @param connector   the connector that is subject to be persisted in the database; may not be null
+     * @return a new {@link ConnectorModel}
      */
-    private void insertPins(final int connectorId, final List<Pin> pins) {
-        for (final var pin : pins) {
-            insertPin(connectorId, pin);
-        }
-    }
-
-    /**
-     * Inserts the pin for given connector id
-     *
-     * @param connectorId the primary key of connector in database
-     * @param pin         the pin to be persisted
-     * @return the primary key of pin after insertion
-     */
-    private int insertPin(final int connectorId, final Pin pin) {
-        // index for dynamic may vary, for static it is always a constant
-        final var pinIndex = pin instanceof DynamicPin ? ((DynamicPin) pin).getIndex() : 0;
-
-        final var pinModel = PinModel.builder()
-                .connectorId(connectorId)
-                .uid(pin.getUid())
-                .index(pinIndex)
+    private ConnectorModel toModel(final int componentId, final Connector connector) {
+        return ConnectorModel.builder()
+                .uid(connector.getUid())
+                .componentId(componentId)
+                .bindingType(connector)
+                .connectorName(connector.getDescriptor().getName())
                 .build();
-
-        return verifyAutoGeneratedKey(databaseManager.dao(PinsDao.class).insert(pinModel));
     }
-
 }

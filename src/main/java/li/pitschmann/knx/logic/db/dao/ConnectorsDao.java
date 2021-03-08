@@ -1,6 +1,7 @@
 package li.pitschmann.knx.logic.db.dao;
 
 import li.pitschmann.knx.logic.db.models.ConnectorModel;
+import li.pitschmann.knx.logic.uid.UID;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -23,39 +24,48 @@ public interface ConnectorsDao {
     int size();
 
     /**
-     * Returns the connector for given {@code id}
+     * Returns the {@link ConnectorModel} for given {@code id}
      *
      * @param id the identifier of connector
      * @return {@link ConnectorModel}
      */
     @SqlQuery("SELECT * FROM connectors WHERE id = ?")
-    ConnectorModel getById(final int id);
+    ConnectorModel find(final int id);
 
     /**
-     * Returns all connectors for given component {@code id}
+     * Returns the {@link ConnectorModel} for given {@code uid}
      *
-     * @param id the identifier of component id
+     * @param uid {@link UID} of connector
+     * @return {@link ConnectorModel}
+     */
+    @SqlQuery("SELECT * FROM connectors WHERE uid = ?")
+    ConnectorModel find(final UID uid);
+
+    /**
+     * Returns all {@link ConnectorModel} for given component {@code id}
+     *
+     * @param id the identifier of connector
      * @return list of {@link ConnectorModel}
      */
     @SqlQuery("SELECT * FROM connectors WHERE componentId = ?")
-    List<ConnectorModel> getByComponentId(final int id);
+    List<ConnectorModel> byComponentId(final int id);
 
     /**
      * Inserts the {@link ConnectorModel}
      *
-     * @param model
+     * @param model model of connector
      * @return auto-generated key
      */
     @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO connectors (componentId, bindingType, connectorName) VALUES (:componentId, :bindingType, :connectorName)")
+    @SqlUpdate("INSERT INTO connectors (uid, componentId, bindingType, connectorName) VALUES (:uid, :componentId, :bindingType, :connectorName)")
     int insert(@BindBean final ConnectorModel model);
 
     /**
      * Updates the {@link ConnectorModel}
      *
-     * @param model
+     * @param model model of connector
      */
-    @SqlUpdate("UPDATE connectors SET bindingType = :bindingType, connectorName = :connectorName WHERE id = :id")
+    @SqlUpdate("UPDATE connectors SET uid = :uid, bindingType = :bindingType, connectorName = :connectorName WHERE id = :id")
     void update(@BindBean final ConnectorModel model);
 
     /**

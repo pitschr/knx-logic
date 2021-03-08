@@ -68,7 +68,7 @@ abstract class AbstractComponentLoader<T extends Component> {
      * @return the loaded component
      */
     public T loadById(final int id) {
-        return load(databaseManager.dao(ComponentsDao.class).getById(id));
+        return load(databaseManager.dao(ComponentsDao.class).find(id));
     }
 
     /**
@@ -92,7 +92,7 @@ abstract class AbstractComponentLoader<T extends Component> {
         final var className = model.getClassName();
 
         // update connectors (and pins inside)
-        final var connectorModels = databaseManager.dao(ConnectorsDao.class).getByComponentId(id);
+        final var connectorModels = databaseManager.dao(ConnectorsDao.class).byComponentId(id);
         if (connectorModels.isEmpty()) {
             LOG.warn("No connectors found for logic component model?!?! Please double-check your component (id={}): {}", id, className);
         } else if (LOG.isDebugEnabled()) {
@@ -131,11 +131,19 @@ abstract class AbstractComponentLoader<T extends Component> {
 
             // check data integrity: static or dynamic?
             if (connectorModel.getBindingType() == BindingType.STATIC && connector instanceof StaticConnector) {
-                final StaticConnector staticFieldConnector = (StaticConnector) connector;
-                updateStaticField(staticFieldConnector, connectorModel);
+                final StaticConnector staticConnector = (StaticConnector) connector;
+                // override the UID
+                final var uid = Objects.requireNonNull(connectorModel.getUid());
+                staticConnector.setUid(uid);
+
+                updateStaticField(staticConnector, connectorModel);
             } else if (connectorModel.getBindingType() == BindingType.DYNAMIC && connector instanceof DynamicConnector) {
-                final DynamicConnector dynamicFieldConnector = (DynamicConnector) connector;
-                updateDynamicField(dynamicFieldConnector, connectorModel);
+                final DynamicConnector dynamicConnector = (DynamicConnector) connector;
+                // override the UID
+                final var uid = Objects.requireNonNull(connectorModel.getUid());
+                dynamicConnector.setUid(uid);
+
+                updateDynamicField(dynamicConnector, connectorModel);
             } else {
                 throw new LoaderException(
                         String.format("Incompatible match for connector and connectorModel: %s [connector(name)=%s, connectorModel(bindingType)=%s]",
@@ -235,7 +243,6 @@ abstract class AbstractComponentLoader<T extends Component> {
 
     protected Class<?> loadClass(final String className) {
         try {
-
             return Class.forName(className);
         } catch (final ClassNotFoundException e) {
             throw new LoaderException("Could not find class: " + className, e);
