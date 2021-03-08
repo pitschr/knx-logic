@@ -23,8 +23,6 @@ public class UIDFactoryTest {
         assertThat(staticRandomUid.toString()).matches("" +
                 "^" + //
                 "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}" + // from UUID
-                "-" + //
-                "[0-9a-f]{11}" + // from currentTimeMillis(), encoded as hex
                 "$" //
         );
     }

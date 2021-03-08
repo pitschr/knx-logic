@@ -6,6 +6,7 @@ import experimental.api.v1.json.ComponentResponse;
 import experimental.api.v1.json.ConnectorResponse;
 import experimental.api.v1.json.CreateComponentRequest;
 import experimental.api.v1.json.PinResponse;
+import experimental.api.v1.services.ComponentService;
 import io.javalin.http.Context;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.components.Component;
@@ -14,9 +15,7 @@ import li.pitschmann.knx.logic.connector.ConnectorAware;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.InputConnectorAware;
 import li.pitschmann.knx.logic.connector.OutputConnectorAware;
-import li.pitschmann.knx.logic.db.DatabaseManager;
-import li.pitschmann.knx.logic.db.dao.ComponentsDao;
-import li.pitschmann.knx.logic.pin.DynamicPin;
+import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +35,14 @@ public class ComponentController {
 
     private final UidRegistry uidRegistry;
     private final ComponentFactory componentFactory;
-    private final DatabaseManager dbManager;
+    private final ComponentService componentService;
 
-    public ComponentController(final UidRegistry uidRegistry, final ComponentFactory componentFactory, final DatabaseManager dbManager) {
+    public ComponentController(final UidRegistry uidRegistry,
+                               final ComponentFactory componentFactory,
+                               final ComponentService componentService) {
         this.uidRegistry = Objects.requireNonNull(uidRegistry);
         this.componentFactory = Objects.requireNonNull(componentFactory);
-        this.dbManager = Objects.requireNonNull(dbManager);
+        this.componentService = Objects.requireNonNull(componentService);
     }
 
     /**
@@ -118,10 +119,13 @@ public class ComponentController {
             );
         }
 
+        componentService.addComponent(component);
+
         // register the component
         uidRegistry.registerComponent(component);
+
         LOG.debug("Component registered: {}", component);
-        dbManager.save(component);
+
         ctx.status(201);
         ctx.json(toComponentResponse(component));
     }
@@ -142,7 +146,7 @@ public class ComponentController {
         if (component != null) {
             // TODO: check if component has at least one link -> protected?
             uidRegistry.deregisterComponent(component);
-            dbManager.dao(ComponentsDao.class).delete(component.getUid());
+            componentService.removeComponent(component);
         }
 
         ctx.status(204);
@@ -208,20 +212,20 @@ public class ComponentController {
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
-
-        // if index is provided, then add the pin at the defined index,
-        // otherwise add the pin at the end of connector
         final var dynamicConnector = (DynamicConnector) connector;
-        final DynamicPin newPin;
-        if (index == null || index < 0) {
-            LOG.debug("Add new pin for connector name '{}' and component uid: {}", connectorName, componentUID);
-            newPin = dynamicConnector.addPin();
-        } else {
 
-            LOG.debug("Add new pin at index {} connector name '{}' and component uid: {}", index, connectorName, componentUID);
-            newPin = dynamicConnector.addPin(index);
+        final Pin addedPin;
+        if (index == null) {
+            addedPin = componentService.addPin(dynamicConnector);
+        } else {
+            // index must be valid
+            if (index < 0 || index >= dynamicConnector.size()) {
+                ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+            addedPin = componentService.addPin(dynamicConnector, index);
         }
-        uidRegistry.registerPin(newPin);
+        uidRegistry.registerPin(addedPin);
 
         ctx.status(HttpServletResponse.SC_CREATED);
         ctx.json(toPinResponses(connector));
@@ -256,20 +260,19 @@ public class ComponentController {
         }
 
         // verify if connector is dynamic
-            if (!(connector instanceof DynamicConnector)) {
-                ctx.status(HttpServletResponse.SC_FORBIDDEN);
-                return;
-            }
+        if (!(connector instanceof DynamicConnector)) {
+            ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
         final var dynamicConnector = (DynamicConnector) connector;
 
-        // index must be valid
+        // index must be provided and valid
         if (index == null || index < 0 || index >= dynamicConnector.size()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
 
-        // a valid index must be provided when deleted
-        final var deletedPin = dynamicConnector.removePin(index);
+        final var deletedPin = componentService.removePin(dynamicConnector, index);
         uidRegistry.deregisterPin(deletedPin);
 
         ctx.status(HttpServletResponse.SC_NO_CONTENT);

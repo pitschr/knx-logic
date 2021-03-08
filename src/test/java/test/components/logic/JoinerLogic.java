@@ -12,7 +12,7 @@ import java.util.List;
  * Joins all inputs to a single string representation (separated by single white space character)
  */
 public class JoinerLogic implements Logic {
-    @Input(min = 2, max = 2)
+    @Input(min = 2, max = 4)
     private List<String> inputs;
 
     @Output

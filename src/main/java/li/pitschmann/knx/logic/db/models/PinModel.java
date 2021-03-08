@@ -10,8 +10,8 @@ import li.pitschmann.knx.logic.uid.UID;
  * @author PITSCHR
  */
 public final class PinModel extends Model {
-    private int connectorId;
     private UID uid;
+    private int connectorId;
     private int index;
 
     /**
@@ -23,12 +23,12 @@ public final class PinModel extends Model {
         return new Builder();
     }
 
-    public int getConnectorId() {
-        return connectorId;
-    }
-
     public UID getUid() {
         return uid;
+    }
+
+    public int getConnectorId() {
+        return connectorId;
     }
 
     public int getIndex() {
@@ -39,8 +39,8 @@ public final class PinModel extends Model {
     public String toString() {
         return Strings.toStringHelper(this) //
                 .add("id", getId()) //
-                .add("connectorId", connectorId) //
                 .add("uid", uid) //
+                .add("connectorId", connectorId) //
                 .add("index", index) //
                 .toString();
     }
@@ -51,17 +51,17 @@ public final class PinModel extends Model {
      * @author PITSCHR
      */
     public static class Builder {
-        private int connectorId;
         private UID uid;
+        private int connectorId;
         private int index;
-
-        public Builder connectorId(final int connectorId) {
-            this.connectorId = connectorId;
-            return this;
-        }
 
         public Builder uid(final UID uid) {
             this.uid = uid;
+            return this;
+        }
+
+        public Builder connectorId(final int connectorId) {
+            this.connectorId = connectorId;
             return this;
         }
 
@@ -72,8 +72,8 @@ public final class PinModel extends Model {
 
         public PinModel build() {
             final var model = new PinModel();
-            model.connectorId = this.connectorId;
             model.uid = this.uid;
+            model.connectorId = this.connectorId;
             model.index = this.index;
             return model;
         }

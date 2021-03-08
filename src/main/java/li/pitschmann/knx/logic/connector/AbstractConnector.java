@@ -1,6 +1,8 @@
 package li.pitschmann.knx.logic.connector;
 
 import li.pitschmann.knx.logic.descriptor.FieldDescriptor;
+import li.pitschmann.knx.logic.uid.UID;
+import li.pitschmann.knx.logic.uid.UIDFactory;
 
 import java.util.Objects;
 
@@ -15,6 +17,7 @@ import java.util.Objects;
  */
 public abstract class AbstractConnector implements Connector {
     private final FieldDescriptor descriptor;
+    private UID uid = UIDFactory.createRandomUid();
 
     /**
      * Constructor for {@link AbstractConnector} that implements
@@ -24,6 +27,20 @@ public abstract class AbstractConnector implements Connector {
      */
     protected AbstractConnector(final FieldDescriptor descriptor) {
         this.descriptor = Objects.requireNonNull(descriptor);
+    }
+
+    @Override
+    public final UID getUid() {
+        return this.uid;
+    }
+
+    /**
+     * Overrides the {@link UID} which was created as random
+     *
+     * @param uid the {@link UID} to be used; may not be null
+     */
+    public final void setUid(final UID uid) {
+        this.uid = Objects.requireNonNull(uid);
     }
 
     @Override

@@ -14,11 +14,16 @@ import li.pitschmann.knx.logic.db.jdbi.mappers.column.EventKeyColumnMapper;
 import li.pitschmann.knx.logic.db.jdbi.mappers.column.UIDColumnMapper;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.db.models.ConnectorModel;
+import li.pitschmann.knx.logic.db.models.DiagramComponentModel;
+import li.pitschmann.knx.logic.db.models.DiagramLinkModel;
+import li.pitschmann.knx.logic.db.models.DiagramModel;
 import li.pitschmann.knx.logic.db.models.EventKeyModel;
+import li.pitschmann.knx.logic.db.models.PinLinkModel;
 import li.pitschmann.knx.logic.db.models.PinModel;
-import li.pitschmann.knx.logic.db.strategies.InboxComponentPersistenceStrategy;
-import li.pitschmann.knx.logic.db.strategies.LogicComponentPersistenceStrategy;
-import li.pitschmann.knx.logic.db.strategies.OutboxComponentPersistenceStrategy;
+import li.pitschmann.knx.logic.db.persistence.ConnectorPersistenceStrategy;
+import li.pitschmann.knx.logic.db.persistence.InboxComponentPersistenceStrategy;
+import li.pitschmann.knx.logic.db.persistence.LogicComponentPersistenceStrategy;
+import li.pitschmann.knx.logic.db.persistence.OutboxComponentPersistenceStrategy;
 import org.h2.tools.Server;
 import org.jdbi.v3.core.Jdbi;
 import org.jdbi.v3.core.mapper.reflect.FieldMapper;
@@ -72,6 +77,7 @@ public final class H2DatabaseManager implements DatabaseManager {
         persistenceManager.addPersistenceStrategy(new LogicComponentPersistenceStrategy(this));
         persistenceManager.addPersistenceStrategy(new InboxComponentPersistenceStrategy(this));
         persistenceManager.addPersistenceStrategy(new OutboxComponentPersistenceStrategy(this));
+        persistenceManager.addPersistenceStrategy(new ConnectorPersistenceStrategy(this));
     }
 
     @Override
@@ -126,7 +132,11 @@ public final class H2DatabaseManager implements DatabaseManager {
             jdbi.registerRowMapper(FieldMapper.factory(ComponentModel.class));
             jdbi.registerRowMapper(FieldMapper.factory(ConnectorModel.class));
             jdbi.registerRowMapper(FieldMapper.factory(PinModel.class));
+            jdbi.registerRowMapper(FieldMapper.factory(PinLinkModel.class));
             jdbi.registerRowMapper(FieldMapper.factory(EventKeyModel.class));
+            jdbi.registerRowMapper(FieldMapper.factory(DiagramModel.class));
+            jdbi.registerRowMapper(FieldMapper.factory(DiagramComponentModel.class));
+            jdbi.registerRowMapper(FieldMapper.factory(DiagramLinkModel.class));
 
             jdbi.registerArgument(new UIDArgumentFactory());
             jdbi.registerArgument(new BindingTypeArgumentFactory());

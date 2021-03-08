@@ -119,7 +119,7 @@ class AbstractComponentLoaderTest extends BaseDatabaseSuite {
 
         // connector model has multiple pins
         final var connectors = List.of(connectorMock);
-        final var connectorModel = connectorsDao().getById(1);
+        final var connectorModel = connectorsDao().find(1);
         final var connectorModels = List.of(connectorModel);
 
         final var loader = new TestComponentLoader();
@@ -141,7 +141,7 @@ class AbstractComponentLoaderTest extends BaseDatabaseSuite {
 
         // connector model is dynamic
         final var connectors = List.of(connectorMock);
-        final var connectorModel = connectorsDao().getById(1);
+        final var connectorModel = connectorsDao().find(1);
         final var connectorModels = List.of(connectorModel);
 
         final var loader = new TestComponentLoader();

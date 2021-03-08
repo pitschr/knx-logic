@@ -6,6 +6,8 @@ import li.pitschmann.knx.core.utils.Strings;
 import li.pitschmann.knx.logic.descriptor.FieldDescriptor;
 import li.pitschmann.knx.logic.descriptor.InputDescriptor;
 import li.pitschmann.knx.logic.descriptor.OutputDescriptor;
+import li.pitschmann.knx.logic.exceptions.MaximumBoundException;
+import li.pitschmann.knx.logic.exceptions.MinimumBoundException;
 import li.pitschmann.knx.logic.helpers.ReflectHelper;
 import li.pitschmann.knx.logic.helpers.ValueHelper;
 import li.pitschmann.knx.logic.pin.DynamicPin;
@@ -142,9 +144,9 @@ public final class DynamicConnector extends AbstractConnector
         this.writeLock.lock();
         try {
             if (size() >= maximumOfOccurrences()) {
-                throw new ArrayIndexOutOfBoundsException(
+                throw new MaximumBoundException(
                         String.format(
-                                "Maximum of occurrences already reached for connector '%s': desired=%s, actual=%s",
+                                "Maximum number of pin already reached for connector '%s': maximum=%s, actual=%s",
                                 getName(),
                                 maximumOfOccurrences(),
                                 size()
@@ -202,9 +204,9 @@ public final class DynamicConnector extends AbstractConnector
         this.writeLock.lock();
         try {
             if (size() <= minimumOfOccurrences()) {
-                throw new ArrayIndexOutOfBoundsException(
+                throw new MinimumBoundException(
                         String.format(
-                                "Minimum of occurrences already reached for connector '%s': desired=%s, actual=%s",
+                                "Minimum number of pins already reached for connector '%s': minimum=%s, actual=%s",
                                 getName(),
                                 minimumOfOccurrences(),
                                 size()

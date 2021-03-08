@@ -47,14 +47,6 @@ import static org.mockito.Mockito.mock;
  */
 class LogicComponentLoaderTest extends BaseDatabaseSuite {
 
-    @Override
-    public void afterDatabaseStart(final DatabaseManager databaseManager) {
-        // databaseManager.executeSqlFile(new File(Sql.INSERT_LOGIC_COMPONENT_SAMPLES));
-        // assertThat(componentsDao().size()).isEqualTo(15);
-        // assertThat(connectorsDao().size()).isEqualTo(57);
-        // assertThat(pinsDao().size()).isEqualTo(91);
-    }
-
     /**
      * {@link test.components.LogicA}
      * Input:  N/A
@@ -93,6 +85,8 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-B"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
+        assertThat(logic.getInputConnector("i").getUid()).isEqualTo(createUid("uid-connector-logic-B#i"));
+
         assertThat(logic.getInputPins()).hasSize(1);
         assertThat(logic.getInputPin("i").getUid()).isEqualTo(createUid("uid-pin-logic-B#i"));
 
@@ -116,10 +110,14 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-C"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
+        assertThat(logic.getInputConnector("i").getUid()).isEqualTo(createUid("uid-connector-logic-C#i"));
+
         assertThat(logic.getInputPins()).hasSize(1);
         assertThat(logic.getInputPin("i").getUid()).isEqualTo(createUid("uid-pin-logic-C#i"));
 
         assertThat(logic.getOutputConnectors()).hasSize(1);
+        assertThat(logic.getOutputConnector("o").getUid()).isEqualTo(createUid("uid-connector-logic-C#o"));
+
         assertThat(logic.getOutputPins()).hasSize(1);
         assertThat(logic.getOutputPin("o").getUid()).isEqualTo(createUid("uid-pin-logic-C#o"));
     }
@@ -140,6 +138,8 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-D"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
+        assertThat(logic.getInputConnector("i").getUid()).isEqualTo(createUid("uid-connector-logic-D#i"));
+
         assertThat(logic.getInputPins()).hasSize(2);
         assertThat(logic.getInputPin("i[0]").getUid()).isEqualTo(createUid("uid-pin-logic-D#i[0]"));
         assertThat(logic.getInputPin("i[1]").getUid()).isEqualTo(createUid("uid-pin-logic-D#i[1]"));
@@ -164,11 +164,15 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-E"));
 
         assertThat(logic.getInputConnectors()).hasSize(1);
+        assertThat(logic.getInputConnector("i").getUid()).isEqualTo(createUid("uid-connector-logic-E#i"));
+
         assertThat(logic.getInputPins()).hasSize(2);
         assertThat(logic.getInputPin("i[0]").getUid()).isEqualTo(createUid("uid-pin-logic-E#i[0]"));
         assertThat(logic.getInputPin("i[1]").getUid()).isEqualTo(createUid("uid-pin-logic-E#i[1]"));
 
         assertThat(logic.getOutputConnectors()).hasSize(1);
+        assertThat(logic.getOutputConnector("o").getUid()).isEqualTo(createUid("uid-connector-logic-E#o"));
+
         assertThat(logic.getOutputPins()).hasSize(2);
         assertThat(logic.getOutputPin("o[0]").getUid()).isEqualTo(createUid("uid-pin-logic-E#o[0]"));
         assertThat(logic.getOutputPin("o[1]").getUid()).isEqualTo(createUid("uid-pin-logic-E#o[1]"));
@@ -194,12 +198,18 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-F"));
 
         assertThat(logic.getInputConnectors()).hasSize(2);
+        assertThat(logic.getInputConnector("input").getUid()).isEqualTo(createUid("uid-connector-logic-F#input"));
+        assertThat(logic.getInputConnector("inputs").getUid()).isEqualTo(createUid("uid-connector-logic-F#inputs"));
+
         assertThat(logic.getInputPins()).hasSize(3);
         assertThat(logic.getInputPin("input").getUid()).isEqualTo(createUid("uid-pin-logic-F#input"));
         assertThat(logic.getInputPin("inputs[0]").getUid()).isEqualTo(createUid("uid-pin-logic-F#inputs[0]"));
         assertThat(logic.getInputPin("inputs[1]").getUid()).isEqualTo(createUid("uid-pin-logic-F#inputs[1]"));
 
         assertThat(logic.getOutputConnectors()).hasSize(2);
+        assertThat(logic.getOutputConnector("output").getUid()).isEqualTo(createUid("uid-connector-logic-F#output"));
+        assertThat(logic.getOutputConnector("outputs").getUid()).isEqualTo(createUid("uid-connector-logic-F#outputs"));
+
         assertThat(logic.getOutputPins()).hasSize(4);
         assertThat(logic.getOutputPin("output").getUid()).isEqualTo(createUid("uid-pin-logic-F#output"));
         assertThat(logic.getOutputPin("outputs[0]").getUid()).isEqualTo(createUid("uid-pin-logic-F#outputs[0]"));
@@ -223,6 +233,15 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-G"));
 
         assertThat(logic.getInputConnectors()).hasSize(8);
+        assertThat(logic.getInputConnector("inputBooleanPrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputBooleanPrimitive"));
+        assertThat(logic.getInputConnector("inputBytePrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputBytePrimitive"));
+        assertThat(logic.getInputConnector("inputCharacterPrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputCharacterPrimitive"));
+        assertThat(logic.getInputConnector("inputDoublePrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputDoublePrimitive"));
+        assertThat(logic.getInputConnector("inputFloatPrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputFloatPrimitive"));
+        assertThat(logic.getInputConnector("inputIntegerPrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputIntegerPrimitive"));
+        assertThat(logic.getInputConnector("inputLongPrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputLongPrimitive"));
+        assertThat(logic.getInputConnector("inputShortPrimitive").getUid()).isEqualTo(createUid("uid-connector-logic-G#inputShortPrimitive"));
+
         assertThat(logic.getInputPins()).hasSize(8);
         assertThat(logic.getInputPin("inputBooleanPrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputBooleanPrimitive"));
         assertThat(logic.getInputPin("inputBytePrimitive").getUid()).isEqualTo(createUid("uid-pin-logic-G#inputBytePrimitive"));
@@ -262,6 +281,15 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-H"));
 
         assertThat(logic.getInputConnectors()).hasSize(8);
+        assertThat(logic.getInputConnector("booleans").getUid()).isEqualTo(createUid("uid-connector-logic-H#booleans"));
+        assertThat(logic.getInputConnector("bytes").getUid()).isEqualTo(createUid("uid-connector-logic-H#bytes"));
+        assertThat(logic.getInputConnector("chars").getUid()).isEqualTo(createUid("uid-connector-logic-H#chars"));
+        assertThat(logic.getInputConnector("doubles").getUid()).isEqualTo(createUid("uid-connector-logic-H#doubles"));
+        assertThat(logic.getInputConnector("floats").getUid()).isEqualTo(createUid("uid-connector-logic-H#floats"));
+        assertThat(logic.getInputConnector("integers").getUid()).isEqualTo(createUid("uid-connector-logic-H#integers"));
+        assertThat(logic.getInputConnector("longs").getUid()).isEqualTo(createUid("uid-connector-logic-H#longs"));
+        assertThat(logic.getInputConnector("shorts").getUid()).isEqualTo(createUid("uid-connector-logic-H#shorts"));
+
         assertThat(logic.getInputPins()).hasSize(16);
         assertThat(logic.getInputPin("booleans[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#booleans[0]"));
         assertThat(logic.getInputPin("booleans[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#booleans[1]"));
@@ -281,6 +309,8 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getInputPin("shorts[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#shorts[1]"));
 
         assertThat(logic.getOutputConnectors()).hasSize(1);
+        assertThat(logic.getOutputConnector("strings").getUid()).isEqualTo(createUid("uid-connector-logic-H#strings"));
+
         assertThat(logic.getOutputPins()).hasSize(2);
         assertThat(logic.getOutputPin("strings[0]").getUid()).isEqualTo(createUid("uid-pin-logic-H#strings[0]"));
         assertThat(logic.getOutputPin("strings[1]").getUid()).isEqualTo(createUid("uid-pin-logic-H#strings[1]"));
@@ -302,11 +332,17 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-I"));
 
         assertThat(logic.getInputConnectors()).hasSize(2);
+        assertThat(logic.getInputConnector("inputFirst").getUid()).isEqualTo(createUid("uid-connector-logic-I#inputFirst"));
+        assertThat(logic.getInputConnector("inputSecond").getUid()).isEqualTo(createUid("uid-connector-logic-I#inputSecond"));
+
         assertThat(logic.getInputPins()).hasSize(2);
         assertThat(logic.getInputPin("inputFirst").getUid()).isEqualTo(createUid("uid-pin-logic-I#inputFirst"));
         assertThat(logic.getInputPin("inputSecond").getUid()).isEqualTo(createUid("uid-pin-logic-I#inputSecond"));
 
         assertThat(logic.getOutputConnectors()).hasSize(2);
+        assertThat(logic.getOutputConnector("outputFirst").getUid()).isEqualTo(createUid("uid-connector-logic-I#outputFirst"));
+        assertThat(logic.getOutputConnector("outputSecond").getUid()).isEqualTo(createUid("uid-connector-logic-I#outputSecond"));
+
         assertThat(logic.getOutputPins()).hasSize(2);
         assertThat(logic.getOutputPin("outputFirst").getUid()).isEqualTo(createUid("uid-pin-logic-I#outputFirst"));
         assertThat(logic.getOutputPin("outputSecond").getUid()).isEqualTo(createUid("uid-pin-logic-I#outputSecond"));
@@ -328,6 +364,9 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-J"));
 
         assertThat(logic.getInputConnectors()).hasSize(2);
+        assertThat(logic.getInputConnector("inputFirst").getUid()).isEqualTo(createUid("uid-connector-logic-J#inputFirst"));
+        assertThat(logic.getInputConnector("inputSecond").getUid()).isEqualTo(createUid("uid-connector-logic-J#inputSecond"));
+
         assertThat(logic.getInputPins()).hasSize(5);
         assertThat(logic.getInputPin("inputFirst[0]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputFirst[0]"));
         assertThat(logic.getInputPin("inputFirst[1]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputFirst[1]"));
@@ -336,6 +375,9 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
         assertThat(logic.getInputPin("inputSecond[1]").getUid()).isEqualTo(createUid("uid-pin-logic-J#inputSecond[1]"));
 
         assertThat(logic.getOutputConnectors()).hasSize(2);
+        assertThat(logic.getOutputConnector("outputFirst").getUid()).isEqualTo(createUid("uid-connector-logic-J#outputFirst"));
+        assertThat(logic.getOutputConnector("outputSecond").getUid()).isEqualTo(createUid("uid-connector-logic-J#outputSecond"));
+
         assertThat(logic.getOutputPins()).hasSize(6);
         assertThat(logic.getOutputPin("outputFirst[0]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputFirst[0]"));
         assertThat(logic.getOutputPin("outputFirst[1]").getUid()).isEqualTo(createUid("uid-pin-logic-J#outputFirst[1]"));

@@ -1,5 +1,7 @@
 package li.pitschmann.knx.logic.connector;
 
+import li.pitschmann.knx.logic.exceptions.MaximumBoundException;
+import li.pitschmann.knx.logic.exceptions.MinimumBoundException;
 import li.pitschmann.knx.logic.pin.DynamicPin;
 
 import java.util.List;
@@ -14,7 +16,7 @@ public interface DynamicConnectorAware {
      * Creates a new {@link DynamicPin} and appends it at the end of the list
      *
      * @return newly created {@link DynamicPin}; not null
-     * @throws ArrayIndexOutOfBoundsException in case the maximum of occurrence has already been reached
+     * @throws MaximumBoundException in case the maximum bound has already been reached
      */
     DynamicPin addPin();
 
@@ -23,7 +25,7 @@ public interface DynamicConnectorAware {
      *
      * @param index the index of {@link DynamicPin} to be added; must be in valid size range
      * @return newly created {@link DynamicPin}; not null
-     * @throws ArrayIndexOutOfBoundsException in case the maximum of occurrence has already been reached
+     * @throws MaximumBoundException in case the maximum bound has already been reached
      */
     DynamicPin addPin(int index);
 
@@ -48,7 +50,7 @@ public interface DynamicConnectorAware {
      *
      * @param index the index of {@link DynamicPin} to be removed
      * @return the {@link DynamicPin} instance which has been removed; not null
-     * @throws IndexOutOfBoundsException if the index is out of range
+     * @throws MinimumBoundException in case the minimum bound has already been reached
      */
     DynamicPin removePin(int index);
 

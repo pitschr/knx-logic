@@ -5,6 +5,7 @@ import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.StaticConnector;
 import li.pitschmann.knx.logic.db.jdbi.mappers.BindingType;
+import li.pitschmann.knx.logic.uid.UID;
 
 /**
  * Database model for {@link Connector} (static and dynamic)
@@ -12,6 +13,7 @@ import li.pitschmann.knx.logic.db.jdbi.mappers.BindingType;
  * @author PITSCHR
  */
 public final class ConnectorModel extends Model {
+    private UID uid;
     private int componentId;
     private BindingType bindingType;
     private String connectorName;
@@ -23,6 +25,10 @@ public final class ConnectorModel extends Model {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    public UID getUid() {
+        return uid;
     }
 
     public int getComponentId() {
@@ -49,6 +55,7 @@ public final class ConnectorModel extends Model {
     public String toString() {
         return Strings.toStringHelper(this) //
                 .add("id", getId()) //
+                .add("uid", uid) //
                 .add("componentId", componentId) //
                 .add("bindingType", bindingType) //
                 .add("connectorName", connectorName) //
@@ -61,9 +68,15 @@ public final class ConnectorModel extends Model {
      * @author PITSCHR
      */
     public static class Builder {
+        private UID uid;
         private int componentId;
         private BindingType bindingType;
         private String connectorName;
+
+        public Builder uid(final UID uid) {
+            this.uid = uid;
+            return this;
+        }
 
         public Builder componentId(final int componentId) {
             this.componentId = componentId;
@@ -88,6 +101,7 @@ public final class ConnectorModel extends Model {
 
         public ConnectorModel build() {
             final var model = new ConnectorModel();
+            model.uid = this.uid;
             model.componentId = this.componentId;
             model.bindingType = this.bindingType;
             model.connectorName = this.connectorName;

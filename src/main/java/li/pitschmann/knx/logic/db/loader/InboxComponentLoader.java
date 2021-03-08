@@ -24,8 +24,6 @@ import li.pitschmann.knx.logic.db.DatabaseManager;
 import li.pitschmann.knx.logic.db.dao.EventKeyDao;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.event.EventKey;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 
@@ -41,8 +39,6 @@ import java.util.Objects;
  * </ul>
  */
 public class InboxComponentLoader extends AbstractComponentLoader<InboxComponent> {
-    private static final Logger LOG = LoggerFactory.getLogger(InboxComponentLoader.class);
-
     public InboxComponentLoader(final DatabaseManager databaseManager) {
         super(databaseManager);
     }

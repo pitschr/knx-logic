@@ -26,11 +26,11 @@ public final class UIDFactory {
      * Creates a randomized static {@link UID} with format
      * {@code UUID-hex(currentTimeMillis)}.
      * <p>
-     * Example: {@code 5a5d08a4-21f1-4a88-8c81-f06d28480bd1-170827fbee1}
+     * Example: {@code 5a5d08a4-21f1-4a88-8c81-f06d28480bd1}
      *
      * @return randomized {@link StaticUID}
      */
     public static StaticUID createRandomUid() {
-        return new StaticUID(UUID.randomUUID().toString() + "-" + Long.toHexString(System.currentTimeMillis()));
+        return new StaticUID(UUID.randomUUID().toString());
     }
 }

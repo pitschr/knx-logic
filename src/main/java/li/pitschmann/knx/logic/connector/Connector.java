@@ -2,6 +2,7 @@ package li.pitschmann.knx.logic.connector;
 
 import li.pitschmann.knx.logic.descriptor.FieldDescriptor;
 import li.pitschmann.knx.logic.pin.Pin;
+import li.pitschmann.knx.logic.uid.UIDAware;
 
 import java.util.stream.Stream;
 
@@ -23,7 +24,7 @@ import java.util.stream.Stream;
  *
  * @author PITSCHR
  */
-public interface Connector {
+public interface Connector extends UIDAware {
     /**
      * Returns {@link Stream} of fields which are instance of {@link Pin}.
      * <p>In case the {@link Connector} is static then stream will always have

@@ -1,6 +1,9 @@
 package test;
 
+import io.javalin.http.Context;
+import io.javalin.http.util.ContextUtil;
 import li.pitschmann.knx.logic.Logic;
+import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.components.InboxComponent;
 import li.pitschmann.knx.logic.components.InboxComponentImpl;
 import li.pitschmann.knx.logic.components.LogicComponent;
@@ -17,7 +20,12 @@ import li.pitschmann.knx.logic.event.VariableEventChannel;
 import li.pitschmann.knx.logic.uid.UID;
 import li.pitschmann.knx.logic.uid.UIDFactory;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 
 public final class TestHelpers {
     private TestHelpers() {
@@ -73,5 +81,15 @@ public final class TestHelpers {
         } catch (final ReflectiveOperationException t) {
             throw new AssertionError("Could not create instance from: " + logicClass);
         }
+    }
+
+    /**
+     * Returns a new Javalin {@link Context} incl. wrapped
+     * spy-functionality from Mockito
+     *
+     * @return wrapped {@link Context} with {@link org.mockito.Spy}
+     */
+    public static Context contextSpy() {
+        return spy(ContextUtil.init(mock(HttpServletRequest.class), mock(HttpServletResponse.class)));
     }
 }

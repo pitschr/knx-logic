@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * !!! LOGIC FOR TESTING PURPOSES ONLY !!!
  * <p>
- * A simple form of 2-AND Gate.
+ * A simple form of AND Gate.
  * <p>
  * The field {@code output} is {@code true} only when both inputs are {@code true}.
  * The field {@code outputNegation} is the negation value of {@code output}.

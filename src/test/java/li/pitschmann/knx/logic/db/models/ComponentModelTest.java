@@ -1,41 +1,33 @@
 package li.pitschmann.knx.logic.db.models;
 
-import li.pitschmann.knx.logic.components.LogicComponent;
 import li.pitschmann.knx.logic.db.jdbi.mappers.ComponentType;
-import li.pitschmann.knx.logic.uid.StaticUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.components.LogicA;
 
+import static li.pitschmann.knx.logic.uid.UIDFactory.createUid;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Test for {@link ComponentModel}
  */
-public class ComponentModelTest {
+class ComponentModelTest {
 
     @Test
     @DisplayName("Basic Test for ComponentModel")
-    public void test() {
-        final var uidMock = mock(StaticUID.class);
-        when(uidMock.toString()).thenReturn("STATIC-UID");
-        final var componentMock = mock(LogicComponent.class);
-        when(componentMock.getUid()).thenReturn(uidMock);
-
+    void test() {
         final var model = ComponentModel.builder()
-                .uid(uidMock)
+                .uid(createUid("COMPONENT-UID"))
                 .className(LogicA.class.getName())
                 .componentType(ComponentType.LOGIC)
                 .build();
 
-        assertThat(model.getUid()).isInstanceOf(StaticUID.class);
+        assertThat(model.getUid()).isEqualTo(createUid("COMPONENT-UID"));
         assertThat(model.getClassName()).isEqualTo("test.components.LogicA");
         assertThat(model.getComponentType()).isSameAs(ComponentType.LOGIC);
         assertThat(model).hasToString("" + //
                 "ComponentModel{" + //
-                "uid=STATIC-UID, " +
+                "uid=COMPONENT-UID, " +
                 "className=test.components.LogicA, " + //
                 "componentType=LOGIC" + //
                 "}"

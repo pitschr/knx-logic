@@ -32,22 +32,22 @@ public interface ComponentsDao {
     List<ComponentModel> all();
 
     /**
-     * Returns the component for given {@code id}
+     * Returns the {@link ComponentModel} for given {@code id}
      *
      * @param id the identifier of component
      * @return {@link ComponentModel}
      */
     @SqlQuery("SELECT * FROM components WHERE id = ?")
-    ComponentModel getById(final int id);
+    ComponentModel find(final int id);
 
     /**
-     * Returns the component for given {@code uid}
+     * Returns the {@link ComponentModel} for given {@code uid}
      *
      * @param uid {@link UID} of component
      * @return {@link ComponentModel}
      */
     @SqlQuery("SELECT * FROM components WHERE uid = ?")
-    ComponentModel getByUID(final UID uid);
+    ComponentModel find(final UID uid);
 
     /**
      * Inserts a new {@link ComponentModel} into database
@@ -73,6 +73,6 @@ public interface ComponentsDao {
      *
      * @param uid UID of model to be deleted
      */
-    @SqlUpdate("DELETE FROM components WHERE uid = :uid")
+    @SqlUpdate("DELETE FROM components WHERE uid = ?")
     void delete(final UID uid);
 }

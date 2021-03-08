@@ -24,7 +24,6 @@ public class ConnectorResponse {
         this.pinType = pinType;
     }
 
-
     public List<PinResponse> getPins() {
         return pins;
     }

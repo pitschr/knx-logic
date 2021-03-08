@@ -1,22 +1,35 @@
 package test;
 
+import experimental.api.ComponentFactory;
+import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.db.DatabaseManager;
 import li.pitschmann.knx.logic.db.H2DatabaseManager;
 import li.pitschmann.knx.logic.db.dao.ComponentsDao;
 import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
 import li.pitschmann.knx.logic.db.dao.EventKeyDao;
+import li.pitschmann.knx.logic.db.dao.PinLinksDao;
 import li.pitschmann.knx.logic.db.dao.PinValuesDao;
 import li.pitschmann.knx.logic.db.dao.PinsDao;
+import li.pitschmann.knx.logic.db.loader.InboxComponentLoader;
+import li.pitschmann.knx.logic.db.loader.LogicComponentLoader;
+import li.pitschmann.knx.logic.db.loader.OutboxComponentLoader;
+import li.pitschmann.knx.logic.db.models.ComponentModel;
 import org.jdbi.v3.core.Jdbi;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class BaseDatabaseSuite {
     protected static final DatabaseManager databaseManager = new H2DatabaseManager("localhost", 9093, "junit");
+    protected static final LogicComponentLoader logicLoader = new LogicComponentLoader(databaseManager, new ComponentFactory());
+    protected static final InboxComponentLoader inboxLoader =  new InboxComponentLoader(databaseManager);
+    protected static final OutboxComponentLoader outboxLoader =  new OutboxComponentLoader(databaseManager);
 
     /**
      * Returns the DAO for JUnit Database Manager
@@ -40,7 +53,7 @@ public class BaseDatabaseSuite {
     /**
      * Executes the given SQL {@code file}
      *
-     * @param file
+     * @param file SQL file to be executed
      */
     protected void executeSqlFile(final File file) {
         databaseManager.executeSqlFile(file);
@@ -76,6 +89,41 @@ public class BaseDatabaseSuite {
     }
 
     protected PinValuesDao pinValuesDao()  { return dao(PinValuesDao.class); }
+
+    protected PinLinksDao pinLinksDao() { return dao(PinLinksDao.class); }
+
+    /**
+     * Loads all components from the database
+     *
+     * @return list of {@link Component}
+     */
+    protected List<Component> loadAllComponents() {
+        return componentsDao().all().stream().map(this::loadComponent).collect(Collectors.toList());
+    }
+
+    /**
+     * Loads a specific component from the database
+     *
+     * @param id the id of component to be loaded
+     * @return the loaded {@link Component}
+     */
+    @SuppressWarnings("unchecked")
+    protected <T extends Component> T loadComponentById(final int id) {
+        return (T)loadComponent(componentsDao().find(id));
+    }
+
+    private Component loadComponent(final ComponentModel model) {
+        switch (model.getComponentType()) {
+            case LOGIC:
+                return logicLoader.load(model);
+            case INBOX:
+                return inboxLoader.load(model);
+            case OUTBOX:
+                return outboxLoader.load(model);
+            default:
+                throw new AssertionError();
+        }
+    }
 
     /**
      * Start up database

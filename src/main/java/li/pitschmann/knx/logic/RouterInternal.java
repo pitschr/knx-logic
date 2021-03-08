@@ -196,7 +196,7 @@ final class RouterInternal {
      * Returns a list of {@link Pin} that are linked with given {@link Pin}
      *
      * @param pin the given pin to gather linked pins
-     * @return an immutable list of linked pins
+     * @return an immutable list of linked pins, or empty list if no links found
      */
     public List<Pin> getLinkedPins(final Pin pin) {
         final var linkedPins = linkMap.get(pin);
