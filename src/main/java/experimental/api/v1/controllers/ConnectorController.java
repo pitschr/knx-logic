@@ -67,7 +67,7 @@ public class ConnectorController {
     public void addPin(final Context ctx,
                        final String connectorUid,
                        final @Nullable Integer index) {
-        LOG.trace("Delete pin at index '{}' for connector UID: {}", index, connectorUid);
+        LOG.trace("Add pin at index '{}' for connector UID: {}", index, connectorUid);
 
         // find connector
         final var connector = uidRegistry.findConnectorByUID(connectorUid);
@@ -83,18 +83,18 @@ public class ConnectorController {
         }
         final var dynamicConnector = (DynamicConnector) connector;
 
-        final Pin addedPin;
+        final Pin newPin;
         if (index == null) {
-            addedPin = connectorService.addPin(dynamicConnector);
+            newPin = connectorService.addPin(dynamicConnector);
         } else {
             // index must be valid
             if (index < 0 || index >= dynamicConnector.size()) {
                 ctx.status(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            addedPin = connectorService.addPin(dynamicConnector, index);
+            newPin = connectorService.addPin(dynamicConnector, index);
         }
-        uidRegistry.registerPin(addedPin);
+        uidRegistry.registerPin(newPin);
 
         ctx.status(HttpServletResponse.SC_CREATED);
         ctx.json(toPinResponses(connector));

@@ -1,8 +1,9 @@
 package experimental.api.v1.controllers;
 
 import experimental.UidRegistry;
-import experimental.api.v1.json.PinRequest;
 import experimental.api.v1.json.PinResponse;
+import experimental.api.v1.json.PinSetValueRequest;
+import experimental.api.v1.services.PinService;
 import io.javalin.http.Context;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
@@ -19,32 +20,11 @@ public class PinController {
     private static final Logger LOG = LoggerFactory.getLogger(PinController.class);
 
     private final UidRegistry uidRegistry;
+    private final PinService pinService;
 
-    public PinController(final UidRegistry uidRegistry) {
+    public PinController(final UidRegistry uidRegistry, final PinService pinService) {
         this.uidRegistry = Objects.requireNonNull(uidRegistry);
-    }
-
-    /**
-     * Returns data about individual {@link Pin}
-     *
-     * @param ctx    context
-     * @param pinUid UID of pin to be returned as JSON representation
-     */
-    public void getPin(final Context ctx, final String pinUid) {
-        LOG.trace("Get Info for Pin by UID: {}", pinUid);
-
-        // find the pin by uid
-        final var pin = uidRegistry.findPinByUID(pinUid);
-        if (pin == null) {
-            ctx.status(404);
-            return;
-        }
-
-        // TODO: get pin response
-
-        final var response = new PinResponse();
-        ctx.status(200);
-        ctx.json(response);
+        this.pinService = Objects.requireNonNull(pinService);
     }
 
     /**
@@ -54,7 +34,7 @@ public class PinController {
      * @param pinUid  UID of pin to be updated
      * @param request request context to update the pin
      */
-    public void updatePin(final Context ctx, final String pinUid, final PinRequest request) {
+    public void setValue(final Context ctx, final String pinUid, final PinSetValueRequest request) {
         LOG.trace("Update Pin by UID '{}': {}", pinUid, request);
 
         // find the pin by uid
@@ -64,11 +44,17 @@ public class PinController {
             return;
         }
 
-        // TODO: update the pin
+        final var valueAsString = request.getValue();
+        pinService.setValue(pin, valueAsString);
 
-        final var response = new PinResponse();
-        ctx.status(200);
-        ctx.json(response);
+        ctx.status(204);
+    }
+
+    private PinResponse toPinResponse(final Pin pin) {
+        final var pinResponse = new PinResponse();
+        pinResponse.setUid(pin.getUid().toString());
+        pinResponse.setValue(String.valueOf(pin.getValue()));
+        return pinResponse;
     }
 
 }

@@ -1,5 +1,6 @@
 package li.pitschmann.knx.logic.transformers;
 
+import li.pitschmann.knx.core.annotations.Nullable;
 import li.pitschmann.knx.core.utils.Maps;
 import li.pitschmann.knx.core.utils.Preconditions;
 
@@ -49,12 +50,12 @@ public final class Transformers {
      * Transforms given {@code value}. It will look up for suitable {@link Transformer}
      * based on {@code targetClass} and returns the transformed value
      *
-     * @param value       the value to be transformed
+     * @param value       the value to be transformed; may be null
      * @param targetClass the class that should transform the value to be an instance of this class
      * @return transformed object which is an instance of {@code T}
      * @throws IllegalArgumentException if no suitable {@link Transformer} could be found
      */
-    public static <T> T transform(final String value, final Class<T> targetClass) {
+    public static <T> T transform(final @Nullable String value, final Class<T> targetClass) {
         Preconditions.checkArgument(!targetClass.isPrimitive(),
                 "No transformation for primitive classes. Use wrapper classes.");
 

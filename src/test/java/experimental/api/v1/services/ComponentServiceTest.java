@@ -31,7 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static test.TestHelpers.createInboxComponent;
 import static test.TestHelpers.createLogicComponent;
+import static test.TestHelpers.createOutboxComponent;
 
 /**
  * Test for {@link ComponentService}
@@ -39,17 +41,15 @@ import static test.TestHelpers.createLogicComponent;
 class ComponentServiceTest extends BaseDatabaseSuite {
 
     @Test
-    @DisplayName("Test #addComponent(Component)")
-    void test_addComponent() {
-
+    @DisplayName("Test #addComponent(Component) for Logic")
+    void test_addComponent_Logic() {
         final var routerMock = mock(Router.class);
         final var service = new ComponentService(databaseManager, routerMock);
 
         // ----------------------
-        // Add Component
+        // Add Logic Component
         // ----------------------
         final var notLogic = createLogicComponent(new NegationLogic());
-
         service.addComponent(notLogic);
 
         // verify if called
@@ -59,6 +59,59 @@ class ComponentServiceTest extends BaseDatabaseSuite {
         assertThat(componentsDao().size()).isOne();
         assertThat(connectorsDao().size()).isEqualTo(2);
         assertThat(pinsDao().size()).isEqualTo(2);
+        assertThat(eventKeyDao().size()).isZero();
+    }
+
+    @Test
+    @DisplayName("Test #addComponent(Component) for Inbox")
+    void test_addComponent_Inbox() {
+        final var routerMock = mock(Router.class);
+        final var service = new ComponentService(databaseManager, routerMock);
+
+        // ----------------------
+        // Add Inbox Component
+        // ----------------------
+        final var inbox = createInboxComponent("inboxKey");
+        service.addComponent(inbox);
+
+        // verify if called
+        verify(routerMock).register(inbox);
+
+        // verify if persisted to database
+        assertThat(componentsDao().size()).isOne();
+        assertThat(connectorsDao().size()).isOne();
+        assertThat(pinsDao().size()).isOne();
+        assertThat(eventKeyDao().size()).isOne();
+
+        final var eventKey = eventKeyDao().getByComponentId(1);
+        assertThat(eventKey.getKey()).isEqualTo("inboxKey");
+        assertThat(eventKey.getChannel()).isEqualTo("var");
+    }
+
+    @Test
+    @DisplayName("Test #addComponent(Component) for Outbox")
+    void test_addComponent_Outbox() {
+        final var routerMock = mock(Router.class);
+        final var service = new ComponentService(databaseManager, routerMock);
+
+        // ----------------------
+        // Add Outbox Component
+        // ----------------------
+        final var outbox = createOutboxComponent("outboxKey");
+        service.addComponent(outbox);
+
+        // verify if called
+        verify(routerMock).register(outbox);
+
+        // verify if persisted to database
+        assertThat(componentsDao().size()).isOne();
+        assertThat(connectorsDao().size()).isOne();
+        assertThat(pinsDao().size()).isOne();
+        assertThat(eventKeyDao().size()).isOne();
+
+        final var eventKey = eventKeyDao().getByComponentId(1);
+        assertThat(eventKey.getKey()).isEqualTo("outboxKey");
+        assertThat(eventKey.getChannel()).isEqualTo("var");
     }
 
     @Test

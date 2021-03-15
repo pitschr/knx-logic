@@ -11,7 +11,6 @@ import io.javalin.http.Context;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.connector.Connector;
-import li.pitschmann.knx.logic.connector.ConnectorAware;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.InputConnectorAware;
 import li.pitschmann.knx.logic.connector.OutputConnectorAware;
@@ -19,7 +18,6 @@ import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -182,11 +180,15 @@ public class ComponentController {
         final var pins = connector.getPinStream().collect(Collectors.toList());
         final var pinResponses = new ArrayList<PinResponse>(pins.size());
         for (final var pin : pins) {
-            final var pinResponse = new PinResponse();
-            pinResponse.setUid(pin.getUid().toString());
-            pinResponse.setValue(String.valueOf(pin.getValue()));
-            pinResponses.add(pinResponse);
+            pinResponses.add(toPinResponse(pin));
         }
         return pinResponses;
+    }
+
+    private PinResponse toPinResponse(final Pin pin) {
+        final var pinResponse = new PinResponse();
+        pinResponse.setUid(pin.getUid().toString());
+        pinResponse.setValue(String.valueOf(pin.getValue()));
+        return pinResponse;
     }
 }

@@ -17,12 +17,10 @@
 
 package experimental.api.v1.services;
 
-import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.Router;
-import li.pitschmann.knx.logic.components.Component;
+import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.db.DatabaseManager;
-import li.pitschmann.knx.logic.db.dao.ComponentsDao;
 import li.pitschmann.knx.logic.pin.DynamicPin;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
@@ -53,33 +51,30 @@ public final class ConnectorService {
      * @return a new created {@link Pin}
      */
     public Pin addPin(final DynamicConnector connector) {
-        return addPin(connector, -1);
+        LOG.debug("Add new pin at last index for connector: {}", connector.getName());
+        final var newPin = connector.addPin();
+
+        databaseManager.save(connector);
+
+        // router won't be informed - it will be relevant only when add a link
+        // this mechanism is covered by the LinkService
+        return newPin;
     }
 
     /**
      * Adds a new {@link Pin} to the {@link DynamicConnector} at the given {@code index}
      *
      * @param connector dynamic connector that should be extended with a pin at the {@code index}; may not be null
-     * @param index the index where a new {@link Pin} should be added; negative number means at the last index
-     *
+     * @param index     the index where a new {@link Pin} should be added; negative number means at the last index
      * @return a new created {@link Pin}
      */
     public Pin addPin(final DynamicConnector connector, final int index) {
-        // if index is provided, then add the pin at the defined index,
-        // otherwise add the pin at the end of connector
-        final DynamicPin newPin;
-        if (index < 0) {
-            LOG.debug("Add new pin at last index for connector: {}", connector.getName());
-            newPin = connector.addPin();
-        } else {
-            LOG.debug("Add new pin at index {} for connector: {}", index, connector.getName());
-            newPin = connector.addPin(index);
-        }
+        LOG.debug("Add new pin at index {} for connector: {}", index, connector.getName());
+        final var newPin = connector.addPin(index);
 
-        // update the database (component)
         databaseManager.save(connector);
 
-        // router must not be informed - it will be relevant only when add a link
+        // router won't be informed - it will be relevant only when add a link
         // this mechanism is covered by the LinkService
         return newPin;
     }
@@ -88,16 +83,13 @@ public final class ConnectorService {
      * Removes the {@link Pin} at the given {@code index} of {@link DynamicConnector}
      *
      * @param connector dynamic connector that should be altered; may not be null
-     * @param index the index of {@link Pin} that should be removed
-     *
+     * @param index     the index of {@link Pin} that should be removed
      * @return the removed {@link Pin}
      */
     public Pin removePin(final DynamicConnector connector, final int index) {
         final var removedPin = connector.removePin(index);
 
-        // update the database (component)
         databaseManager.save(connector);
-
         router.unlink(removedPin);
 
         return removedPin;

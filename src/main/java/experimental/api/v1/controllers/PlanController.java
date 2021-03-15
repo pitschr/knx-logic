@@ -1,7 +1,6 @@
 package experimental.api.v1.controllers;
 
 import experimental.Plan;
-import experimental.api.ComponentFactory;
 import experimental.api.v1.json.CreateNewPlanRequest;
 import experimental.api.v1.json.CreateNewPlanResponse;
 import experimental.api.v1.json.PlanResponse;
