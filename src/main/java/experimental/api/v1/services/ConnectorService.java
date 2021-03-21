@@ -21,7 +21,6 @@ import li.pitschmann.knx.logic.Router;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.db.DatabaseManager;
-import li.pitschmann.knx.logic.pin.DynamicPin;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
