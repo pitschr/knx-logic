@@ -1,42 +1,54 @@
 package experimental.api.v1.json;
 
-import java.util.List;
+import li.pitschmann.knx.logic.connector.Connector;
+import li.pitschmann.knx.logic.connector.DynamicConnector;
 
-public class ConnectorResponse {
-    private String name;
-    private boolean dynamic;
-    private String pinType;
-    private List<PinResponse> pins = List.of();
+import java.util.List;
+import java.util.stream.Collectors;
+
+public final class ConnectorResponse {
+    private final String uid;
+    private final String name;
+    private final boolean dynamic;
+    private final String pinType;
+    private final List<PinResponse> pins;
+
+
+    private ConnectorResponse(final String uid, final String name, boolean dynamic, final String pinType, final List<PinResponse> pins) {
+        this.uid = uid;
+        this.name = name;
+        this.dynamic = dynamic;
+        this.pinType = pinType;
+        this.pins = pins;
+    }
+
+    public static ConnectorResponse from(final Connector connector) {
+        return new ConnectorResponse(
+                connector.getUid().toString(),
+                connector.getDescriptor().getName(),
+                connector instanceof DynamicConnector,
+                connector.getDescriptor().getFieldType().getSimpleName().toLowerCase(),
+                connector.getPinStream().map(PinResponse::fromWithoutConnectorUid).collect(Collectors.toUnmodifiableList())
+        );
+    }
+
+    public String getUid() {
+        return uid;
+    }
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getPinType() {
         return pinType;
     }
 
-    public void setPinType(String pinType) {
-        this.pinType = pinType;
-    }
-
     public List<PinResponse> getPins() {
         return pins;
     }
 
-    public void setPins(List<PinResponse> pins) {
-        this.pins = pins;
-    }
-
     public boolean isDynamic() {
         return dynamic;
-    }
-
-    public void setDynamic(boolean dynamic) {
-        this.dynamic = dynamic;
     }
 }

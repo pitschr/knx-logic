@@ -27,6 +27,19 @@ public class PinController {
         this.pinService = Objects.requireNonNull(pinService);
     }
 
+    public void getValue(final Context ctx, final String pinUid) {
+        LOG.trace("Find Pin by UID '{}'", pinUid);
+
+        // find the pin by uid
+        final var pin = uidRegistry.findPinByUID(pinUid);
+        if (pin == null) {
+            ctx.status(404);
+        } else {
+            ctx.status(200);
+            ctx.json(PinResponse.from(pin));
+        }
+    }
+
     /**
      * <p>Updates the {@link Pin}</p> (e.g. value)
      *
@@ -49,12 +62,4 @@ public class PinController {
 
         ctx.status(204);
     }
-
-    private PinResponse toPinResponse(final Pin pin) {
-        final var pinResponse = new PinResponse();
-        pinResponse.setUid(pin.getUid().toString());
-        pinResponse.setValue(String.valueOf(pin.getValue()));
-        return pinResponse;
-    }
-
 }

@@ -3,25 +3,16 @@ package experimental.api.v1.controllers;
 import experimental.UidRegistry;
 import experimental.api.ComponentFactory;
 import experimental.api.v1.json.ComponentResponse;
-import experimental.api.v1.json.ConnectorResponse;
 import experimental.api.v1.json.CreateComponentRequest;
-import experimental.api.v1.json.PinResponse;
 import experimental.api.v1.services.ComponentService;
 import io.javalin.http.Context;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.components.Component;
-import li.pitschmann.knx.logic.connector.Connector;
-import li.pitschmann.knx.logic.connector.DynamicConnector;
-import li.pitschmann.knx.logic.connector.InputConnectorAware;
-import li.pitschmann.knx.logic.connector.OutputConnectorAware;
-import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Controller for {@link Component} (Logic, Inbox, Outbox)
@@ -56,7 +47,7 @@ public class ComponentController {
 
         final var responses = new ArrayList<>(components.size());
         for (final var component : components) {
-            responses.add(toComponentResponse(component));
+            responses.add(ComponentResponse.from(component));
         }
 
         // TODO: filter? limit?
@@ -84,7 +75,7 @@ public class ComponentController {
 
         // return component
         ctx.status(200);
-        ctx.json(toComponentResponse(component));
+        ctx.json(ComponentResponse.from(component));
     }
 
     /**
@@ -125,7 +116,7 @@ public class ComponentController {
         LOG.debug("Component registered: {}", component);
 
         ctx.status(201);
-        ctx.json(toComponentResponse(component));
+        ctx.json(ComponentResponse.from(component));
     }
 
 
@@ -148,47 +139,5 @@ public class ComponentController {
         }
 
         ctx.status(204);
-    }
-
-    private ComponentResponse toComponentResponse(final Component component) {
-        final var response = new ComponentResponse();
-        response.setUid(component.getUid().toString());
-        response.setClassName(component.getWrappedObject().getClass().getName());
-        response.setInputs(getInputConnectors(component).stream().map(this::toConnectorResponse).collect(Collectors.toList()));
-        response.setOutputs(getOutputConnectors(component).stream().map(this::toConnectorResponse).collect(Collectors.toList()));
-        return response;
-    }
-
-    private List<Connector> getInputConnectors(final Component component) {
-        return component instanceof InputConnectorAware ? ((InputConnectorAware) component).getInputConnectors() : List.of();
-    }
-
-    private List<Connector> getOutputConnectors(final Component component) {
-        return component instanceof OutputConnectorAware ? ((OutputConnectorAware) component).getOutputConnectors() : List.of();
-    }
-
-    private ConnectorResponse toConnectorResponse(final Connector connector) {
-        final var connectorResponse = new ConnectorResponse();
-        connectorResponse.setName(connector.getDescriptor().getName());
-        connectorResponse.setPinType(connector.getDescriptor().getFieldType().getSimpleName().toLowerCase());
-        connectorResponse.setPins(toPinResponses(connector));
-        connectorResponse.setDynamic(connector instanceof DynamicConnector);
-        return connectorResponse;
-    }
-
-    private List<PinResponse> toPinResponses(final Connector connector) {
-        final var pins = connector.getPinStream().collect(Collectors.toList());
-        final var pinResponses = new ArrayList<PinResponse>(pins.size());
-        for (final var pin : pins) {
-            pinResponses.add(toPinResponse(pin));
-        }
-        return pinResponses;
-    }
-
-    private PinResponse toPinResponse(final Pin pin) {
-        final var pinResponse = new PinResponse();
-        pinResponse.setUid(pin.getUid().toString());
-        pinResponse.setValue(String.valueOf(pin.getValue()));
-        return pinResponse;
     }
 }

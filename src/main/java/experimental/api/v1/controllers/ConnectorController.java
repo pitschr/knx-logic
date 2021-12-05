@@ -2,7 +2,6 @@ package experimental.api.v1.controllers;
 
 import experimental.UidRegistry;
 import experimental.api.v1.json.ConnectorResponse;
-import experimental.api.v1.json.PinResponse;
 import experimental.api.v1.services.ConnectorService;
 import io.javalin.http.Context;
 import li.pitschmann.knx.core.annotations.Nullable;
@@ -14,10 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Controller for {@link Connector} (Input, Output)
@@ -52,7 +48,7 @@ public class ConnectorController {
             ctx.status(404);
         } else {
             ctx.status(200);
-            ctx.json(toConnectorResponse(connector));
+            ctx.json(ConnectorResponse.from(connector));
         }
     }
 
@@ -97,7 +93,7 @@ public class ConnectorController {
         uidRegistry.registerPin(newPin);
 
         ctx.status(HttpServletResponse.SC_CREATED);
-        ctx.json(toPinResponses(connector));
+        ctx.json(ConnectorResponse.from(connector).getPins());
     }
 
     /**
@@ -136,27 +132,6 @@ public class ConnectorController {
         uidRegistry.deregisterPin(deletedPin);
 
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
-        ctx.json(toConnectorResponse(connector));
-    }
-
-    private ConnectorResponse toConnectorResponse(final Connector connector) {
-        final var connectorResponse = new ConnectorResponse();
-        connectorResponse.setName(connector.getDescriptor().getName());
-        connectorResponse.setPinType(connector.getDescriptor().getFieldType().getSimpleName().toLowerCase());
-        connectorResponse.setPins(toPinResponses(connector));
-        connectorResponse.setDynamic(connector instanceof DynamicConnector);
-        return connectorResponse;
-    }
-
-    private List<PinResponse> toPinResponses(final Connector connector) {
-        final var pins = connector.getPinStream().collect(Collectors.toList());
-        final var pinResponses = new ArrayList<PinResponse>(pins.size());
-        for (final var pin : pins) {
-            final var pinResponse = new PinResponse();
-            pinResponse.setUid(pin.getUid().toString());
-            pinResponse.setValue(String.valueOf(pin.getValue()));
-            pinResponses.add(pinResponse);
-        }
-        return pinResponses;
+        ctx.json(ConnectorResponse.from(connector));
     }
 }
