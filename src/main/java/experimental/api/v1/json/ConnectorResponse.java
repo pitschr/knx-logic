@@ -13,7 +13,6 @@ public final class ConnectorResponse {
     private final String pinType;
     private final List<PinResponse> pins;
 
-
     private ConnectorResponse(final String uid, final String name, boolean dynamic, final String pinType, final List<PinResponse> pins) {
         this.uid = uid;
         this.name = name;

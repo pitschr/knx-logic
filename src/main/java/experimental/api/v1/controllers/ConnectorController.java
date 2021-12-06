@@ -8,11 +8,14 @@ import li.pitschmann.knx.core.annotations.Nullable;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
+import li.pitschmann.knx.logic.exceptions.MaximumBoundException;
+import li.pitschmann.knx.logic.exceptions.MinimumBoundException;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -45,9 +48,9 @@ public class ConnectorController {
 
         final var connector = uidRegistry.findConnectorByUID(connectorUid);
         if (connector == null) {
-            ctx.status(404);
+            ctx.status(HttpServletResponse.SC_NOT_FOUND);
         } else {
-            ctx.status(200);
+            ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector));
         }
     }
@@ -69,31 +72,42 @@ public class ConnectorController {
         final var connector = uidRegistry.findConnectorByUID(connectorUid);
         if (connector == null) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            LOG.error("No connector found for UID: {}", connectorUid);
             return;
         }
 
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            LOG.error("Connector is not dynamic: {}", connector);
             return;
         }
         final var dynamicConnector = (DynamicConnector) connector;
 
-        final Pin newPin;
-        if (index == null) {
-            newPin = connectorService.addPin(dynamicConnector);
-        } else {
-            // index must be valid
-            if (index < 0 || index >= dynamicConnector.size()) {
-                ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-                return;
+        try {
+            final Pin newPin;
+            if (index == null) {
+                newPin = connectorService.addPin(dynamicConnector);
+            } else {
+                // index must be valid
+                if (index < 0 || index >= dynamicConnector.size()) {
+                    ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+                    ctx.json(Map.of(
+                            "message",
+                            String.format("Pin index is out of range: %s (min=0, max=%s)", index, dynamicConnector.size()-1))
+                    );
+                    return;
+                }
+                newPin = connectorService.addPin(dynamicConnector, index);
             }
-            newPin = connectorService.addPin(dynamicConnector, index);
-        }
-        uidRegistry.registerPin(newPin);
+            uidRegistry.registerPin(newPin);
 
-        ctx.status(HttpServletResponse.SC_CREATED);
-        ctx.json(ConnectorResponse.from(connector).getPins());
+            ctx.status(HttpServletResponse.SC_CREATED);
+            ctx.json(ConnectorResponse.from(connector).getPins());
+        } catch (final MaximumBoundException e) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(Map.of("message", e.getMessage()));
+        }
     }
 
     /**
@@ -112,12 +126,14 @@ public class ConnectorController {
         final var connector = uidRegistry.findConnectorByUID(connectorUid);
         if (connector == null) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            LOG.error("No connector found for UID: {}", connectorUid);
             return;
         }
 
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            LOG.error("Connector is not dynamic: {}", connector);
             return;
         }
         final var dynamicConnector = (DynamicConnector) connector;
@@ -125,13 +141,22 @@ public class ConnectorController {
         // index must be provided and valid
         if (index == null || index < 0 || index >= dynamicConnector.size()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("Pin index is out of range: %s (min=0, max=%s)", index, dynamicConnector.size()-1))
+            );
             return;
         }
 
-        final var deletedPin = connectorService.removePin(dynamicConnector, index);
-        uidRegistry.deregisterPin(deletedPin);
+        try {
+            final var deletedPin = connectorService.removePin(dynamicConnector, index);
+            uidRegistry.deregisterPin(deletedPin);
 
-        ctx.status(HttpServletResponse.SC_NO_CONTENT);
-        ctx.json(ConnectorResponse.from(connector));
+            ctx.status(HttpServletResponse.SC_ACCEPTED);
+            ctx.json(ConnectorResponse.from(connector));
+        } catch (final MinimumBoundException e) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(Map.of("message", e.getMessage()));
+        }
     }
 }
