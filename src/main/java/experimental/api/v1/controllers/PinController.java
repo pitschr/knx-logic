@@ -3,11 +3,9 @@ package experimental.api.v1.controllers;
 import experimental.UidRegistry;
 import experimental.api.v1.json.PinResponse;
 import experimental.api.v1.json.PinSetValueRequest;
-import experimental.api.v1.services.ConnectorService;
 import experimental.api.v1.services.PinService;
 import io.javalin.http.Context;
-import li.pitschmann.knx.logic.annotations.Output;
-import li.pitschmann.knx.logic.pin.DynamicPin;
+import li.pitschmann.knx.logic.descriptor.OutputDescriptor;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +24,10 @@ public class PinController {
 
     private final UidRegistry uidRegistry;
     private final PinService pinService;
-    private final ConnectorService connectorService;
 
-    public PinController(final UidRegistry uidRegistry, final PinService pinService, final ConnectorService connectorService) {
+    public PinController(final UidRegistry uidRegistry, final PinService pinService) {
         this.uidRegistry = Objects.requireNonNull(uidRegistry);
         this.pinService = Objects.requireNonNull(pinService);
-        this.connectorService = Objects.requireNonNull(connectorService);
     }
 
     public void getPin(final Context ctx, final String pinUid) {
@@ -100,8 +96,8 @@ public class PinController {
             return;
         }
 
-        if (pin.getDescriptor().getField().getAnnotation(Output.class) != null) {
-            LOG.error("Pin is output: {}", pin);
+        if (pin.getDescriptor() instanceof OutputDescriptor) {
+            LOG.error("Pin is declared as an Output: {}", pin);
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
             ctx.json(Map.of(
                     "message",
@@ -113,42 +109,6 @@ public class PinController {
         final var valueAsString = request.getValue();
         pinService.setValue(pin, valueAsString);
 
-        ctx.status(HttpServletResponse.SC_ACCEPTED);
-    }
-
-    public void deletePin(final Context ctx, final String pinUid) {
-        LOG.trace("Delete pin: {}", pinUid);
-
-        final var pin = uidRegistry.findPinByUID(pinUid);
-        if (pin == null) {
-            LOG.error("No pin found for UID: {}", pinUid);
-            ctx.status(HttpServletResponse.SC_NOT_FOUND);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("No pin found with UID: %s", pinUid))
-            );
-            return;
-        }
-
-        if (!(pin instanceof DynamicPin)) {
-            LOG.error("Pin is not dynamic: {}", pin);
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("Pin is not dynamic: %s", pin))
-            );
-            return;
-        }
-        final var dynamicPin = (DynamicPin) pin;
-        final var dynamicConnector = dynamicPin.getConnector();
-
-        if (dynamicConnector == null) {
-            ctx.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            LOG.error("No suitable dynamic connector found for pin: {}", pin);
-            return;
-        }
-
-        connectorService.removePin(dynamicConnector, dynamicPin.getIndex());
         ctx.status(HttpServletResponse.SC_ACCEPTED);
     }
 }
