@@ -48,7 +48,12 @@ public class ConnectorController {
 
         final var connector = uidRegistry.findConnectorByUID(connectorUid);
         if (connector == null) {
+            LOG.error("No connector found for UID: {}", connectorUid);
             ctx.status(HttpServletResponse.SC_NOT_FOUND);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("No connector found with UID: %s", connectorUid))
+            );
         } else {
             ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector));
@@ -71,15 +76,23 @@ public class ConnectorController {
         // find connector
         final var connector = uidRegistry.findConnectorByUID(connectorUid);
         if (connector == null) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             LOG.error("No connector found for UID: {}", connectorUid);
+            ctx.status(HttpServletResponse.SC_NOT_FOUND);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("No connector found with UID: %s", connectorUid))
+            );
             return;
         }
 
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
             LOG.error("Connector is not dynamic: {}", connector);
+            ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("Connector is not dynamic: %s", connector))
+            );
             return;
         }
         final var dynamicConnector = (DynamicConnector) connector;
@@ -102,7 +115,7 @@ public class ConnectorController {
             }
             uidRegistry.registerPin(newPin);
 
-            ctx.status(HttpServletResponse.SC_CREATED);
+            ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector).getPins());
         } catch (final MaximumBoundException e) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
@@ -125,15 +138,23 @@ public class ConnectorController {
         // find connector
         final var connector = uidRegistry.findConnectorByUID(connectorUid);
         if (connector == null) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             LOG.error("No connector found for UID: {}", connectorUid);
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("No connector found with UID: %s", connectorUid))
+            );
             return;
         }
 
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
             LOG.error("Connector is not dynamic: {}", connector);
+            ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("Connector is not dynamic: %s", connector))
+            );
             return;
         }
         final var dynamicConnector = (DynamicConnector) connector;
@@ -152,7 +173,7 @@ public class ConnectorController {
             final var deletedPin = connectorService.removePin(dynamicConnector, index);
             uidRegistry.deregisterPin(deletedPin);
 
-            ctx.status(HttpServletResponse.SC_ACCEPTED);
+            ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector));
         } catch (final MinimumBoundException e) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);

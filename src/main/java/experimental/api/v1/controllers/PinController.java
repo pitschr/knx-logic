@@ -6,12 +6,14 @@ import experimental.api.v1.json.PinSetValueRequest;
 import experimental.api.v1.services.ConnectorService;
 import experimental.api.v1.services.PinService;
 import io.javalin.http.Context;
+import li.pitschmann.knx.logic.annotations.Output;
 import li.pitschmann.knx.logic.pin.DynamicPin;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -32,18 +34,48 @@ public class PinController {
         this.connectorService = Objects.requireNonNull(connectorService);
     }
 
-    public void getValue(final Context ctx, final String pinUid) {
+    public void getPin(final Context ctx, final String pinUid) {
         LOG.trace("Find Pin by UID '{}'", pinUid);
 
         // find the pin by uid
         final var pin = uidRegistry.findPinByUID(pinUid);
         if (pin == null) {
+            LOG.error("No pin found for UID: {}", pinUid);
             ctx.status(HttpServletResponse.SC_NOT_FOUND);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("No pin found with UID: %s", pinUid))
+            );
             return;
         }
 
         ctx.status(HttpServletResponse.SC_OK);
         ctx.json(PinResponse.from(pin));
+    }
+
+    /**
+     * Returns the value of a pin
+     *
+     * @param ctx     context
+     * @param pinUid  UID of pin to be fetched
+     */
+    public void getValue(final Context ctx, final String pinUid) {
+        LOG.trace("Get Value Pin by UID: {}", pinUid);
+
+        // find the pin by uid
+        final var pin = uidRegistry.findPinByUID(pinUid);
+        if (pin == null) {
+            LOG.error("No pin found for UID: {}", pinUid);
+            ctx.status(HttpServletResponse.SC_NOT_FOUND);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("No pin found with UID: %s", pinUid))
+            );
+            return;
+        }
+
+        ctx.status(HttpServletResponse.SC_OK);
+        ctx.json(Map.of("value", String.valueOf(pin.getValue())));
     }
 
     /**
@@ -54,12 +86,27 @@ public class PinController {
      * @param request request context to update the pin
      */
     public void setValue(final Context ctx, final String pinUid, final PinSetValueRequest request) {
-        LOG.trace("Update Pin by UID '{}': {}", pinUid, request);
+        LOG.trace("Set Value Pin by UID '{}': {}", pinUid, request);
 
         // find the pin by uid
         final var pin = uidRegistry.findPinByUID(pinUid);
         if (pin == null) {
+            LOG.error("No pin found for UID: {}", pinUid);
             ctx.status(HttpServletResponse.SC_NOT_FOUND);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("No pin found with UID: %s", pinUid))
+            );
+            return;
+        }
+
+        if (pin.getDescriptor().getField().getAnnotation(Output.class) != null) {
+            LOG.error("Pin is output: {}", pin);
+            ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("Pin is declared as an output pin, and therefore not suitable to set the value: %s", pin))
+            );
             return;
         }
 
@@ -74,13 +121,22 @@ public class PinController {
 
         final var pin = uidRegistry.findPinByUID(pinUid);
         if (pin == null) {
+            LOG.error("No pin found for UID: {}", pinUid);
             ctx.status(HttpServletResponse.SC_NOT_FOUND);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("No pin found with UID: %s", pinUid))
+            );
             return;
         }
 
         if (!(pin instanceof DynamicPin)) {
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
             LOG.error("Pin is not dynamic: {}", pin);
+            ctx.status(HttpServletResponse.SC_FORBIDDEN);
+            ctx.json(Map.of(
+                    "message",
+                    String.format("Pin is not dynamic: %s", pin))
+            );
             return;
         }
         final var dynamicPin = (DynamicPin) pin;
