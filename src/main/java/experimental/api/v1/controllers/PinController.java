@@ -31,17 +31,10 @@ public class PinController {
     }
 
     public void getPin(final Context ctx, final String pinUid) {
-        LOG.trace("Find Pin by UID '{}'", pinUid);
+        LOG.trace("Get Pin by UID '{}'", pinUid);
 
-        // find the pin by uid
-        final var pin = uidRegistry.findPinByUID(pinUid);
+        final var pin = findPinByUid(ctx, pinUid);
         if (pin == null) {
-            LOG.error("No pin found for UID: {}", pinUid);
-            ctx.status(HttpServletResponse.SC_NOT_FOUND);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("No pin found with UID: %s", pinUid))
-            );
             return;
         }
 
@@ -52,21 +45,14 @@ public class PinController {
     /**
      * Returns the value of a pin
      *
-     * @param ctx     context
-     * @param pinUid  UID of pin to be fetched
+     * @param ctx    context
+     * @param pinUid UID of pin to be fetched
      */
     public void getValue(final Context ctx, final String pinUid) {
         LOG.trace("Get Value Pin by UID: {}", pinUid);
 
-        // find the pin by uid
-        final var pin = uidRegistry.findPinByUID(pinUid);
+        final var pin = findPinByUid(ctx, pinUid);
         if (pin == null) {
-            LOG.error("No pin found for UID: {}", pinUid);
-            ctx.status(HttpServletResponse.SC_NOT_FOUND);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("No pin found with UID: %s", pinUid))
-            );
             return;
         }
 
@@ -82,17 +68,10 @@ public class PinController {
      * @param request request context to update the pin
      */
     public void setValue(final Context ctx, final String pinUid, final PinSetValueRequest request) {
-        LOG.trace("Set Value Pin by UID '{}': {}", pinUid, request);
+        LOG.trace("Set Value Pin for UID '{}': {}", pinUid, request);
 
-        // find the pin by uid
-        final var pin = uidRegistry.findPinByUID(pinUid);
+        final var pin = findPinByUid(ctx, pinUid);
         if (pin == null) {
-            LOG.error("No pin found for UID: {}", pinUid);
-            ctx.status(HttpServletResponse.SC_NOT_FOUND);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("No pin found with UID: %s", pinUid))
-            );
             return;
         }
 
@@ -110,5 +89,31 @@ public class PinController {
         pinService.setValue(pin, valueAsString);
 
         ctx.status(HttpServletResponse.SC_ACCEPTED);
+    }
+
+    /**
+     * Returns a {@link Pin} if found, otherwise {@code null}
+     * and error message in {@link Context}
+     *
+     * @param ctx context
+     * @param uid UID of pin for look up
+     * @return Pin if found, otherwise {@code null}
+     */
+    private Pin findPinByUid(final Context ctx, final String uid) {
+        Pin pin = null;
+        if (uid == null || uid.isBlank()) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(Map.of("message", "No pin UID provided."));
+        } else {
+            pin = uidRegistry.findPinByUID(uid);
+            if (pin == null) {
+                ctx.status(HttpServletResponse.SC_NOT_FOUND);
+                ctx.json(Map.of(
+                        "message",
+                        String.format("No pin found with UID: %s", uid))
+                );
+            }
+        }
+        return pin;
     }
 }

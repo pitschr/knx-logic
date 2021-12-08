@@ -8,11 +8,14 @@ import experimental.api.v1.services.ComponentService;
 import io.javalin.http.Context;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.components.Component;
+import li.pitschmann.knx.logic.exceptions.NoLogicClassFound;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Controller for {@link Component} (Logic, Inbox, Outbox)
@@ -45,14 +48,13 @@ public class ComponentController {
         // return and find all components
         final var components = uidRegistry.getAllComponents();
 
-        final var responses = new ArrayList<>(components.size());
-        for (final var component : components) {
-            responses.add(ComponentResponse.from(component));
-        }
+        final var responses = components.stream()
+                .map(ComponentResponse::from)
+                .collect(Collectors.toUnmodifiableList());
 
         // TODO: filter? limit?
 
-        ctx.status(200);
+        ctx.status(HttpServletResponse.SC_OK);
         ctx.json(responses);
     }
 
@@ -64,17 +66,13 @@ public class ComponentController {
      */
     public void getComponent(final Context ctx, final String componentUid) {
         LOG.trace("Get Info for Component UID: {}", componentUid);
-        Preconditions.checkNonNull(componentUid, "UID for component not provided.");
 
-        // find the component by uid
-        final var component = uidRegistry.findComponentByUID(componentUid);
+        final var component = findComponentByUid(ctx, componentUid);
         if (component == null) {
-            ctx.status(404);
             return;
         }
 
-        // return component
-        ctx.status(200);
+        ctx.status(HttpServletResponse.SC_OK);
         ctx.json(ComponentResponse.from(component));
     }
 
@@ -91,8 +89,14 @@ public class ComponentController {
         final Component component;
         if ("logic".equalsIgnoreCase(request.getType())) {
             // create logic
-            component = componentFactory.createLogic(request.getData());
-            LOG.debug("Logic Component added: {}", component);
+            try {
+                component = componentFactory.createLogic(request.getData());
+                LOG.debug("Logic Component added: {}", component);
+            } catch (final NoLogicClassFound ex) {
+                ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+                ctx.json(Map.of("message", ex.getMessage()));
+                return;
+            }
         } else if ("inbox".equalsIgnoreCase(request.getType())) {
             // create inbox
             component = componentFactory.createInbox(request.getEvent(), request.getData());
@@ -102,10 +106,14 @@ public class ComponentController {
             component = componentFactory.createOutbox(request.getEvent(), request.getData());
             LOG.debug("Outbox Component added: {}", component);
         } else {
-            ctx.status(400);
-            throw new AssertionError(
-                    "Unsupported type: " + request.getType() + ". Supported are: logic, inbox and outbox."
+            LOG.error("Unsupported Component Type: {}", request.getType());
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(Map.of(
+                            "message",
+                            String.format("Unsupported Component Type: %s. Supported are: logic, inbox and outbox.", request.getType())
+                    )
             );
+            return;
         }
 
         componentService.addComponent(component);
@@ -115,7 +123,7 @@ public class ComponentController {
 
         LOG.debug("Component registered: {}", component);
 
-        ctx.status(201);
+        ctx.status(HttpServletResponse.SC_CREATED);
         ctx.json(ComponentResponse.from(component));
     }
 
@@ -131,13 +139,41 @@ public class ComponentController {
         LOG.trace("Delete for Component UID: {}", componentUid);
         Preconditions.checkNonNull(componentUid, "UID for component delete not provided.");
 
-        final var component = uidRegistry.findComponentByUID(componentUid);
-        if (component != null) {
-            // TODO: check if component has at least one link -> protected?
-            uidRegistry.deregisterComponent(component);
-            componentService.removeComponent(component);
+        final var component = findComponentByUid(ctx, componentUid);
+        if (component == null) {
+            return;
         }
 
-        ctx.status(204);
+        // TODO: check if component has at least one link -> protected?
+        uidRegistry.deregisterComponent(component);
+        componentService.removeComponent(component);
+
+        ctx.status(HttpServletResponse.SC_NO_CONTENT);
+    }
+
+    /**
+     * Returns a {@link Component} if found, otherwise {@code null}
+     * and error message in {@link Context}
+     *
+     * @param ctx context
+     * @param uid UID of component for look up
+     * @return Component if found, otherwise {@code null}
+     */
+    private Component findComponentByUid(final Context ctx, final String uid) {
+        Component component = null;
+        if (uid == null || uid.isBlank()) {
+            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(Map.of("message", "No component UID provided."));
+        } else {
+            component = uidRegistry.findComponentByUID(uid);
+            if (component == null) {
+                ctx.status(HttpServletResponse.SC_NOT_FOUND);
+                ctx.json(Map.of(
+                        "message",
+                        String.format("No component found with UID: %s", uid))
+                );
+            }
+        }
+        return component;
     }
 }
