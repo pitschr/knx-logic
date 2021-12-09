@@ -22,17 +22,14 @@ import java.util.stream.Collectors;
  *
  * @author PITSCHR
  */
-public class ComponentController {
+public final class ComponentController {
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
-    private final UidRegistry uidRegistry;
     private final ComponentFactory componentFactory;
     private final ComponentService componentService;
 
-    public ComponentController(final UidRegistry uidRegistry,
-                               final ComponentFactory componentFactory,
+    public ComponentController(final ComponentFactory componentFactory,
                                final ComponentService componentService) {
-        this.uidRegistry = Objects.requireNonNull(uidRegistry);
         this.componentFactory = Objects.requireNonNull(componentFactory);
         this.componentService = Objects.requireNonNull(componentService);
     }
@@ -46,7 +43,7 @@ public class ComponentController {
         LOG.trace("Return all components");
 
         // return and find all components
-        final var components = uidRegistry.getAllComponents();
+        final var components = UidRegistry.getAllComponents();
 
         final var responses = components.stream()
                 .map(ComponentResponse::from)
@@ -119,7 +116,7 @@ public class ComponentController {
         componentService.addComponent(component);
 
         // register the component
-        uidRegistry.registerComponent(component);
+        UidRegistry.register(component);
 
         LOG.debug("Component registered: {}", component);
 
@@ -145,7 +142,7 @@ public class ComponentController {
         }
 
         // TODO: check if component has at least one link -> protected?
-        uidRegistry.deregisterComponent(component);
+        UidRegistry.deregister(component);
         componentService.removeComponent(component);
 
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
@@ -165,7 +162,7 @@ public class ComponentController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", "No component UID provided."));
         } else {
-            component = uidRegistry.findComponentByUID(uid);
+            component = UidRegistry.findComponentByUID(uid);
             if (component == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(

@@ -22,11 +22,9 @@ import java.util.Objects;
 public class PinController {
     private static final Logger LOG = LoggerFactory.getLogger(PinController.class);
 
-    private final UidRegistry uidRegistry;
     private final PinService pinService;
 
-    public PinController(final UidRegistry uidRegistry, final PinService pinService) {
-        this.uidRegistry = Objects.requireNonNull(uidRegistry);
+    public PinController(final PinService pinService) {
         this.pinService = Objects.requireNonNull(pinService);
     }
 
@@ -105,7 +103,7 @@ public class PinController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", "No pin UID provided."));
         } else {
-            pin = uidRegistry.findPinByUID(uid);
+            pin = UidRegistry.findPinByUID(uid);
             if (pin == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(

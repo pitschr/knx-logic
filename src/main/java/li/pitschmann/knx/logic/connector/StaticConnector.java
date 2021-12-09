@@ -12,8 +12,7 @@ import java.util.stream.Stream;
  *
  * @author PITSCHR
  */
-public final class StaticConnector extends AbstractConnector
-        implements StaticConnectorAware {
+public final class StaticConnector extends AbstractConnector {
     private final StaticPin pin;
 
     /**
@@ -33,7 +32,11 @@ public final class StaticConnector extends AbstractConnector
         return Stream.of(this.pin);
     }
 
-    @Override
+    /**
+     * Returns the {@link StaticPin}
+     *
+     * @return {@link StaticPin}; not null
+     */
     public StaticPin getPin() {
         return this.pin;
     }

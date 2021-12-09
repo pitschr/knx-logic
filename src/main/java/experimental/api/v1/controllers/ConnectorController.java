@@ -9,7 +9,6 @@ import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.exceptions.MaximumBoundException;
 import li.pitschmann.knx.logic.exceptions.MinimumBoundException;
-import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,12 +24,9 @@ import java.util.Objects;
 public class ConnectorController {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectorController.class);
 
-    private final UidRegistry uidRegistry;
     private final ConnectorService connectorService;
 
-    public ConnectorController(final UidRegistry uidRegistry,
-                               final ConnectorService connectorService) {
-        this.uidRegistry = Objects.requireNonNull(uidRegistry);
+    public ConnectorController(final ConnectorService connectorService) {
         this.connectorService = Objects.requireNonNull(connectorService);
     }
 
@@ -84,9 +80,8 @@ public class ConnectorController {
         final var dynamicConnector = (DynamicConnector) connector;
 
         try {
-            final Pin newPin;
             if (index == null) {
-                newPin = connectorService.addPin(dynamicConnector);
+                connectorService.addPin(dynamicConnector);
             } else {
                 // index must be valid
                 if (index < 0 || index >= dynamicConnector.size()) {
@@ -97,9 +92,8 @@ public class ConnectorController {
                     );
                     return;
                 }
-                newPin = connectorService.addPin(dynamicConnector, index);
+                connectorService.addPin(dynamicConnector, index);
             }
-            uidRegistry.registerPin(newPin);
 
             ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector).getPins());
@@ -149,8 +143,7 @@ public class ConnectorController {
         }
 
         try {
-            final var deletedPin = connectorService.removePin(dynamicConnector, index);
-            uidRegistry.deregisterPin(deletedPin);
+            connectorService.removePin(dynamicConnector, index);
 
             ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector));
@@ -174,7 +167,7 @@ public class ConnectorController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", "No connector UID provided."));
         } else {
-            connector = uidRegistry.findConnectorByUID(uid);
+            connector = UidRegistry.findConnectorByUID(uid);
             if (connector == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(
