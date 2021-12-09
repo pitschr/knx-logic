@@ -17,7 +17,6 @@
 
 package experimental.api.v1.services;
 
-import experimental.UidRegistry;
 import li.pitschmann.knx.logic.Router;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +30,6 @@ import static li.pitschmann.knx.logic.uid.UIDFactory.createUid;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -207,9 +205,6 @@ class LinkServiceTest extends BaseDatabaseSuite {
         when(pin1Mock.getUid()).thenReturn(createUid("UID-1"));
         final var pin2Mock = mock(Pin.class);
         when(pin2Mock.getUid()).thenReturn(createUid("UID-2"));
-
-        final var uidRegistryMock = mock(UidRegistry.class);
-        when(uidRegistryMock.findPinByUID(anyString())).thenReturn(mock(Pin.class));
 
         final var routerMock = mock(Router.class);
         when(routerMock.getLinkedPins(any(Pin.class))).thenReturn(List.of(pin1Mock, pin2Mock));
