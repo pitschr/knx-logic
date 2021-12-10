@@ -1,15 +1,17 @@
 package experimental.api.v1.controllers;
 
 import experimental.Plan;
+import experimental.UidRegistry;
 import experimental.api.v1.json.CreateNewPlanRequest;
-import experimental.api.v1.json.CreateNewPlanResponse;
 import experimental.api.v1.json.PlanResponse;
 import experimental.api.v1.json.SaveNoteRequest;
 import io.javalin.http.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Controller about the plan containing components
@@ -30,7 +32,7 @@ public class PlanController {
         // returns json array of all plans with their ids
 
         ctx.status(200);
-        ctx.json(List.of("1", "2", "3"));
+        ctx.json(UidRegistry.getAllPlans().stream().map(PlanResponse::from).collect(Collectors.toList()));
     }
 
     /**
@@ -45,10 +47,8 @@ public class PlanController {
         // TODO: Check if plan exists
         // TODO: get individual plan (note, component ids)
 
-        final var response = new PlanResponse();
-
         ctx.status(200);
-        ctx.json(response);
+        ctx.json(PlanResponse.from(plan));
     }
 
     /**
@@ -62,7 +62,15 @@ public class PlanController {
 
         // creates a new logic plan (return new id)  { name: "lorem ipsum", note: "lorem ipsum" }
         // TODO: create new plan
-        final var response = new CreateNewPlanResponse();
+
+        final var plan = new Plan();
+        plan.setId(4711);
+        plan.setName("Create Plan Name");
+        plan.setDescription("Create Plan Description");
+        plan.setComponents(
+                request.getComponentUids().stream().map(UidRegistry::findComponentByUID).collect(Collectors.toList())
+        );
+        final var response = PlanResponse.from(plan);
 
         ctx.status(201);
         ctx.json(response);

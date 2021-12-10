@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 public final class UidRegistry {
+    private static final Map<String, Plan> planMap = new HashMap<>();
     private static final Map<String, Component> componentMap = new HashMap<>();
     private static final Map<String, Connector> connectorMap = new HashMap<>();
     private static final Map<String, Pin> pinMap = new HashMap<>();
@@ -19,7 +20,11 @@ public final class UidRegistry {
     }
 
     public static Plan findPlanByUID(final String uidAsString) {
-        return null;
+        return planMap.get(uidAsString);
+    }
+
+    public static List<Plan> getAllPlans() {
+        return List.copyOf(planMap.values());
     }
 
     public static List<Component> getAllComponents() {
@@ -36,6 +41,10 @@ public final class UidRegistry {
 
     public static Pin findPinByUID(final String uidAsString) {
         return pinMap.get(uidAsString);
+    }
+
+    public static void register(Plan plan) {
+        planMap.put(plan.getName(), plan);
     }
 
     public static void register(Component component) {
