@@ -50,6 +50,15 @@ public interface ComponentsDao {
     ComponentModel find(final UID uid);
 
     /**
+     * Returns all {@link ComponentModel} for given diagram {@code id}
+     *
+     * @param id the identifier of diagram
+     * @return list of {@link ComponentModel}
+     */
+    @SqlQuery("SELECT c.* FROM diagram_components dc INNER JOIN components c ON dc.componentId = c.id WHERE dc.diagramId = ?")
+    List<ComponentModel> byDiagramId(final int id);
+
+    /**
      * Inserts a new {@link ComponentModel} into database
      *
      * @param model model to be inserted

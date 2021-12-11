@@ -19,24 +19,29 @@ import java.util.Objects;
  *
  * @author PITSCHR
  */
-public class PinController {
+public final class PinController {
     private static final Logger LOG = LoggerFactory.getLogger(PinController.class);
-
     private final PinService pinService;
 
     public PinController(final PinService pinService) {
         this.pinService = Objects.requireNonNull(pinService);
     }
 
-    public void getPin(final Context ctx, final String pinUid) {
-        LOG.trace("Get Pin by UID '{}'", pinUid);
+    /**
+     * Returns response about a specific pin by its {@code uid}
+     *
+     * @param ctx context
+     * @param uid the pin uid
+     */
+    public void getOne(final Context ctx, final String uid) {
+        LOG.trace("Get Pin by UID: {}", uid);
 
-        final var pin = findPinByUid(ctx, pinUid);
+        final var pin = findPinByUID(ctx, uid);
         if (pin == null) {
             return;
         }
 
-        ctx.status(HttpServletResponse.SC_OK);
+        ctx.status(HttpServletResponse.SC_NO_CONTENT);
         ctx.json(PinResponse.from(pin));
     }
 
@@ -49,7 +54,7 @@ public class PinController {
     public void getValue(final Context ctx, final String pinUid) {
         LOG.trace("Get Value Pin by UID: {}", pinUid);
 
-        final var pin = findPinByUid(ctx, pinUid);
+        final var pin = findPinByUID(ctx, pinUid);
         if (pin == null) {
             return;
         }
@@ -68,7 +73,7 @@ public class PinController {
     public void setValue(final Context ctx, final String pinUid, final PinSetValueRequest request) {
         LOG.trace("Set Value Pin for UID '{}': {}", pinUid, request);
 
-        final var pin = findPinByUid(ctx, pinUid);
+        final var pin = findPinByUID(ctx, pinUid);
         if (pin == null) {
             return;
         }
@@ -97,7 +102,7 @@ public class PinController {
      * @param uid UID of pin for look up
      * @return Pin if found, otherwise {@code null}
      */
-    private Pin findPinByUid(final Context ctx, final String uid) {
+    private Pin findPinByUID(final Context ctx, final String uid) {
         Pin pin = null;
         if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);

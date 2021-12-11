@@ -3,28 +3,31 @@ package experimental;
 import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.ConnectorAware;
+import li.pitschmann.knx.logic.diagram.Diagram;
 import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.pin.PinAware;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public final class UidRegistry {
-    private static final Map<String, Plan> planMap = new HashMap<>();
+    private static final Map<String, Diagram> diagramMap = new HashMap<>();
     private static final Map<String, Component> componentMap = new HashMap<>();
     private static final Map<String, Connector> connectorMap = new HashMap<>();
     private static final Map<String, Pin> pinMap = new HashMap<>();
+    private static final Map<String, List<Diagram>> diagramComponentMap = new HashMap<>();
 
     private UidRegistry() {
     }
 
-    public static Plan findPlanByUID(final String uidAsString) {
-        return planMap.get(uidAsString);
+    public static Diagram findDiagramByUID(final String uidAsString) {
+        return diagramMap.get(uidAsString);
     }
 
-    public static List<Plan> getAllPlans() {
-        return List.copyOf(planMap.values());
+    public static List<Diagram> getAllDiagrams() {
+        return List.copyOf(diagramMap.values());
     }
 
     public static List<Component> getAllComponents() {
@@ -43,29 +46,33 @@ public final class UidRegistry {
         return pinMap.get(uidAsString);
     }
 
-    public static void register(Plan plan) {
-        planMap.put(plan.getName(), plan);
+    public static void register(final Diagram diagram) {
+        diagramMap.put(diagram.getUid().toString(), diagram);
     }
 
-    public static void register(Component component) {
+    public static void register(final Component component) {
         componentMap.put(component.getUid().toString(), component);
 
         if (component instanceof ConnectorAware) {
-            ((ConnectorAware)component).getConnectors().forEach(connector -> connectorMap.put(connector.getUid().toString(), connector));
+            ((ConnectorAware) component).getConnectors().forEach(connector -> connectorMap.put(connector.getUid().toString(), connector));
         }
         if (component instanceof PinAware) {
-            ((PinAware)component).getPins().forEach(UidRegistry::register);
+            ((PinAware) component).getPins().forEach(UidRegistry::register);
         }
+    }
+
+    public static void deregister(final Diagram diagram) {
+        diagramMap.remove(diagram.getUid().toString());
     }
 
     public static void deregister(final Component component) {
         componentMap.remove(component.getUid().toString());
 
         if (component instanceof ConnectorAware) {
-            ((ConnectorAware)component).getConnectors().forEach(connector -> connectorMap.remove(connector.getUid().toString()));
+            ((ConnectorAware) component).getConnectors().forEach(connector -> connectorMap.remove(connector.getUid().toString()));
         }
         if (component instanceof PinAware) {
-            ((PinAware)component).getPins().forEach(UidRegistry::deregister);
+            ((PinAware) component).getPins().forEach(UidRegistry::deregister);
         }
     }
 

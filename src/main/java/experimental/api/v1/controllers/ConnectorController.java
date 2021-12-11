@@ -21,7 +21,7 @@ import java.util.Objects;
  *
  * @author PITSCHR
  */
-public class ConnectorController {
+public final class ConnectorController {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectorController.class);
 
     private final ConnectorService connectorService;
@@ -34,13 +34,13 @@ public class ConnectorController {
      * Returns info about a specific connector by its {@code connectorName}
      * owned by the component
      *
-     * @param ctx          context
-     * @param connectorUid the connector uid
+     * @param ctx context
+     * @param uid the connector uid
      */
-    public void getConnector(final Context ctx, final String connectorUid) {
-        LOG.trace("Get Connector by UID: {}", connectorUid);
+    public void getOne(final Context ctx, final String uid) {
+        LOG.trace("Get Connector by UID: {}", uid);
 
-        final var connector = findConnectorByUid(ctx, connectorUid);
+        final var connector = findConnectorByUID(ctx, uid);
         if (connector == null) {
             return;
         }
@@ -62,7 +62,7 @@ public class ConnectorController {
                        final @Nullable Integer index) {
         LOG.trace("Add pin for connector UID (index={}): {}", index, connectorUid);
 
-        final var connector = findConnectorByUid(ctx, connectorUid);
+        final var connector = findConnectorByUID(ctx, connectorUid);
         if (connector == null) {
             return;
         }
@@ -115,7 +115,7 @@ public class ConnectorController {
                           final Integer index) {
         LOG.trace("Delete pin for connector UID (index={}): {}", index, connectorUid);
 
-        final var connector = findConnectorByUid(ctx, connectorUid);
+        final var connector = findConnectorByUID(ctx, connectorUid);
         if (connector == null) {
             return;
         }
@@ -161,7 +161,7 @@ public class ConnectorController {
      * @param uid UID of connector for look up
      * @return Connector if found, otherwise {@code null}
      */
-    private Connector findConnectorByUid(final Context ctx, final String uid) {
+    private Connector findConnectorByUID(final Context ctx, final String uid) {
         Connector connector = null;
         if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);

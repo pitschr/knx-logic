@@ -39,7 +39,7 @@ public final class ComponentController {
      *
      * @param ctx context
      */
-    public void getComponents(final Context ctx) {
+    public void getAll(final Context ctx) {
         LOG.trace("Return all components");
 
         // return and find all components
@@ -58,13 +58,13 @@ public final class ComponentController {
     /**
      * Return individual {@link Component} by UID
      *
-     * @param ctx          context
-     * @param componentUid component uid to be returned as JSON representation
+     * @param ctx context
+     * @param uid component uid to be returned as JSON representation
      */
-    public void getComponent(final Context ctx, final String componentUid) {
-        LOG.trace("Get Info for Component UID: {}", componentUid);
+    public void getOne(final Context ctx, final String uid) {
+        LOG.trace("Get Info for Component UID: {}", uid);
 
-        final var component = findComponentByUid(ctx, componentUid);
+        final var component = findComponentByUID(ctx, uid);
         if (component == null) {
             return;
         }
@@ -79,7 +79,7 @@ public final class ComponentController {
      * @param ctx     context
      * @param request request containing data to create a new component
      */
-    public void createComponent(final Context ctx, final CreateComponentRequest request) {
+    public void create(final Context ctx, final CreateComponentRequest request) {
         LOG.trace("Creates new component for: {}", request);
 
         // create component
@@ -129,15 +129,16 @@ public final class ComponentController {
      * Deletes the individual {@link Component} by its UID.
      * This method is idempotent. If the component doesn't exists, no effect.
      *
-     * @param ctx          context
-     * @param componentUid component uid to be deleted
+     * @param ctx context
+     * @param uid component uid to be deleted
      */
-    public void deleteComponent(final Context ctx, final String componentUid) {
-        LOG.trace("Delete for Component UID: {}", componentUid);
-        Preconditions.checkNonNull(componentUid, "UID for component delete not provided.");
+    public void delete(final Context ctx, final String uid) {
+        LOG.trace("Delete for Component UID: {}", uid);
+        Preconditions.checkNonNull(uid, "UID for component delete not provided.");
 
-        final var component = findComponentByUid(ctx, componentUid);
+        final var component = UidRegistry.findComponentByUID(uid);
         if (component == null) {
+            ctx.status(HttpServletResponse.SC_NO_CONTENT);
             return;
         }
 
@@ -156,7 +157,7 @@ public final class ComponentController {
      * @param uid UID of component for look up
      * @return Component if found, otherwise {@code null}
      */
-    private Component findComponentByUid(final Context ctx, final String uid) {
+    private Component findComponentByUID(final Context ctx, final String uid) {
         Component component = null;
         if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);

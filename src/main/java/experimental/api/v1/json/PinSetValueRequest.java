@@ -1,6 +1,6 @@
 package experimental.api.v1.json;
 
-public class PinSetValueRequest {
+public final class PinSetValueRequest {
     private String value;
 
     public String getValue() {

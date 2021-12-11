@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public final class ComponentResponse {
-    private String uid;
-    private String className;
-    private List<ConnectorResponse> inputs;
-    private List<ConnectorResponse> outputs;
+    private final String uid;
+    private final String className;
+    private final List<ConnectorResponse> inputs;
+    private final List<ConnectorResponse> outputs;
 
     private ComponentResponse(final String uid, final String className, final List<Connector> inputs, final List<Connector> outputs) {
         this.uid = uid;
         this.className = className;
         this.inputs = inputs.stream()
-                .map(ConnectorResponse::from).collect(Collectors.toUnmodifiableList());;
+                .map(ConnectorResponse::from).collect(Collectors.toUnmodifiableList());
         this.outputs = outputs.stream()
-                .map(ConnectorResponse::from).collect(Collectors.toUnmodifiableList());;
+                .map(ConnectorResponse::from).collect(Collectors.toUnmodifiableList());
     }
 
     public static ComponentResponse from(final Component component) {

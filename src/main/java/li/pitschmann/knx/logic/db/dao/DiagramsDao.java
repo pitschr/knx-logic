@@ -65,14 +65,14 @@ public interface DiagramsDao {
      * @param model model to be updated
      * @return primary key of updated model
      */
-    @SqlUpdate("UPDATE diagram SET name = :name, description = :description WHERE id = :id")
+    @SqlUpdate("UPDATE diagrams SET name = :name, description = :description WHERE id = :id")
     int update(@BindBean final DiagramModel model);
 
     /**
      * Deletes an existing {@link DiagramModel} from database
      *
-     * @param id the model identifier
+     * @param uid UID of model to be deleted
      */
-    @SqlUpdate("DELETE FROM diagrams WHERE id = ?")
-    void delete(final int id);
+    @SqlUpdate("DELETE FROM diagrams WHERE uid = ?")
+    void delete(final UID uid);
 }

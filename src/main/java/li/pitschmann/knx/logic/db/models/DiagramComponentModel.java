@@ -1,6 +1,7 @@
 package li.pitschmann.knx.logic.db.models;
 
 import li.pitschmann.knx.core.utils.Strings;
+import li.pitschmann.knx.logic.uid.UID;
 
 /**
  * Database model for diagram components
@@ -10,6 +11,7 @@ import li.pitschmann.knx.core.utils.Strings;
 public final class DiagramComponentModel extends Model {
     private int diagramId;
     private int componentId;
+    private UID componentUid;
     private int positionX;
     private int positionY;
 
@@ -30,6 +32,10 @@ public final class DiagramComponentModel extends Model {
         return componentId;
     }
 
+    public UID getComponentUid() {
+        return componentUid;
+    }
+
     public int getPositionX() {
         return positionX;
     }
@@ -43,6 +49,7 @@ public final class DiagramComponentModel extends Model {
         return Strings.toStringHelper(this) //
                 .add("diagramId", diagramId) //
                 .add("componentId", componentId) //
+                .add("componentUid", componentUid) //
                 .add("positionX", positionX) //
                 .add("positionY", positionY) //
                 .toString();
@@ -56,6 +63,7 @@ public final class DiagramComponentModel extends Model {
     public static class Builder {
         private int diagramId;
         private int componentId;
+        private UID componentUid;
         private int positionX;
         private int positionY;
 
@@ -69,6 +77,11 @@ public final class DiagramComponentModel extends Model {
             return this;
         }
 
+        public Builder componentUid(final UID componentUid) {
+            this.componentUid = componentUid;
+            return this;
+        }
+
         public Builder position(final int positionX, final int positionY) {
             this.positionX = positionX;
             this.positionY = positionY;
@@ -79,6 +92,7 @@ public final class DiagramComponentModel extends Model {
             final var model = new DiagramComponentModel();
             model.diagramId = this.diagramId;
             model.componentId = this.componentId;
+            model.componentUid = this.componentUid;
             model.positionX = this.positionX;
             model.positionY = this.positionY;
 
