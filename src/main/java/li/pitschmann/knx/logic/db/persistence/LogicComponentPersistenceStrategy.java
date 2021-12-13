@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author PITSCHR
  */
-public class LogicComponentPersistenceStrategy extends AbstractComponentPersistenceStrategy<LogicComponentImpl> {
+public final class LogicComponentPersistenceStrategy extends AbstractPersistence<ComponentModel, LogicComponentImpl> {
     private static final Logger LOG = LoggerFactory.getLogger(LogicComponentPersistenceStrategy.class);
     private final ConnectorPersistence connectorPersistence;
     private final EventKeyPersistence eventKeyPersistence;
@@ -50,14 +50,8 @@ public class LogicComponentPersistenceStrategy extends AbstractComponentPersiste
         final var sw = Stopwatch.createStarted();
         LOG.trace("Database write request for logic component: {}", component);
 
-        final var componentModel = ComponentModel.builder()
-                .uid(component.getUid())
-                .className(component.getWrappedObject().getClass().getName())
-                .componentType(ComponentType.LOGIC)
-                .build();
-
         // insert component
-        final var componentId = databaseManager.dao(ComponentsDao.class).insert(componentModel);
+        final var componentId = super.insert(component);
 
         // insert connectors and related pins
         connectorPersistence.insertConnectors(componentId, component.getConnectors());
@@ -69,17 +63,27 @@ public class LogicComponentPersistenceStrategy extends AbstractComponentPersiste
     }
 
     @Override
-    protected int update(final ComponentModel componentModel, final LogicComponentImpl component) {
-        final var componentId = componentModel.getId();
-
+    protected void update(final int id, final LogicComponentImpl component) {
         // update connectors and related pins
-        connectorPersistence.updateConnectors(componentId, component.getConnectors());
+        connectorPersistence.updateConnectors(id, component.getConnectors());
+    }
 
-        return componentId;
+    @Override
+    protected ComponentModel toModel(final LogicComponentImpl component) {
+        return ComponentModel.builder()
+                .uid(component.getUid())
+                .className(component.getWrappedObject().getClass().getName())
+                .componentType(ComponentType.LOGIC)
+                .build();
     }
 
     @Override
     public Class<?>[] compatibleClasses() {
         return new Class<?>[]{LogicComponentImpl.class};
+    }
+
+    @Override
+    protected Class<ComponentsDao> daoClass() {
+        return ComponentsDao.class;
     }
 }

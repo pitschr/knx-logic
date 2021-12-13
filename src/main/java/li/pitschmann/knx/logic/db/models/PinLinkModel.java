@@ -2,7 +2,6 @@ package li.pitschmann.knx.logic.db.models;
 
 import li.pitschmann.knx.core.utils.Strings;
 import li.pitschmann.knx.logic.pin.Pin;
-import li.pitschmann.knx.logic.uid.UID;
 
 /**
  * Database model for links between two {@link Pin}s

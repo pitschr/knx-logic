@@ -14,22 +14,31 @@ import java.util.List;
  *
  * @author PITSCHR
  */
-public interface ComponentsDao {
-    /**
-     * Returns the total size for all components
-     *
-     * @return the total size of components
-     */
+public interface ComponentsDao extends GenericDao<ComponentModel> {
+    @Override
     @SqlQuery("SELECT COUNT(*) FROM components")
     int size();
 
-    /**
-     * Returns all components
-     *
-     * @return list of {@link ComponentModel}
-     */
+    @Override
     @SqlQuery("SELECT * FROM components")
     List<ComponentModel> all();
+
+    @Override
+    @SqlQuery("SELECT * FROM components WHERE uid = ?")
+    ComponentModel find(final UID uid);
+
+    @Override
+    @GetGeneratedKeys
+    @SqlUpdate("INSERT INTO components (componentType, uid, className) VALUES (:componentType, :uid, :className)")
+    int insert(@BindBean final ComponentModel model);
+
+    @Override
+    @SqlUpdate("UPDATE components SET eventKey = :eventKey WHERE id = :id")
+    void update(@BindBean final ComponentModel model);
+
+    @Override
+    @SqlUpdate("DELETE FROM components WHERE uid = ?")
+    void delete(final UID uid);
 
     /**
      * Returns the {@link ComponentModel} for given {@code id}
@@ -41,15 +50,6 @@ public interface ComponentsDao {
     ComponentModel find(final int id);
 
     /**
-     * Returns the {@link ComponentModel} for given {@code uid}
-     *
-     * @param uid {@link UID} of component
-     * @return {@link ComponentModel}
-     */
-    @SqlQuery("SELECT * FROM components WHERE uid = ?")
-    ComponentModel find(final UID uid);
-
-    /**
      * Returns all {@link ComponentModel} for given diagram {@code id}
      *
      * @param id the identifier of diagram
@@ -57,31 +57,4 @@ public interface ComponentsDao {
      */
     @SqlQuery("SELECT c.* FROM diagram_components dc INNER JOIN components c ON dc.componentId = c.id WHERE dc.diagramId = ?")
     List<ComponentModel> byDiagramId(final int id);
-
-    /**
-     * Inserts a new {@link ComponentModel} into database
-     *
-     * @param model model to be inserted
-     * @return newly generated primary key
-     */
-    @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO components (componentType, uid, className) VALUES (:componentType, :uid, :className)")
-    int insert(@BindBean final ComponentModel model);
-
-    /**
-     * Updates an existing {@link ComponentModel} in database
-     *
-     * @param model model to be updated
-     * @return primary key of component model that has been updated
-     */
-    @SqlUpdate("UPDATE components SET eventKey = :eventKey WHERE id = :id")
-    int update(@BindBean final ComponentModel model);
-
-    /**
-     * Deletes an existing {@link ComponentModel} from database
-     *
-     * @param uid UID of model to be deleted
-     */
-    @SqlUpdate("DELETE FROM components WHERE uid = ?")
-    void delete(final UID uid);
 }

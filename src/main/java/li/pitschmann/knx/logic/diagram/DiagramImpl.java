@@ -21,6 +21,12 @@ import li.pitschmann.knx.core.utils.Strings;
 import li.pitschmann.knx.logic.uid.UID;
 import li.pitschmann.knx.logic.uid.UIDFactory;
 
+/**
+ * Implementation of {@link Diagram} that represents
+ * how the (input, logic, output, ...) components are linked.
+ *
+ * @author PITSCHR
+ */
 public final class DiagramImpl implements Diagram {
     private UID uid = UIDFactory.createRandomUid();
     private String name;
@@ -55,7 +61,7 @@ public final class DiagramImpl implements Diagram {
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
-                .add("uid", getUid()) //
+                .add("uid", uid) //
                 .add("name", name) //
                 .add("description", description) //
                 .toString();

@@ -65,13 +65,11 @@ class PerformanceLoadParallelTest extends BaseDatabaseSuite {
             loadParallelInternal();
         }
         final var duration = System.currentTimeMillis() - start;
-        System.out.println(
-                String.format("[Result | %s] Total(%s)=%.4fs / Average=%.2fms",
-                        LocalDate.now(),
-                        TIMES * ITERATIONS,
-                        (duration / 1000d),
-                        (duration / ((double) ITERATIONS * TIMES))
-                )
+        System.out.printf("[Result | %s] Total(%s)=%.4fs / Average=%.2fms%n",
+                LocalDate.now(),
+                TIMES * ITERATIONS,
+                (duration / 1000d),
+                (duration / ((double) ITERATIONS * TIMES))
         );
     }
 

@@ -141,5 +141,5 @@ CREATE TABLE diagram_links
     modifiedTs     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (diagramId) REFERENCES diagrams (id) ON DELETE CASCADE,
     FOREIGN KEY (pinLinkId) REFERENCES pin_links (id) ON DELETE CASCADE,
-    CONSTRAINT diagram_links_unique UNIQUE (diagramId, pinLinkId)
+    CONSTRAINT diagram_links_unique UNIQUE (pinLinkId)
 );

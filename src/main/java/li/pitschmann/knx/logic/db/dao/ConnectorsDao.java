@@ -14,14 +14,31 @@ import java.util.List;
  *
  * @author PITSCHR
  */
-public interface ConnectorsDao {
-    /**
-     * Returns the total size for all connectors
-     *
-     * @return size of all connectors
-     */
+public interface ConnectorsDao extends GenericDao<ConnectorModel> {
+    @Override
     @SqlQuery("SELECT COUNT(*) FROM connectors")
     int size();
+
+    @Override
+    @SqlQuery("SELECT * FROM connectors")
+    List<ConnectorModel> all();
+
+    @Override
+    @SqlQuery("SELECT * FROM connectors WHERE uid = ?")
+    ConnectorModel find(final UID uid);
+
+    @Override
+    @GetGeneratedKeys
+    @SqlUpdate("INSERT INTO connectors (uid, componentId, bindingType, connectorName) VALUES (:uid, :componentId, :bindingType, :connectorName)")
+    int insert(@BindBean final ConnectorModel model);
+
+    @Override
+    @SqlUpdate("UPDATE connectors SET uid = :uid, bindingType = :bindingType, connectorName = :connectorName WHERE id = :id")
+    void update(@BindBean final ConnectorModel model);
+
+    @Override
+    @SqlUpdate("DELETE connectors WHERE uid = ?")
+    void delete(final UID uid);
 
     /**
      * Returns the {@link ConnectorModel} for given {@code id}
@@ -33,15 +50,6 @@ public interface ConnectorsDao {
     ConnectorModel find(final int id);
 
     /**
-     * Returns the {@link ConnectorModel} for given {@code uid}
-     *
-     * @param uid {@link UID} of connector
-     * @return {@link ConnectorModel}
-     */
-    @SqlQuery("SELECT * FROM connectors WHERE uid = ?")
-    ConnectorModel find(final UID uid);
-
-    /**
      * Returns all {@link ConnectorModel} for given component {@code id}
      *
      * @param id the identifier of connector
@@ -50,29 +58,4 @@ public interface ConnectorsDao {
     @SqlQuery("SELECT * FROM connectors WHERE componentId = ?")
     List<ConnectorModel> byComponentId(final int id);
 
-    /**
-     * Inserts the {@link ConnectorModel}
-     *
-     * @param model model of connector
-     * @return auto-generated key
-     */
-    @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO connectors (uid, componentId, bindingType, connectorName) VALUES (:uid, :componentId, :bindingType, :connectorName)")
-    int insert(@BindBean final ConnectorModel model);
-
-    /**
-     * Updates the {@link ConnectorModel}
-     *
-     * @param model model of connector
-     */
-    @SqlUpdate("UPDATE connectors SET uid = :uid, bindingType = :bindingType, connectorName = :connectorName WHERE id = :id")
-    void update(@BindBean final ConnectorModel model);
-
-    /**
-     * Deletes the {@link ConnectorModel} by id, the associated pins will be also deleted.
-     *
-     * @param id the model identifier
-     */
-    @SqlUpdate("DELETE connectors WHERE id = ?")
-    int delete(final int id);
 }

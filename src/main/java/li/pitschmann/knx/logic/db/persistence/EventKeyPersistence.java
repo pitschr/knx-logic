@@ -45,8 +45,8 @@ class EventKeyPersistence {
      * @param eventKey    the event key to be persisted; may not be null
      * @return the new primary key of event key
      */
-    public int insertEventKey(final int componentId,
-                              final EventKey eventKey) {
+    int insertEventKey(final int componentId,
+                       final EventKey eventKey) {
         Preconditions.checkArgument(componentId > 0,
                 "Component ID must be positive, but was: {}", componentId);
         final var eventKeyModel = toModel(componentId, eventKey);
@@ -59,8 +59,8 @@ class EventKeyPersistence {
      * @param componentId the identifier of {@link ComponentModel} as owner for {@link EventKey}
      * @param eventKey    the event key to be updated; may not be null
      */
-    public void updateEventKey(final int componentId,
-                               final EventKey eventKey) {
+    void updateEventKey(final int componentId,
+                        final EventKey eventKey) {
         Preconditions.checkArgument(componentId > 0,
                 "Component ID must be positive, but was: {}", componentId);
         final var eventKeyModel = toModel(componentId, eventKey);

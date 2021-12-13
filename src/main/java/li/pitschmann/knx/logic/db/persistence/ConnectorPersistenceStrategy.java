@@ -44,7 +44,6 @@ public final class ConnectorPersistenceStrategy implements PersistenceStrategy<C
         this.connectorPersistence = new ConnectorPersistence(databaseManager);
     }
 
-
     @Override
     public int save(final Connector connector) {
         final var connectorModel = databaseManager.dao(ConnectorsDao.class).find(connector.getUid());
