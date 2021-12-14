@@ -33,12 +33,22 @@ public final class DiagramPersistenceStrategy extends AbstractPersistence<Diagra
         super(databaseManager);
     }
 
-    /**
-     * Creates a new {@link DiagramModel} based on {@link Diagram}
-     *
-     * @param diagram the diagram as source for model
-     * @return a new {@link DiagramModel}
-     */
+    @Override
+    protected int insert(final DiagramImpl diagram) {
+        return databaseManager.dao(DiagramsDao.class).insert(toModel(diagram));
+    }
+
+    @Override
+    void update(final DiagramModel model, final DiagramImpl diagram) {
+        databaseManager.dao(DiagramsDao.class).update(model.getId(), toModel(diagram));
+    }
+
+    @Override
+    protected DiagramModel findModel(final DiagramImpl diagram) {
+        return databaseManager.dao(DiagramsDao.class).find(diagram.getUid());
+    }
+
+    @Override
     protected DiagramModel toModel(final DiagramImpl diagram) {
         return DiagramModel.builder()
                 .uid(diagram.getUid())
@@ -50,10 +60,5 @@ public final class DiagramPersistenceStrategy extends AbstractPersistence<Diagra
     @Override
     public Class<?>[] compatibleClasses() {
         return new Class<?>[]{DiagramImpl.class};
-    }
-
-    @Override
-    protected Class<DiagramsDao> daoClass() {
-        return DiagramsDao.class;
     }
 }

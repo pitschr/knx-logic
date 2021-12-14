@@ -2,6 +2,7 @@ package li.pitschmann.knx.logic.db.dao;
 
 import li.pitschmann.knx.logic.db.models.DiagramModel;
 import li.pitschmann.knx.logic.uid.UID;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -29,12 +30,17 @@ public interface DiagramsDao extends GenericDao<DiagramModel> {
 
     @Override
     @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO diagrams (name, description) VALUES (:name, :description)")
+    @SqlUpdate("INSERT INTO diagrams (uid, name, description)" +
+            "   VALUES (:uid, :name, :description)")
     int insert(@BindBean final DiagramModel model);
 
     @Override
-    @SqlUpdate("UPDATE diagrams SET name = :name, description = :description WHERE uid = :uid")
-    void update(@BindBean final DiagramModel model);
+    @SqlUpdate("UPDATE diagrams SET " +
+            "     uid = :uid, " +
+            "     name = :name, " +
+            "     description = :description " +
+            "   WHERE id = :id")
+    void update(final @Bind("id") int id, @BindBean final DiagramModel model);
 
     @Override
     @SqlUpdate("DELETE FROM diagrams WHERE uid = ?")

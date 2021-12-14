@@ -50,7 +50,7 @@ public final class InboxComponentPersistenceStrategy extends AbstractPersistence
         LOG.trace("Database write request for inbox component: {}", component);
 
         // insert component
-        final var componentId = super.insert(component);
+        final var componentId = databaseManager.dao(ComponentsDao.class).insert(toModel(component));
 
         // insert connectors and related pins
         connectorPersistence.insertConnectors(componentId, component.getOutputConnectors());
@@ -65,12 +65,19 @@ public final class InboxComponentPersistenceStrategy extends AbstractPersistence
     }
 
     @Override
-    protected void update(final int id, final InboxComponentImpl component) {
+    protected void update(final ComponentModel model, final InboxComponentImpl component) {
+        final var id = model.getId();
+
         // update connectors and related pins
         connectorPersistence.updateConnectors(id, component.getOutputConnectors());
 
         // update the event key model
         eventKeyPersistence.updateEventKey(id, component.getEventKey());
+    }
+
+    @Override
+    protected ComponentModel findModel(final InboxComponentImpl component) {
+        return databaseManager.dao(ComponentsDao.class).find(component.getUid());
     }
 
     @Override
@@ -85,10 +92,5 @@ public final class InboxComponentPersistenceStrategy extends AbstractPersistence
     @Override
     public Class<?>[] compatibleClasses() {
         return new Class<?>[]{InboxComponentImpl.class};
-    }
-
-    @Override
-    protected Class<ComponentsDao> daoClass() {
-        return ComponentsDao.class;
     }
 }

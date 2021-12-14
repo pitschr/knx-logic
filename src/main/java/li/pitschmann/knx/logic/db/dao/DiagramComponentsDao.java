@@ -1,6 +1,7 @@
 package li.pitschmann.knx.logic.db.dao;
 
 import li.pitschmann.knx.logic.db.models.DiagramComponentModel;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -20,7 +21,12 @@ public interface DiagramComponentsDao {
      *
      * @return list of {@link DiagramComponentModel}
      */
-    @SqlQuery("SELECT dc.*, c.uid \"componentUid\" FROM diagram_components dc INNER JOIN components c ON dc.componentId = c.id WHERE dc.diagramId = ?")
+    @SqlQuery("SELECT " +
+            "    dc.*, " +
+            "    c.uid \"componentUid\" " +
+            "  FROM diagram_components dc " +
+            "    INNER JOIN components c ON dc.componentId = c.id " +
+            "  WHERE dc.diagramId = ?")
     List<DiagramComponentModel> byDiagramId(final int diagramId);
 
     /**
@@ -40,9 +46,11 @@ public interface DiagramComponentsDao {
      * @param model model to be updated
      * @return primary key of updated model
      */
-    @SqlUpdate("UPDATE diagram_components SET diagramId = :diagramId, componentId = :componentId, " +
-            "positionX = :positionX, positionY = :positionY WHERE id = :id")
-    int update(@BindBean final DiagramComponentModel model);
+    @SqlUpdate("UPDATE diagram_components SET " +
+            "     positionX = :positionX, " +
+            "     positionY = :positionY " +
+            "   WHERE id = :id")
+    int update(final @Bind("id") int id, @BindBean final DiagramComponentModel model);
 
     /**
      * Deletes an existing {@link DiagramComponentModel} from database

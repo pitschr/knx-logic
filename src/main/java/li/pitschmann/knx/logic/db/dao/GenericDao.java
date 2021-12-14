@@ -20,6 +20,7 @@ package li.pitschmann.knx.logic.db.dao;
 import li.pitschmann.knx.core.annotations.Nullable;
 import li.pitschmann.knx.logic.db.models.Model;
 import li.pitschmann.knx.logic.uid.UID;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 
 import java.util.List;
@@ -63,7 +64,7 @@ public interface GenericDao<M extends Model> {
      *
      * @param model model to be updated
      */
-    void update(@BindBean final M model);
+    void update(@Bind("id") final int id, @BindBean final M model);
 
     /**
      * Deletes an existing model of type {@code M} from database

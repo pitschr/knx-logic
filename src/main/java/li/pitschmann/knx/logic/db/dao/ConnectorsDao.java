@@ -2,6 +2,7 @@ package li.pitschmann.knx.logic.db.dao;
 
 import li.pitschmann.knx.logic.db.models.ConnectorModel;
 import li.pitschmann.knx.logic.uid.UID;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
@@ -20,8 +21,9 @@ public interface ConnectorsDao extends GenericDao<ConnectorModel> {
     int size();
 
     @Override
-    @SqlQuery("SELECT * FROM connectors")
-    List<ConnectorModel> all();
+    default List<ConnectorModel> all() {
+        throw new UnsupportedOperationException("No all() supported for ConnectorModel");
+    }
 
     @Override
     @SqlQuery("SELECT * FROM connectors WHERE uid = ?")
@@ -29,12 +31,17 @@ public interface ConnectorsDao extends GenericDao<ConnectorModel> {
 
     @Override
     @GetGeneratedKeys
-    @SqlUpdate("INSERT INTO connectors (uid, componentId, bindingType, connectorName) VALUES (:uid, :componentId, :bindingType, :connectorName)")
+    @SqlUpdate("INSERT INTO connectors (uid, componentId, bindingType, connectorName) " +
+            "   VALUES (:uid, :componentId, :bindingType, :connectorName)")
     int insert(@BindBean final ConnectorModel model);
 
     @Override
-    @SqlUpdate("UPDATE connectors SET uid = :uid, bindingType = :bindingType, connectorName = :connectorName WHERE id = :id")
-    void update(@BindBean final ConnectorModel model);
+    @SqlUpdate("UPDATE connectors SET " +
+            "     uid = :uid, " +
+            "     bindingType = :bindingType, " +
+            "     connectorName = :connectorName " +
+            "   WHERE id = :id")
+    void update(final @Bind("id") int id, @BindBean final ConnectorModel model);
 
     @Override
     @SqlUpdate("DELETE connectors WHERE uid = ?")

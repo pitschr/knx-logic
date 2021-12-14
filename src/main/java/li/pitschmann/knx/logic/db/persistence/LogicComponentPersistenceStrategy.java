@@ -37,12 +37,10 @@ import java.util.concurrent.TimeUnit;
 public final class LogicComponentPersistenceStrategy extends AbstractPersistence<ComponentModel, LogicComponentImpl> {
     private static final Logger LOG = LoggerFactory.getLogger(LogicComponentPersistenceStrategy.class);
     private final ConnectorPersistence connectorPersistence;
-    private final EventKeyPersistence eventKeyPersistence;
 
     public LogicComponentPersistenceStrategy(final DatabaseManager databaseManager) {
         super(databaseManager);
         this.connectorPersistence = new ConnectorPersistence(databaseManager);
-        this.eventKeyPersistence = new EventKeyPersistence(databaseManager);
     }
 
     @Override
@@ -51,7 +49,7 @@ public final class LogicComponentPersistenceStrategy extends AbstractPersistence
         LOG.trace("Database write request for logic component: {}", component);
 
         // insert component
-        final var componentId = super.insert(component);
+        final var componentId = databaseManager.dao(ComponentsDao.class).insert(toModel(component));
 
         // insert connectors and related pins
         connectorPersistence.insertConnectors(componentId, component.getConnectors());
@@ -63,9 +61,14 @@ public final class LogicComponentPersistenceStrategy extends AbstractPersistence
     }
 
     @Override
-    protected void update(final int id, final LogicComponentImpl component) {
+    protected void update(final ComponentModel model, final LogicComponentImpl component) {
         // update connectors and related pins
-        connectorPersistence.updateConnectors(id, component.getConnectors());
+        connectorPersistence.updateConnectors(model.getId(), component.getConnectors());
+    }
+
+    @Override
+    protected ComponentModel findModel(final LogicComponentImpl component) {
+        return databaseManager.dao(ComponentsDao.class).find(component.getUid());
     }
 
     @Override
@@ -80,10 +83,5 @@ public final class LogicComponentPersistenceStrategy extends AbstractPersistence
     @Override
     public Class<?>[] compatibleClasses() {
         return new Class<?>[]{LogicComponentImpl.class};
-    }
-
-    @Override
-    protected Class<ComponentsDao> daoClass() {
-        return ComponentsDao.class;
     }
 }

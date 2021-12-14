@@ -50,7 +50,7 @@ public final class OutboxComponentPersistenceStrategy extends AbstractPersistenc
         LOG.trace("Database write request for outbox component: {}", component);
 
         // insert component
-        final var componentId = super.insert(component);
+        final var componentId = databaseManager.dao(ComponentsDao.class).insert(toModel(component));
 
         // insert connectors and related pins
         connectorPersistence.insertConnectors(componentId, component.getInputConnectors());
@@ -65,12 +65,19 @@ public final class OutboxComponentPersistenceStrategy extends AbstractPersistenc
     }
 
     @Override
-    protected void update(final int id, final OutboxComponentImpl component) {
+    protected void update(final ComponentModel model, final OutboxComponentImpl component) {
+        final var id = model.getId();
+
         // update connectors and related pins
         connectorPersistence.updateConnectors(id, component.getInputConnectors());
 
         // update the event key model
         eventKeyPersistence.updateEventKey(id, component.getEventKey());
+    }
+
+    @Override
+    protected ComponentModel findModel(final OutboxComponentImpl component) {
+        return databaseManager.dao(ComponentsDao.class).find(component.getUid());
     }
 
     @Override
@@ -80,16 +87,10 @@ public final class OutboxComponentPersistenceStrategy extends AbstractPersistenc
                 .className(component.getWrappedObject().getClass().getName())
                 .componentType(ComponentType.OUTBOX)
                 .build();
-
     }
 
     @Override
     public Class<?>[] compatibleClasses() {
         return new Class<?>[]{OutboxComponentImpl.class};
-    }
-
-    @Override
-    protected Class<ComponentsDao> daoClass() {
-        return ComponentsDao.class;
     }
 }

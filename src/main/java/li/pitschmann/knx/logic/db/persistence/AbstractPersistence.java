@@ -17,8 +17,8 @@
 
 package li.pitschmann.knx.logic.db.persistence;
 
+import li.pitschmann.knx.core.annotations.Nullable;
 import li.pitschmann.knx.logic.db.DatabaseManager;
-import li.pitschmann.knx.logic.db.dao.GenericDao;
 import li.pitschmann.knx.logic.db.models.DiagramModel;
 import li.pitschmann.knx.logic.db.models.Model;
 import li.pitschmann.knx.logic.diagram.Diagram;
@@ -48,27 +48,15 @@ public abstract class AbstractPersistence<M extends Model, T extends UIDAware> i
      * @param object the object to be persisted; may not be null
      * @return the new primary key of object
      */
-    protected int insert(final T object) {
-        return databaseManager.dao(daoClass()).insert(toModel(object));
-    }
+    protected abstract int insert(final T object);
 
     /**
      * Updates the given {@link Object} to the database
      *
-     * @param id     the primary key to be updated
-     * @param object the object to be persisted; may not be null
+     * @param model  the model that is subject to be updated
+     * @param object the source of object to update the model; may not be null
      */
-    protected void update(final int id, final T object) {
-        databaseManager.dao(daoClass()).update(toModel(object));
-    }
-
-    /**
-     * Creates a new {@link Model} based on the given object
-     *
-     * @param object the object as source for model
-     * @return a new {@link Model}
-     */
-    protected abstract M toModel(final T object);
+    abstract void update(final M model, final T object);
 
     /**
      * Inserts or updates the given object
@@ -82,12 +70,11 @@ public abstract class AbstractPersistence<M extends Model, T extends UIDAware> i
         lock.lock();
         try {
             return databaseManager.jdbi().inTransaction(h -> {
-                var model = databaseManager.dao(daoClass()).find(object.getUid());
+                var model = findModel(object);
                 if (model == null) {
                     return insert(object);
                 } else {
-                    final var id = model.getId();
-                    update(id, object);
+                    update(model, object);
                     return model.getId();
                 }
             });
@@ -97,9 +84,19 @@ public abstract class AbstractPersistence<M extends Model, T extends UIDAware> i
     }
 
     /**
-     * The class of DAO that extends {@link GenericDao}
+     * Find a {@link Model} based on the given object
      *
-     * @return the class of DAO
+     * @param object the object to be used for look-up; may not be null
+     * @return the existing model; or {@code null} if not found
      */
-    protected abstract Class<? extends GenericDao<M>> daoClass();
+    @Nullable
+    protected abstract M findModel(final T object);
+
+    /**
+     * Creates a new {@link Model} instance based on the given object
+     *
+     * @param object the object as source for model
+     * @return a new {@link Model}
+     */
+    protected abstract M toModel(final T object);
 }

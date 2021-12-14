@@ -33,8 +33,9 @@ public interface ComponentsDao extends GenericDao<ComponentModel> {
     int insert(@BindBean final ComponentModel model);
 
     @Override
-    @SqlUpdate("UPDATE components SET eventKey = :eventKey WHERE id = :id")
-    void update(@BindBean final ComponentModel model);
+    default void update(final int id, final ComponentModel model) {
+        throw new UnsupportedOperationException("No update supported for ComponentModel");
+    }
 
     @Override
     @SqlUpdate("DELETE FROM components WHERE uid = ?")
@@ -55,6 +56,10 @@ public interface ComponentsDao extends GenericDao<ComponentModel> {
      * @param id the identifier of diagram
      * @return list of {@link ComponentModel}
      */
-    @SqlQuery("SELECT c.* FROM diagram_components dc INNER JOIN components c ON dc.componentId = c.id WHERE dc.diagramId = ?")
+    @SqlQuery("SELECT " +
+            "    c.* " +
+            "  FROM diagram_components dc " +
+            "    INNER JOIN components c ON dc.componentId = c.id " +
+            "  WHERE dc.diagramId = ?")
     List<ComponentModel> byDiagramId(final int id);
 }
