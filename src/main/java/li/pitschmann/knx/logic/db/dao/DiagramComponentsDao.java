@@ -22,8 +22,7 @@ public interface DiagramComponentsDao {
      * @return list of {@link DiagramComponentModel}
      */
     @SqlQuery("SELECT " +
-            "    dc.*, " +
-            "    c.uid \"componentUid\" " +
+            "    dc.* " +
             "  FROM diagram_components dc " +
             "    INNER JOIN components c ON dc.componentId = c.id " +
             "  WHERE dc.diagramId = ?")

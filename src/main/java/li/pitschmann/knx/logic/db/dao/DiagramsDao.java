@@ -25,6 +25,10 @@ public interface DiagramsDao extends GenericDao<DiagramModel> {
     List<DiagramModel> all();
 
     @Override
+    @SqlQuery("SELECT * FROM diagrams WHERE id = ?")
+    DiagramModel find(final int id);
+
+    @Override
     @SqlQuery("SELECT * FROM diagrams WHERE uid = ?")
     DiagramModel find(final UID uid);
 

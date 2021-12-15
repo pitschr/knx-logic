@@ -26,6 +26,10 @@ public interface ConnectorsDao extends GenericDao<ConnectorModel> {
     }
 
     @Override
+    @SqlQuery("SELECT * FROM connectors WHERE id = ?")
+    ConnectorModel find(final int id);
+
+    @Override
     @SqlQuery("SELECT * FROM connectors WHERE uid = ?")
     ConnectorModel find(final UID uid);
 
@@ -47,14 +51,6 @@ public interface ConnectorsDao extends GenericDao<ConnectorModel> {
     @SqlUpdate("DELETE connectors WHERE uid = ?")
     void delete(final UID uid);
 
-    /**
-     * Returns the {@link ConnectorModel} for given {@code id}
-     *
-     * @param id the identifier of connector
-     * @return {@link ConnectorModel}
-     */
-    @SqlQuery("SELECT * FROM connectors WHERE id = ?")
-    ConnectorModel find(final int id);
 
     /**
      * Returns all {@link ConnectorModel} for given component {@code id}

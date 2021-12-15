@@ -43,6 +43,15 @@ public interface GenericDao<M extends Model> {
     List<M> all();
 
     /**
+     * Returns the model of type {@code M} for given primary key
+     *
+     * @param id the primary key
+     * @return the model; or null if not found
+     */
+    @Nullable
+    M find(final int id);
+
+    /**
      * Returns the model of type {@code M} for given {@link UID}
      *
      * @param uid {@link UID} of model

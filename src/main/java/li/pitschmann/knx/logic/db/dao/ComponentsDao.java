@@ -3,6 +3,7 @@ package li.pitschmann.knx.logic.db.dao;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.uid.UID;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -23,9 +24,15 @@ public interface ComponentsDao extends GenericDao<ComponentModel> {
     @SqlQuery("SELECT * FROM components")
     List<ComponentModel> all();
 
+    @SqlQuery("SELECT * FROM components WHERE id = ?")
+    ComponentModel find(final int id);
+
     @Override
     @SqlQuery("SELECT * FROM components WHERE uid = ?")
     ComponentModel find(final UID uid);
+
+    @SqlQuery("SELECT * FROM components WHERE id IN (<ids>)")
+    List<ComponentModel> find(final @BindList("ids") int[] ids);
 
     @Override
     @GetGeneratedKeys
@@ -40,15 +47,6 @@ public interface ComponentsDao extends GenericDao<ComponentModel> {
     @Override
     @SqlUpdate("DELETE FROM components WHERE uid = ?")
     void delete(final UID uid);
-
-    /**
-     * Returns the {@link ComponentModel} for given {@code id}
-     *
-     * @param id the identifier of component
-     * @return {@link ComponentModel}
-     */
-    @SqlQuery("SELECT * FROM components WHERE id = ?")
-    ComponentModel find(final int id);
 
     /**
      * Returns all {@link ComponentModel} for given diagram {@code id}
