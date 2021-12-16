@@ -19,11 +19,12 @@ package experimental.api.v1.services;
 
 import li.pitschmann.knx.logic.Router;
 import li.pitschmann.knx.logic.db.DatabaseManager;
+import li.pitschmann.knx.logic.diagram.Diagram;
 
 import java.util.Objects;
 
 /**
- * Service for {@link li.pitschmann.knx.logic.diagram.Diagram}
+ * Service for {@link Diagram}
  * <p>
  * Registers/De-registers the diagram in {@link Router} and persists in the database.
  */
@@ -34,5 +35,11 @@ public final class DiagramService {
         this.databaseManager = Objects.requireNonNull(databaseManager);
     }
 
-    // TODO
+    public void insertDiagram(final Diagram diagram) {
+        databaseManager.save(diagram);
+    }
+
+    public void updateDiagram(final Diagram diagram) {
+        databaseManager.save(diagram);
+    }
 }

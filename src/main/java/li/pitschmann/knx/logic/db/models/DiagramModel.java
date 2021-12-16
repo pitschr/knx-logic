@@ -37,6 +37,7 @@ public final class DiagramModel extends Model {
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
+                .add("id", getId()) //
                 .add("uid", uid) //
                 .add("name", name) //
                 .add("description", description) //

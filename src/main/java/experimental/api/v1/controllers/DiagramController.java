@@ -1,7 +1,7 @@
 package experimental.api.v1.controllers;
 
 import experimental.UidRegistry;
-import experimental.api.v1.json.CreateDiagramRequest;
+import experimental.api.v1.json.DiagramRequest;
 import experimental.api.v1.json.DiagramResponse;
 import experimental.api.v1.services.DiagramService;
 import io.javalin.http.Context;
@@ -64,21 +64,50 @@ public final class DiagramController {
     }
 
     /**
-     * Creates a new diagram based on {@link CreateDiagramRequest}
+     * Creates a new diagram based on {@link DiagramRequest}
      *
      * @param ctx     context
      * @param request the request object containing all information to create a new diagram
      */
-    public void create(final Context ctx, final CreateDiagramRequest request) {
+    public void create(final Context ctx, final DiagramRequest request) {
         LOG.trace("Create new diagram: {}", request);
 
         // creates a new logic diagram
         final var diagram = new DiagramImpl();
         diagram.setName(request.getName());
         diagram.setDescription(request.getDescription());
+
+        diagramService.insertDiagram(diagram);
         UidRegistry.register(diagram);
 
         ctx.status(HttpServletResponse.SC_CREATED);
+        ctx.json(DiagramResponse.from(diagram));
+    }
+
+    /**
+     * Updates an existing diagram based on {@link DiagramRequest}
+     *
+     * @param uid the UID of diagram to be updated; may not be null
+     * @param request the request object containing information to update the existing diagram
+     */
+    public void update(final Context ctx, final String uid, final DiagramRequest request) {
+        LOG.trace("Updates an existing diagram '{}': {}", uid, request);
+
+        final var diagram = (DiagramImpl) findDiagramByUID(ctx, uid);
+        if (diagram == null) {
+            return;
+        }
+
+        if (request.getName() != null) {
+            diagram.setName(request.getName());
+        }
+        if (request.getDescription() != null) {
+            diagram.setDescription(request.getDescription());
+        }
+
+        diagramService.updateDiagram(diagram);
+
+        ctx.status(HttpServletResponse.SC_OK);
         ctx.json(DiagramResponse.from(diagram));
     }
 

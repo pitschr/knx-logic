@@ -7,7 +7,6 @@ import li.pitschmann.knx.logic.diagram.Diagram;
 import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.pin.PinAware;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

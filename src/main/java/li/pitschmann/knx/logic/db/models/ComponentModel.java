@@ -39,6 +39,7 @@ public final class ComponentModel extends Model {
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
+                .add("id", getId()) //
                 .add("uid", uid) //
                 .add("className", className) //
                 .add("componentType", componentType) //

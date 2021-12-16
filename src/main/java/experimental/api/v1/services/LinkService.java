@@ -62,11 +62,10 @@ public final class LinkService {
         Preconditions.checkNonNull(sourcePinModel, "Could not find id for source pin '{}'. Not persisted yet?", sourcePin.getUid());
         Preconditions.checkNonNull(targetPinModel, "Could not find id for target pin '{}'. Not persisted yet?", targetPin.getUid());
 
-        final var pinLinkModel = PinLinkModel
-                .builder()
-                .pin1(sourcePinModel.getId())
-                .pin2(targetPinModel.getId())
-                .build();
+        final var pinLinkModel = PinLinkModel.create(
+                        sourcePinModel.getId(),
+                        targetPinModel.getId()
+                );
         databaseManager.dao(PinLinksDao.class).insert(pinLinkModel);
 
         router.link(sourcePin, targetPin);

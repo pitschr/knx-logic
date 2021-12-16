@@ -9,7 +9,7 @@ import java.util.Map;
 // INBOX (VAR): { type: "inbox", event: "VAR", data: { "name": "foobar" } }
 // OUTBOX (KNX): { type: "outbox", event: "KNX", data: { "groupAddress": "1/2/3", "dpt": "dpt-1" } }
 // OUTBOX (VAR): { type: "outbox", event: "VAR", data: { "name": "foobar" } }
-public final class CreateComponentRequest {
+public final class ComponentRequest {
     private String type;
     private String event;
     private Map<String, String> data = Map.of();

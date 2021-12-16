@@ -3,7 +3,7 @@ package experimental.api.v1.controllers;
 import experimental.UidRegistry;
 import experimental.api.ComponentFactory;
 import experimental.api.v1.json.ComponentResponse;
-import experimental.api.v1.json.CreateComponentRequest;
+import experimental.api.v1.json.ComponentRequest;
 import experimental.api.v1.services.ComponentService;
 import io.javalin.http.Context;
 import li.pitschmann.knx.core.utils.Preconditions;
@@ -79,7 +79,7 @@ public final class ComponentController {
      * @param ctx     context
      * @param request request containing data to create a new component
      */
-    public void create(final Context ctx, final CreateComponentRequest request) {
+    public void create(final Context ctx, final ComponentRequest request) {
         LOG.trace("Creates new component for: {}", request);
 
         // create component
