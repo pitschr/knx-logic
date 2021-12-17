@@ -1,6 +1,6 @@
 package experimental.api.v1.controllers;
 
-import experimental.UidRegistry;
+import li.pitschmann.knx.api.UIDRegistry;
 import experimental.api.v1.json.DiagramRequest;
 import experimental.api.v1.json.DiagramResponse;
 import experimental.api.v1.services.DiagramService;
@@ -40,7 +40,7 @@ public final class DiagramController {
 
         // returns json array of all diagram responses
         ctx.status(HttpServletResponse.SC_OK);
-        ctx.json(UidRegistry.getAllDiagrams().stream().map(DiagramResponse::from).collect(Collectors.toList()));
+        ctx.json(UIDRegistry.getDiagrams().stream().map(DiagramResponse::from).collect(Collectors.toList()));
     }
 
     /**
@@ -78,7 +78,7 @@ public final class DiagramController {
         diagram.setDescription(request.getDescription());
 
         diagramService.insertDiagram(diagram);
-        UidRegistry.register(diagram);
+        UIDRegistry.register(diagram);
 
         ctx.status(HttpServletResponse.SC_CREATED);
         ctx.json(DiagramResponse.from(diagram));
@@ -122,13 +122,13 @@ public final class DiagramController {
         LOG.trace("Delete Diagram by UID: {}", uid);
         Preconditions.checkNonNull(uid, "UID for diagram delete not provided.");
 
-        final var diagram = UidRegistry.findDiagramByUID(uid);
+        final var diagram = UIDRegistry.getDiagram(uid);
         if (diagram == null) {
             ctx.status(HttpServletResponse.SC_NO_CONTENT);
             return;
         }
 
-        UidRegistry.deregister(diagram);
+        UIDRegistry.deregister(diagram);
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
     }
 
@@ -146,7 +146,7 @@ public final class DiagramController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", "No diagram UID provided."));
         } else {
-            diagram = UidRegistry.findDiagramByUID(uid);
+            diagram = UIDRegistry.getDiagram(uid);
             if (diagram == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(

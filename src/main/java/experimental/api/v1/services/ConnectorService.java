@@ -17,7 +17,7 @@
 
 package experimental.api.v1.services;
 
-import experimental.UidRegistry;
+import li.pitschmann.knx.api.UIDRegistry;
 import li.pitschmann.knx.logic.Router;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
@@ -54,7 +54,7 @@ public final class ConnectorService {
         LOG.debug("Add new pin at last index for connector: {}", connector.getName());
         final var newPin = connector.addPin();
 
-        UidRegistry.register(newPin);
+        UIDRegistry.register(newPin);
         databaseManager.save(connector);
 
         // router won't be informed - it will be relevant only when add a link
@@ -73,7 +73,7 @@ public final class ConnectorService {
         LOG.debug("Add new pin at index {} for connector: {}", index, connector.getName());
         final var newPin = connector.addPin(index);
 
-        UidRegistry.register(newPin);
+        UIDRegistry.register(newPin);
         databaseManager.save(connector);
 
         // router won't be informed - it will be relevant only when add a link
@@ -91,7 +91,7 @@ public final class ConnectorService {
     public Pin removePin(final DynamicConnector connector, final int index) {
         final var removedPin = connector.removePin(index);
 
-        UidRegistry.deregister(removedPin);
+        UIDRegistry.deregister(removedPin);
         databaseManager.save(connector);
         router.unlink(removedPin);
 

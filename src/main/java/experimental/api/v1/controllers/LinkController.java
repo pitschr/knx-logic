@@ -1,6 +1,6 @@
 package experimental.api.v1.controllers;
 
-import experimental.UidRegistry;
+import li.pitschmann.knx.api.UIDRegistry;
 import experimental.api.v1.services.LinkService;
 import io.javalin.http.Context;
 import li.pitschmann.knx.core.utils.Preconditions;
@@ -35,10 +35,10 @@ public class LinkController {
     public void addLink(final Context ctx, final String sourcePinUid, final String targetPinUid) {
         LOG.debug("Add Link: {}", ctx);
 
-        final var sourcePin = Preconditions.checkNonNull(UidRegistry.findPinByUID(sourcePinUid),
+        final var sourcePin = Preconditions.checkNonNull(UIDRegistry.getPin(sourcePinUid),
                 "Source Pin UID not found: {}", sourcePinUid);
 
-        final var targetPin = Preconditions.checkNonNull(UidRegistry.findPinByUID(targetPinUid),
+        final var targetPin = Preconditions.checkNonNull(UIDRegistry.getPin(targetPinUid),
                 "Target Pin UID not found: {}", targetPinUid);
 
         try {
@@ -60,10 +60,10 @@ public class LinkController {
     public void deleteLink(final Context ctx, final String sourcePinUid, final String targetPinUid) {
         LOG.debug("Delete Link: {}", ctx);
 
-        final var sourcePin = Preconditions.checkNonNull(UidRegistry.findPinByUID(sourcePinUid),
+        final var sourcePin = Preconditions.checkNonNull(UIDRegistry.getPin(sourcePinUid),
                 "Source Pin UID not found: {}", sourcePinUid);
 
-        final var targetPin = Preconditions.checkNonNull(UidRegistry.findPinByUID(targetPinUid),
+        final var targetPin = Preconditions.checkNonNull(UIDRegistry.getPin(targetPinUid),
                 "Target Pin UID not found: {}", targetPinUid);
 
         try {
@@ -83,7 +83,7 @@ public class LinkController {
     public void deleteLinks(final Context ctx, final String pinUid) {
         LOG.debug("Delete Links: {}", ctx);
 
-        final var pin = Preconditions.checkNonNull(UidRegistry.findPinByUID(pinUid),
+        final var pin = Preconditions.checkNonNull(UIDRegistry.getPin(pinUid),
                 "Pin UID not found: {}", pinUid);
 
         try {
@@ -103,7 +103,7 @@ public class LinkController {
     public void getLinks(final Context ctx, final String pinUid) {
         LOG.debug("Get Links: {}", ctx);
 
-        final var pin = Preconditions.checkNonNull(UidRegistry.findPinByUID(pinUid),
+        final var pin = Preconditions.checkNonNull(UIDRegistry.getPin(pinUid),
                 "Pin UID not found: {}", pinUid);
 
         try {

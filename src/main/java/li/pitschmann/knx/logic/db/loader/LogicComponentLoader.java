@@ -17,7 +17,7 @@
 
 package li.pitschmann.knx.logic.db.loader;
 
-import experimental.api.ComponentFactory;
+import li.pitschmann.knx.api.ComponentFactory;
 import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.components.LogicComponent;
 import li.pitschmann.knx.logic.components.LogicComponentImpl;

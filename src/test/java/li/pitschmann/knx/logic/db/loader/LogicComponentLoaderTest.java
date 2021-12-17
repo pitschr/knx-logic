@@ -17,8 +17,7 @@
 
 package li.pitschmann.knx.logic.db.loader;
 
-import experimental.api.ComponentFactory;
-import li.pitschmann.knx.logic.db.DatabaseManager;
+import li.pitschmann.knx.api.ComponentFactory;
 import li.pitschmann.knx.logic.exceptions.NoLogicClassFound;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

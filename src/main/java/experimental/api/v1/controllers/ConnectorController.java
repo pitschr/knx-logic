@@ -1,6 +1,6 @@
 package experimental.api.v1.controllers;
 
-import experimental.UidRegistry;
+import li.pitschmann.knx.api.UIDRegistry;
 import experimental.api.v1.json.ConnectorResponse;
 import experimental.api.v1.services.ConnectorService;
 import io.javalin.http.Context;
@@ -167,7 +167,7 @@ public final class ConnectorController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", "No connector UID provided."));
         } else {
-            connector = UidRegistry.findConnectorByUID(uid);
+            connector = UIDRegistry.getConnector(uid);
             if (connector == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(

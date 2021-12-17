@@ -1,6 +1,6 @@
 package test;
 
-import experimental.api.ComponentFactory;
+import li.pitschmann.knx.api.ComponentFactory;
 import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.db.DatabaseManager;
 import li.pitschmann.knx.logic.db.H2DatabaseManager;

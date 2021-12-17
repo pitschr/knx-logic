@@ -3,7 +3,6 @@ package test;
 import io.javalin.http.Context;
 import io.javalin.http.util.ContextUtil;
 import li.pitschmann.knx.logic.Logic;
-import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.components.InboxComponent;
 import li.pitschmann.knx.logic.components.InboxComponentImpl;
 import li.pitschmann.knx.logic.components.LogicComponent;
@@ -17,12 +16,9 @@ import li.pitschmann.knx.logic.components.outbox.VariableOutbox;
 import li.pitschmann.knx.logic.event.Event;
 import li.pitschmann.knx.logic.event.EventKey;
 import li.pitschmann.knx.logic.event.VariableEventChannel;
-import li.pitschmann.knx.logic.uid.UID;
-import li.pitschmann.knx.logic.uid.UIDFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.UUID;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;

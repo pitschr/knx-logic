@@ -1,6 +1,6 @@
 package experimental.api.v1.controllers;
 
-import experimental.UidRegistry;
+import li.pitschmann.knx.api.UIDRegistry;
 import experimental.api.v1.json.PinResponse;
 import experimental.api.v1.json.PinSetValueRequest;
 import experimental.api.v1.services.PinService;
@@ -108,7 +108,7 @@ public final class PinController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", "No pin UID provided."));
         } else {
-            pin = UidRegistry.findPinByUID(uid);
+            pin = UIDRegistry.getPin(uid);
             if (pin == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(

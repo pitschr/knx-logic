@@ -17,9 +17,8 @@
 
 package li.pitschmann.knx.logic.db;
 
-import experimental.api.ComponentFactory;
+import li.pitschmann.knx.api.ComponentFactory;
 import li.pitschmann.knx.logic.components.LogicComponent;
-import li.pitschmann.knx.logic.components.LogicComponentImpl;
 import li.pitschmann.knx.logic.db.loader.LogicComponentLoader;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +29,6 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;

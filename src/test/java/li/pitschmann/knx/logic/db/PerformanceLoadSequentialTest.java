@@ -17,7 +17,7 @@
 
 package li.pitschmann.knx.logic.db;
 
-import experimental.api.ComponentFactory;
+import li.pitschmann.knx.api.ComponentFactory;
 import li.pitschmann.knx.logic.components.LogicComponentImpl;
 import li.pitschmann.knx.logic.db.loader.LogicComponentLoader;
 import org.junit.jupiter.api.Disabled;

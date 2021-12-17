@@ -1,7 +1,7 @@
 package experimental.api.v1.controllers;
 
-import experimental.UidRegistry;
-import experimental.api.ComponentFactory;
+import li.pitschmann.knx.api.UIDRegistry;
+import li.pitschmann.knx.api.ComponentFactory;
 import experimental.api.v1.json.ComponentResponse;
 import experimental.api.v1.json.ComponentRequest;
 import experimental.api.v1.services.ComponentService;
@@ -43,7 +43,7 @@ public final class ComponentController {
         LOG.trace("Return all components");
 
         // return and find all components
-        final var components = UidRegistry.getAllComponents();
+        final var components = UIDRegistry.getComponents();
 
         final var responses = components.stream()
                 .map(ComponentResponse::from)
@@ -116,7 +116,7 @@ public final class ComponentController {
         componentService.addComponent(component);
 
         // register the component
-        UidRegistry.register(component);
+        UIDRegistry.register(component);
 
         LOG.debug("Component registered: {}", component);
 
@@ -136,14 +136,14 @@ public final class ComponentController {
         LOG.trace("Delete for Component UID: {}", uid);
         Preconditions.checkNonNull(uid, "UID for component delete not provided.");
 
-        final var component = UidRegistry.findComponentByUID(uid);
+        final var component = UIDRegistry.getComponent(uid);
         if (component == null) {
             ctx.status(HttpServletResponse.SC_NO_CONTENT);
             return;
         }
 
         // TODO: check if component has at least one link -> protected?
-        UidRegistry.deregister(component);
+        UIDRegistry.deregister(component);
         componentService.removeComponent(component);
 
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
@@ -163,7 +163,7 @@ public final class ComponentController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", "No component UID provided."));
         } else {
-            component = UidRegistry.findComponentByUID(uid);
+            component = UIDRegistry.getComponent(uid);
             if (component == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(
