@@ -35,7 +35,11 @@ import java.util.Objects;
  * UID Registry (application wide)
  *
  * This registry maps UIDs in string format with an object and
- * is used for a fast look-up for API endpoints.
+ * is used for a fast look-up for API endpoints. It does not
+ * contain any logic / behavior, all those needs to be done
+ * outside this class.
+ *
+ * @author PITSCHR
  */
 public final class UIDRegistry {
     private static final Map<String, Diagram> diagramMap = new HashMap<>();

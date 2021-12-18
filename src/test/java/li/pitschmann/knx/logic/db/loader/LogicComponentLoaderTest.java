@@ -17,7 +17,7 @@
 
 package li.pitschmann.knx.logic.db.loader;
 
-import li.pitschmann.knx.api.ComponentFactory;
+import li.pitschmann.knx.logic.LogicRepository;
 import li.pitschmann.knx.logic.exceptions.NoLogicClassFound;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -56,7 +56,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicA() {
         executeSqlFile(new File(Sql.Logic.A));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-A"));
@@ -78,7 +78,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicB() {
         executeSqlFile(new File(Sql.Logic.B));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-B"));
@@ -103,7 +103,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicC() {
         executeSqlFile(new File(Sql.Logic.C));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-C"));
@@ -131,7 +131,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicD() {
         executeSqlFile(new File(Sql.Logic.D));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-D"));
@@ -157,7 +157,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicE() {
         executeSqlFile(new File(Sql.Logic.E));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-E"));
@@ -191,7 +191,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicF() {
         executeSqlFile(new File(Sql.Logic.F));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-F"));
@@ -226,7 +226,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicG() {
         executeSqlFile(new File(Sql.Logic.G));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-G"));
@@ -274,7 +274,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicH() {
         executeSqlFile(new File(Sql.Logic.H));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-H"));
@@ -325,7 +325,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicI() {
         executeSqlFile(new File(Sql.Logic.I));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-I"));
@@ -357,7 +357,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicJ() {
         executeSqlFile(new File(Sql.Logic.J));
 
-        final var logic = new LogicComponentLoader(databaseManager, mock(ComponentFactory.class))
+        final var logic = new LogicComponentLoader(databaseManager, mock(LogicRepository.class))
                 .loadById(1);
 
         assertThat(logic.getUid()).isEqualTo(createUid("uid-component-logic-J"));
@@ -391,8 +391,7 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicFooBar_NotLoadedYet() {
         executeSqlFile(new File(Sql.Logic.JAR_FOOBAR));
 
-        final var componentFactory = new ComponentFactory();
-        final var loader = new LogicComponentLoader(databaseManager, componentFactory);
+        final var loader = new LogicComponentLoader(databaseManager, new LogicRepository());
 
         assertThatThrownBy(() -> loader.loadById(1))
                 .isInstanceOf(NoLogicClassFound.class)
@@ -404,11 +403,11 @@ class LogicComponentLoaderTest extends BaseDatabaseSuite {
     void testLogicFooBar_Loaded() throws IOException {
         executeSqlFile(new File(Sql.Logic.JAR_FOOBAR));
 
-        final var componentFactory = new ComponentFactory();
-        final var loader = new LogicComponentLoader(databaseManager, componentFactory);
+        final var logicRepository = new LogicRepository();
+        final var loader = new LogicComponentLoader(databaseManager, logicRepository);
 
         // Step 1: load from JAR
-        componentFactory.getLogicRepository().scanLogicClasses(Paths.get("."));
+        logicRepository.scanLogicClasses(Paths.get("."));
 
         // Step 2: Load from database and wrap the logic from JAR file
         final var logic = loader.loadById(1);

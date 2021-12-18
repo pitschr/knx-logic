@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package li.pitschmann.knx.api;
+package li.pitschmann.knx.api.v1;
 
 import experimental.api.v1.strategies.CreateStrategy;
 import experimental.api.v1.strategies.KnxInboxCreateStrategy;
@@ -45,16 +45,10 @@ public final class ComponentFactory {
     private final KnxOutboxCreateStrategy knxOutboxCreateStrategy = new KnxOutboxCreateStrategy();
     private final VariableInboxCreateStrategy varInboxCreateStrategy = new VariableInboxCreateStrategy();
     private final VariableOutboxCreateStrategy varOutboxCreateStrategy = new VariableOutboxCreateStrategy();
-    private final LogicRepository logicRepository = new LogicRepository();
-    private final LogicCreateStrategy logicCreateStrategy = new LogicCreateStrategy(logicRepository);
+    private final LogicCreateStrategy logicCreateStrategy;
 
-    /**
-     * Returns the {@link LogicRepository}
-     *
-     * @return actual {@link LogicRepository}
-     */
-    public LogicRepository getLogicRepository() {
-        return logicRepository;
+    public ComponentFactory(final LogicRepository logicRepository) {
+        this.logicCreateStrategy = new LogicCreateStrategy(logicRepository);
     }
 
     /**

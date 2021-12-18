@@ -1,6 +1,6 @@
 package test;
 
-import li.pitschmann.knx.api.ComponentFactory;
+import li.pitschmann.knx.logic.LogicRepository;
 import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.db.DatabaseManager;
 import li.pitschmann.knx.logic.db.H2DatabaseManager;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.mock;
 
 public class BaseDatabaseSuite {
     protected static final DatabaseManager databaseManager = new H2DatabaseManager("localhost", 9093, "junit");
-    protected static final LogicComponentLoader logicLoader = new LogicComponentLoader(databaseManager, new ComponentFactory());
+    protected static final LogicComponentLoader logicLoader = new LogicComponentLoader(databaseManager, mock(LogicRepository.class));
     protected static final InboxComponentLoader inboxLoader =  new InboxComponentLoader(databaseManager);
     protected static final OutboxComponentLoader outboxLoader =  new OutboxComponentLoader(databaseManager);
 
