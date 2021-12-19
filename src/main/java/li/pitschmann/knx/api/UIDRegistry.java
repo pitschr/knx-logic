@@ -18,6 +18,7 @@
 package li.pitschmann.knx.api;
 
 import li.pitschmann.knx.core.annotations.Nullable;
+import li.pitschmann.knx.core.utils.Strings;
 import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.ConnectorAware;
@@ -30,6 +31,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * UID Registry (application wide)
@@ -42,21 +45,17 @@ import java.util.Objects;
  * @author PITSCHR
  */
 public final class UIDRegistry {
-    private static final Map<String, Diagram> diagramMap = new HashMap<>();
-    private static final Map<String, Component> componentMap = new HashMap<>();
-    private static final Map<String, Connector> connectorMap = new HashMap<>();
-    private static final Map<String, Pin> pinMap = new HashMap<>();
-
-    private UIDRegistry() {
-        throw new AssertionError("Don't touch me!");
-    }
+    private final Map<String, Diagram> diagramMap = new HashMap<>();
+    private final Map<String, Component> componentMap = new HashMap<>();
+    private final Map<String, Connector> connectorMap = new HashMap<>();
+    private final Map<String, Pin> pinMap = new HashMap<>();
 
     /**
      * Returns all diagrams that is known to the {@link UIDRegistry}
      *
      * @return immutable list of {@link Diagram}
      */
-    public static List<Diagram> getDiagrams() {
+    public List<Diagram> getDiagrams() {
         return List.copyOf(diagramMap.values());
     }
 
@@ -65,7 +64,7 @@ public final class UIDRegistry {
      *
      * @return immutable list of {@link Component}
      */
-    public static List<Component> getComponents() {
+    public List<Component> getComponents() {
         return List.copyOf(componentMap.values());
     }
 
@@ -76,7 +75,7 @@ public final class UIDRegistry {
      * @return a {@link Diagram} if found, otherwise {@code null}
      */
     @Nullable
-    public static Diagram getDiagram(final String uid) {
+    public Diagram getDiagram(final String uid) {
         return diagramMap.get(Objects.requireNonNull(uid));
     }
 
@@ -87,7 +86,7 @@ public final class UIDRegistry {
      * @return a {@link Component} if found, otherwise {@code null}
      */
     @Nullable
-    public static Component getComponent(final String uid) {
+    public Component getComponent(final String uid) {
         return componentMap.get(Objects.requireNonNull(uid));
     }
 
@@ -98,7 +97,7 @@ public final class UIDRegistry {
      * @return a {@link Connector} if found, otherwise {@code null}
      */
     @Nullable
-    public static Connector getConnector(final String uid) {
+    public Connector getConnector(final String uid) {
         return connectorMap.get(Objects.requireNonNull(uid));
     }
 
@@ -109,7 +108,7 @@ public final class UIDRegistry {
      * @return a {@link Pin} if found, otherwise {@code null}
      */
     @Nullable
-    public static Pin getPin(final String uid) {
+    public Pin getPin(final String uid) {
         return pinMap.get(Objects.requireNonNull(uid));
     }
 
@@ -118,7 +117,7 @@ public final class UIDRegistry {
      *
      * @param diagram the diagram to be registered; may not be null
      */
-    public static void register(final Diagram diagram) {
+    public void register(final Diagram diagram) {
         diagramMap.put(diagram.getUid().toString(), diagram);
     }
 
@@ -130,14 +129,14 @@ public final class UIDRegistry {
      *
      * @param component the component to be registered; may not be null
      */
-    public static void register(final Component component) {
+    public void register(final Component component) {
         componentMap.put(component.getUid().toString(), component);
 
         if (component instanceof ConnectorAware) {
             ((ConnectorAware) component).getConnectors().forEach(connector -> connectorMap.put(connector.getUid().toString(), connector));
         }
         if (component instanceof PinAware) {
-            ((PinAware) component).getPins().forEach(UIDRegistry::registerPinInternal);
+            ((PinAware) component).getPins().forEach(this::registerPinInternal);
         }
     }
 
@@ -148,7 +147,7 @@ public final class UIDRegistry {
      * a component.
      * @param pin the dynamic pin to be registered; may not be null
      */
-    public static void register(final DynamicPin pin) {
+    public void register(final DynamicPin pin) {
         registerPinInternal(pin);
     }
 
@@ -157,7 +156,7 @@ public final class UIDRegistry {
      *
      * @param pin the pin to be registered; may not be null
      */
-    private static void registerPinInternal(final Pin pin) {
+    private void registerPinInternal(final Pin pin) {
         pinMap.put(pin.getUid().toString(), pin);
     }
 
@@ -166,7 +165,7 @@ public final class UIDRegistry {
      *
      * @param diagram the diagram to be de-registered; may not be null
      */
-    public static void deregister(final Diagram diagram) {
+    public void deregister(final Diagram diagram) {
         diagramMap.remove(diagram.getUid().toString());
     }
 
@@ -178,14 +177,14 @@ public final class UIDRegistry {
      *
      * @param component the component to be de-registered; may not be null
      */
-    public static void deregister(final Component component) {
+    public void deregister(final Component component) {
         componentMap.remove(component.getUid().toString());
 
         if (component instanceof ConnectorAware) {
             ((ConnectorAware) component).getConnectors().forEach(connector -> connectorMap.remove(connector.getUid().toString()));
         }
         if (component instanceof PinAware) {
-            ((PinAware) component).getPins().forEach(UIDRegistry::deregisterPinInternal);
+            ((PinAware) component).getPins().forEach(this::deregisterPinInternal);
         }
     }
 
@@ -196,7 +195,7 @@ public final class UIDRegistry {
      * a component.
      * @param pin the dynamic pin to be de-registered; may not be null
      */
-    public static void deregister(final DynamicPin pin) {
+    public void deregister(final DynamicPin pin) {
         deregisterPinInternal(pin);
     }
 
@@ -205,7 +204,34 @@ public final class UIDRegistry {
      *
      * @param pin the pin to be de-registered; may not be null
      */
-    private static void deregisterPinInternal(final Pin pin) {
+    private void deregisterPinInternal(final Pin pin) {
         pinMap.remove(pin.getUid().toString());
+    }
+
+    @Override
+    public String toString() {
+        final var diagramMapNames = toStringHelper(diagramMap, e -> e.getKey() + "=" + e.getValue().getName());
+        final var componentMapNames = toStringHelper(componentMap, e -> e.getKey() + "=" + e.getValue().getName());
+        final var connectorMapNames = toStringHelper(connectorMap, e -> e.getKey() + "=" + e.getValue().getName());
+        final var pinMapNames = toStringHelper(pinMap, e -> e.getKey() + "=" + e.getValue().getName());
+
+        return Strings.toStringHelper(this)
+                .add("\n\tdiagramMap", diagramMapNames)
+                .add("\n\tcomponentMap", componentMapNames)
+                .add("\n\tconnectorMap", connectorMapNames)
+                .add("\n\tpinMap", pinMapNames + '\n')
+                .toString();
+    }
+
+    private static <T> String toStringHelper(final Map<String, T> map, final Function<Map.Entry<String, T>, String> function) {
+        return "{\n\t\t" + map.entrySet().stream().map(function).sorted(
+                // input is: <uid>=<name>
+                // the comparison should be based on name (after "=" char)
+                (String o1, String o2) -> {
+                    var o1Str = o1.substring(o1.indexOf("="));
+                    var o2Str = o2.substring(o2.indexOf("="));
+                    return o1Str.compareTo(o2Str);
+                }
+        ).collect(Collectors.joining(", \n\t\t")) + "\n\t}";
     }
 }

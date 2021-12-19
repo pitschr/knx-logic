@@ -1,5 +1,6 @@
 package li.pitschmann.knx.logic.components;
 
+import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.uid.UIDAware;
 
 /**
@@ -16,4 +17,15 @@ public interface Component extends UIDAware {
      */
     Object getWrappedObject();
 
+    /**
+     * Returns the name of wrapped {@link Component} in following pattern:
+     * <pre>{@code
+     *      my.package.Logic
+     * }</pre>
+     *
+     * @return name of Component
+     */
+    default String getName() {
+        return getWrappedObject().getClass().getName();
+    }
 }
