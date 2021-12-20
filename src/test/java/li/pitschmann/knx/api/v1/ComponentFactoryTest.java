@@ -89,12 +89,18 @@ class ComponentFactoryTest {
     }
 
     @Test
-    @DisplayName("Test createInbox() and createOutbox() for Unknown Type")
-    void testCreateInboxOutboxUnknown() {
+    @DisplayName("Test createInbox() for Unknown Type")
+    void testCreateInboxUnknown() {
         final var factory = new ComponentFactory(mock(LogicRepository.class));
 
         assertThatThrownBy(() -> factory.createInbox("unknown", Map.of()))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @DisplayName("Test createOutbox() for Unknown Type")
+    void testCreateOutboxUnknown() {
+        final var factory = new ComponentFactory(mock(LogicRepository.class));
 
         assertThatThrownBy(() -> factory.createOutbox("unknown", Map.of()))
                 .isInstanceOf(IllegalArgumentException.class);

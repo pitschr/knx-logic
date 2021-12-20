@@ -21,11 +21,15 @@ import li.pitschmann.knx.core.annotations.Nullable;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.transformers.Transformers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Service for {@link Pin}
  */
 public final class PinService {
+    private static final Logger LOG = LoggerFactory.getLogger(PinService.class);
+
     /**
      * Sets the given {@code valueAsString} to {@link Pin}
      *
@@ -36,6 +40,7 @@ public final class PinService {
         Preconditions.checkNonNull(pin, "Pin is required.");
 
         final var obj = Transformers.transform(valueAsString, pin.getDescriptor().getFieldType());
+        LOG.debug("Set Value for Pin ({}): Original={}, Transformed={}", pin.getUid(), valueAsString, obj);
         pin.setValue(obj);
     }
 }
