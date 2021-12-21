@@ -1,7 +1,20 @@
 package experimental.api.v1.json;
 
+import li.pitschmann.knx.core.utils.Strings;
 import li.pitschmann.knx.logic.diagram.Diagram;
 
+/**
+ * API Response for a single {@link Diagram}
+ * <p>
+ * Example Response:
+ * <pre>{@code
+ *      {
+ *          "uid": "uid-diagram-and",
+ *          "name": "Diagram - And",
+ *          "description": "Diagram Description - And"
+ *      }
+ * }</pre>
+ */
 public final class DiagramResponse {
     private final String uid;
     private final String name;
@@ -31,5 +44,14 @@ public final class DiagramResponse {
 
     public String getDescription() {
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return Strings.toStringHelper(this)
+                .add("uid", uid)
+                .add("name", name)
+                .add("description", description)
+                .toString();
     }
 }

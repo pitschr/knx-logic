@@ -1,11 +1,26 @@
 package experimental.api.v1.json;
 
+import li.pitschmann.knx.core.utils.Strings;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * API Response for a single {@link Connector}
+ * <p>
+ * Example Response:
+ * <pre>{@code
+ *      {
+ *          "uid": "uid-connector-logic-input",
+ *          "name": "inputs",
+ *          "dynamic": true,
+ *          "pinType": "boolean",
+ *          "pins": [ .. ]
+ *      }
+ * }</pre>
+ */
 public final class ConnectorResponse {
     private final String uid;
     private final String name;
@@ -26,8 +41,8 @@ public final class ConnectorResponse {
                 connector.getUid().toString(),
                 connector.getDescriptor().getName(),
                 connector instanceof DynamicConnector,
-                connector.getDescriptor().getFieldType().getSimpleName().toLowerCase(),
-                connector.getPinStream().map(PinResponse::fromWithoutConnectorUid).collect(Collectors.toUnmodifiableList())
+                connector.getDescriptor().getFieldType().getName(),
+                connector.getPinStream().map(PinResponse::fromWithoutConnectorInfo).collect(Collectors.toUnmodifiableList())
         );
     }
 
@@ -49,5 +64,19 @@ public final class ConnectorResponse {
 
     public boolean isDynamic() {
         return dynamic;
+    }
+
+    @Override
+    public String toString() {
+            final var pinNames = pins.stream()
+                    .map(PinResponse::getUid).collect(Collectors.toList());
+
+        return Strings.toStringHelper(this)
+                .add("uid", uid)
+                .add("name", name)
+                .add("dynamic", dynamic)
+                .add("pinType", pinType)
+                .add("pins", pinNames)
+                .toString();
     }
 }

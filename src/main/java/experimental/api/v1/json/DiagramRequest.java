@@ -1,19 +1,42 @@
 package experimental.api.v1.json;
 
-public final class DiagramRequest {
-    private final String name;
-    private final String description;
+import li.pitschmann.knx.core.utils.Strings;
 
-    public DiagramRequest(final String name, final String description) {
-        this.name = name;
-        this.description = description;
-    }
+/**
+ * JSON Payload Request to create a diagram
+ * <p>
+ * <pre>{@code
+ *   {
+ *     "name": "New Diagram",
+ *     "description": "New Diagram Description"
+ *   }
+ * }</pre>
+ */
+public final class DiagramRequest {
+    private String name;
+    private String description;
 
     public String getName() {
         return name;
     }
 
+    public void setName(final String name) {
+        this.name = name;
+    }
+
     public String getDescription() {
         return description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    @Override
+    public String toString() {
+        return Strings.toStringHelper(this)
+                .add("name", name)
+                .add("description", description)
+                .toString();
     }
 }

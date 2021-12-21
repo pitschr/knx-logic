@@ -1,5 +1,6 @@
 package experimental.api.v1.json;
 
+import li.pitschmann.knx.core.utils.Strings;
 import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.InputConnectorAware;
@@ -8,6 +9,19 @@ import li.pitschmann.knx.logic.connector.OutputConnectorAware;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * API Response for a single {@link Component}
+ * <p>
+ * Example Response:
+ * <pre>{@code
+ *      {
+ *          "uid": "uid-component-logic",
+ *          "className": "li.pitschmann.knx.logic.components.bitwise.And",
+ *          "inputs": [ .. ],
+ *          "outputs": [ .. ]
+ *      }
+ * }</pre>
+ */
 public final class ComponentResponse {
     private final String uid;
     private final String className;
@@ -60,5 +74,20 @@ public final class ComponentResponse {
 
     public List<ConnectorResponse> getOutputs() {
         return outputs;
+    }
+
+    @Override
+    public String toString() {
+        final var inputNames = inputs.stream()
+                .map(ConnectorResponse::getUid).collect(Collectors.toList());
+        final var outputNames = outputs.stream()
+                .map(ConnectorResponse::getUid).collect(Collectors.toList());
+
+        return Strings.toStringHelper(this)
+                .add("uid", uid)
+                .add("className", className)
+                .add("inputs", inputNames)
+                .add("outputs", outputNames)
+                .toString();
     }
 }

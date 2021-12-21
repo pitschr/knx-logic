@@ -4,11 +4,30 @@ import li.pitschmann.knx.core.utils.Strings;
 
 import java.util.Map;
 
-// LOGIC: { type: "logic", data: { "class": "my.package.Logic.class" } }
-// INBOX (KNX): { type: "inbox", event: "KNX", data: { "groupAddress": "1/2/3", "dpt": "dpt-1" } }
-// INBOX (VAR): { type: "inbox", event: "VAR", data: { "name": "foobar" } }
-// OUTBOX (KNX): { type: "outbox", event: "KNX", data: { "groupAddress": "1/2/3", "dpt": "dpt-1" } }
-// OUTBOX (VAR): { type: "outbox", event: "VAR", data: { "name": "foobar" } }
+/**
+ * JSON Payload Request for /v1/components
+ * <p>
+ * <p>
+ * <pre>Create Logic Component: {@code
+ *    { type: "logic", data: { "class": "my.package.Logic.class" } }
+ * }</pre>
+ * <p>
+ * <pre>Create Variable Inbox Component: {@code
+ *    { type: "inbox", event: "VAR", data: { "name": "foobar" } }
+ * }</pre>
+ * <p>
+ * <pre>Create KNX Inbox Component: {@code
+ *    { type: "inbox", event: "KNX", data: { "groupAddress": "1/2/3", "dpt": "dpt-1" } }
+ * }</pre>
+ * <p>
+ * <pre>Create Variable Outbox Component: {@code
+ *    { type: "outbox", event: "VAR", data: { "name": "foobar" } }
+ * }</pre>
+ * <p>
+ * <pre>Create KNX Outbox Component: {@code
+ *    { type: "outbox", event: "KNX", data: { "groupAddress": "1/2/3", "dpt": "dpt-1" } }
+ * }</pre>
+ */
 public final class ComponentRequest {
     private String type;
     private String event;
@@ -18,7 +37,7 @@ public final class ComponentRequest {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
@@ -26,7 +45,7 @@ public final class ComponentRequest {
         return event;
     }
 
-    public void setEvent(String event) {
+    public void setEvent(final String event) {
         this.event = event;
     }
 
@@ -34,7 +53,7 @@ public final class ComponentRequest {
         return data;
     }
 
-    public void setData(Map<String, String> data) {
+    public void setData(final Map<String, String> data) {
         this.data = data;
     }
 
