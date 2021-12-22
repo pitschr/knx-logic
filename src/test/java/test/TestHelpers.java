@@ -1,7 +1,10 @@
 package test;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import io.javalin.http.Context;
 import io.javalin.http.util.ContextUtil;
+import io.javalin.plugin.json.JavalinJson;
 import li.pitschmann.knx.logic.Logic;
 import li.pitschmann.knx.logic.components.InboxComponent;
 import li.pitschmann.knx.logic.components.InboxComponentImpl;
@@ -20,10 +23,14 @@ import li.pitschmann.knx.logic.event.VariableEventChannel;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.util.Objects;
+
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 public final class TestHelpers {
+    private static final Gson GSON = new GsonBuilder().create();
+
     private TestHelpers() {
     }
 
@@ -80,6 +87,14 @@ public final class TestHelpers {
     }
 
     /**
+     * Initializes Javalin JSON with {@link #GSON}
+     */
+    public static void initJavalinJson() {
+        JavalinJson.setFromJsonMapper(GSON::fromJson);
+        JavalinJson.setToJsonMapper(GSON::toJson);
+    }
+
+    /**
      * Returns a new Javalin {@link Context} incl. wrapped
      * spy-functionality from Mockito
      *
@@ -87,5 +102,27 @@ public final class TestHelpers {
      */
     public static Context contextSpy() {
         return spy(ContextUtil.init(mock(HttpServletRequest.class), mock(HttpServletResponse.class)));
+    }
+
+    /**
+     * Returns a JSON string for given objects in the parameter
+     *
+     * @param obj the first object; may not be null
+     * @param moreObjects the more objects; may be null
+     * @return a JSON string representation
+     */
+    public static String toJson(final Object obj, final Object... moreObjects) {
+        Objects.requireNonNull(obj);
+        if (moreObjects.length == 0) {
+            return GSON.toJson(obj);
+        } else {
+            final var sb = new StringBuilder(1024);
+            sb.append('[').append(GSON.toJson(obj));
+            for (var moreObject : moreObjects) {
+                sb.append(',').append(toJson(moreObject));
+            }
+            sb.append(']');
+            return sb.toString();
+        }
     }
 }
