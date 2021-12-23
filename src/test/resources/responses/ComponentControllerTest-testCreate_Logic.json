@@ -1,0 +1,48 @@
+{
+  "uid": "********-****-****-****-************",
+  "className": "test.components.logic.AndLogic",
+  "inputs": [
+    {
+      "uid": "********-****-****-****-************",
+      "name": "inputs",
+      "dynamic": true,
+      "pinType": "java.lang.Boolean",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "false"
+        },
+        {
+          "uid": "********-****-****-****-************",
+          "value": "false"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "uid": "********-****-****-****-************",
+      "name": "output",
+      "dynamic": false,
+      "pinType": "java.lang.Boolean",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "outputNegation",
+      "dynamic": false,
+      "pinType": "java.lang.Boolean",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "true"
+        }
+      ]
+    }
+  ]
+}

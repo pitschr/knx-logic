@@ -1,0 +1,116 @@
+{
+  "uid": "********-****-****-****-************",
+  "className": "test.components.LogicH",
+  "inputs": [
+    {
+      "uid": "********-****-****-****-************",
+      "name": "booleans",
+      "dynamic": true,
+      "pinType": "java.lang.Boolean",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "false"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "bytes",
+      "dynamic": true,
+      "pinType": "java.lang.Byte",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "chars",
+      "dynamic": true,
+      "pinType": "java.lang.Character",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "\u0000"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "doubles",
+      "dynamic": true,
+      "pinType": "java.lang.Double",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "0.0"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "floats",
+      "dynamic": true,
+      "pinType": "java.lang.Float",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "0.0"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "integers",
+      "dynamic": true,
+      "pinType": "java.lang.Integer",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "longs",
+      "dynamic": true,
+      "pinType": "java.lang.Long",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "0"
+        }
+      ]
+    },
+    {
+      "uid": "********-****-****-****-************",
+      "name": "shorts",
+      "dynamic": true,
+      "pinType": "java.lang.Short",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "0"
+        }
+      ]
+    }
+  ],
+  "outputs": [
+    {
+      "uid": "********-****-****-****-************",
+      "name": "strings",
+      "dynamic": true,
+      "pinType": "java.lang.String",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": ""
+        }
+      ]
+    }
+  ]
+}

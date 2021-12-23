@@ -2,6 +2,8 @@ package test;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import io.javalin.http.Context;
 import io.javalin.http.util.ContextUtil;
 import io.javalin.plugin.json.JavalinJson;
@@ -22,15 +24,20 @@ import li.pitschmann.knx.logic.event.VariableEventChannel;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
 public final class TestHelpers {
     private static final Gson GSON = new GsonBuilder().create();
+    private static final String UUID_PATTERN = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
+    private static final String UUID_PATTERN_REPLACE = "********-****-****-****-************";
 
     private TestHelpers() {
     }
@@ -108,7 +115,7 @@ public final class TestHelpers {
     /**
      * Returns a JSON string for given objects in the parameter
      *
-     * @param obj the first object; may not be null
+     * @param obj         the first object; may not be null
      * @param moreObjects the more objects; may be null
      * @return a JSON string representation
      */
@@ -131,24 +138,85 @@ public final class TestHelpers {
      * Asserts the given response body of {@link Context} (which is JSON) against
      * the error {@code message}.
      *
-     * @param ctx the {@link Context} to be verified; may not be null
+     * @param ctx     the {@link Context} to be verified; may not be null
      * @param message the expected error message
      */
     public static void assertContextJsonErrorMessage(final Context ctx, final String message) {
-        assertThat(ctx.resultString()).isEqualTo("{\"message\":\"" + message + "\"}");
+        assertContextJsonResult(ctx, "{\"message\":\"" + message + "\"}");
     }
 
     /**
      * Asserts the given response body of {@link Context} (which is JSON) against
      * the {@code expectedJson}. As {@link li.pitschmann.knx.logic.uid.UID} are
-     * dynamically, it will be replaced by a dummy UID for comparison.
+     * dynamically, it will be replaced by a dummy UID pattern for comparison.
      *
-     * @param ctx the {@link Context} to be verified; may not be null
+     * @param ctx          the {@link Context} to be verified; may not be null
      * @param expectedJson the expected JSON string
      */
-    public static void assertContextJsonResult(final Context ctx, String expectedJson) {
-        final var expectedJsonWithDummyUid = expectedJson.replaceAll("\"uid\":\"[^\"]+\"", "\"uid\":\"dummy-uid\"");
-        final var actualJsonWithDummyUid = ctx.resultString().replaceAll("\"uid\":\"[^\"]+\"", "\"uid\":\"dummy-uid\"");
-        assertThat(actualJsonWithDummyUid).isEqualTo(expectedJsonWithDummyUid);
+    public static void assertContextJsonResult(final Context ctx, final String expectedJson) {
+        assertContextJsonResult(ctx, expectedJson, true);
+    }
+
+    /**
+     * Asserts the given response body of {@link Context} (which is JSON) against
+     * the {@code expectedJson}. As {@link li.pitschmann.knx.logic.uid.UID} are
+     * dynamically, it will be replaced by a dummy UID pattern for comparison.
+     *
+     * @param ctx          the {@link Context} to be verified; may not be null
+     * @param expectedJson the expected JSON string
+     * @param isStrict     if the order in array is considered as strict
+     */
+    public static void assertContextJsonResult(final Context ctx, final String expectedJson, final boolean isStrict) {
+        final var actualJson = ctx.resultString();
+        if (actualJson == null) {
+            assertThat(expectedJson).isNull();
+        } else {
+            final var expectedJsonWithDummyUid = expectedJson.replaceAll(UUID_PATTERN, UUID_PATTERN_REPLACE);
+            final var actualJsonWithDummyUid = actualJson.replaceAll(UUID_PATTERN, UUID_PATTERN_REPLACE);
+            final var expectedJsonElement = JsonParser.parseString(expectedJsonWithDummyUid);
+            final var actualJsonElement = JsonParser.parseString(actualJsonWithDummyUid);
+
+            if (!isStrict && expectedJsonElement.isJsonArray() && actualJsonElement.isJsonArray()) {
+                final var expectedArray = (JsonArray) expectedJsonElement;
+                final var actualArray = (JsonArray) actualJsonElement;
+                assertThat(expectedArray.size()).isEqualTo(actualArray.size());
+                for (var i = 0; i < expectedArray.size(); i++) {
+                    assertThat(actualArray.contains(expectedArray.get(i))).isTrue();
+                }
+            } else {
+                assertThat(actualJsonElement).isEqualTo(expectedJsonElement);
+            }
+        }
+    }
+
+    /**
+     * Asserts the given response body of {@link Context} (which is JSON) against
+     * the content of given {@link Path}. As {@link li.pitschmann.knx.logic.uid.UID}
+     * are dynamically, it will be replaced by a dummy UID pattern for comparison.
+     *
+     * @param ctx  the {@link Context} to be verified; may not be null
+     * @param path the path of file that contains the expected JSON; may not be null
+     */
+    public static void assertContextJsonResult(final Context ctx, final Path path) {
+        assertContextJsonResult(ctx, path, true);
+    }
+
+    /**
+     * Asserts the given response body of {@link Context} (which is JSON) against
+     * the content of given {@link Path}. As {@link li.pitschmann.knx.logic.uid.UID}
+     * are dynamically, it will be replaced by a dummy UID pattern for comparison.
+     *
+     * @param ctx      the {@link Context} to be verified; may not be null
+     * @param path     the path of file that contains the expected JSON; may not be null
+     * @param isStrict if the order in array is considered as strict
+     */
+    public static void assertContextJsonResult(final Context ctx, final Path path, final boolean isStrict) {
+        final var newPath = TestHelpers.class.getResource("/").getPath() + path.toString();
+        try {
+            final var expectedJson = Files.readString(Path.of(newPath));
+            assertContextJsonResult(ctx, expectedJson, isStrict);
+        } catch (IOException e) {
+            fail("Could not read string from path: " + newPath, e);
+        }
     }
 }

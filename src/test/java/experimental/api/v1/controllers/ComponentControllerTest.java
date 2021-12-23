@@ -18,7 +18,6 @@
 package experimental.api.v1.controllers;
 
 import experimental.api.v1.json.ComponentRequest;
-import experimental.api.v1.json.ComponentResponse;
 import experimental.api.v1.services.ComponentService;
 import li.pitschmann.knx.api.UIDRegistry;
 import li.pitschmann.knx.api.v1.ComponentFactory;
@@ -30,11 +29,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.TestHelpers;
 import test.components.LogicA;
+import test.components.LogicB;
+import test.components.LogicC;
+import test.components.LogicD;
+import test.components.LogicH;
+import test.components.logic.AndLogic;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import java.nio.file.Path;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
@@ -45,10 +50,7 @@ import static org.mockito.Mockito.verify;
 import static test.TestHelpers.assertContextJsonErrorMessage;
 import static test.TestHelpers.assertContextJsonResult;
 import static test.TestHelpers.contextSpy;
-import static test.TestHelpers.createInboxComponent;
 import static test.TestHelpers.createLogicComponent;
-import static test.TestHelpers.createOutboxComponent;
-import static test.TestHelpers.toJson;
 
 /**
  * Test for {@link ComponentController}
@@ -72,32 +74,35 @@ class ComponentControllerTest {
         controller.getAll(context);
 
         verify(context).status(HttpServletResponse.SC_OK);
-        verify(context).result("[]");
+        assertContextJsonResult(
+                context,
+                Path.of("responses/ComponentControllerTest-testAll_NoComponents.json")
+        );
     }
 
     @Test
-    @DisplayName("Endpoint: Get All Components (two components registered)")
-    void testAll_TwoComponents() {
+    @DisplayName("Endpoint: Get All Components (with components registered)")
+    void testAll_WithComponents() {
         final var serviceMock = mock(ComponentService.class);
         final var factoryMock = mock(ComponentFactory.class);
-        final var registryMock = mock(UIDRegistry.class);
 
         // register two components
-        final var component1 = new LogicComponentImpl(new LogicA());
-        final var component2 = new LogicComponentImpl(new LogicA());
-        doReturn(List.of(component1, component2)).when(registryMock).getComponents();
+        final var registry = new UIDRegistry();
+        registry.register(createLogicComponent(LogicA.class));
+        registry.register(createLogicComponent(LogicB.class));
+        registry.register(createLogicComponent(LogicC.class));
+        registry.register(createLogicComponent(LogicD.class));
 
-        final var controller = new ComponentController(serviceMock, factoryMock, registryMock);
+        final var controller = new ComponentController(serviceMock, factoryMock, registry);
 
         final var context = contextSpy();
         controller.getAll(context);
 
         verify(context).status(HttpServletResponse.SC_OK);
-        verify(context).result(
-                toJson(
-                        ComponentResponse.from(component1),
-                        ComponentResponse.from(component2)
-                )
+        assertContextJsonResult(
+                context,
+                Path.of("responses/ComponentControllerTest-testAll_WithComponents.json"),
+                false
         );
     }
 
@@ -114,7 +119,7 @@ class ComponentControllerTest {
         controller.getOne(context, "");
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
-        assertContextJsonErrorMessage(context,"No component UID provided");
+        assertContextJsonErrorMessage(context, "No component UID provided");
     }
 
     @Test
@@ -130,7 +135,7 @@ class ComponentControllerTest {
         controller.getOne(context, "does-not-exists");
 
         verify(context).status(HttpServletResponse.SC_NOT_FOUND);
-        assertContextJsonErrorMessage(context,"No component found with UID: does-not-exists");
+        assertContextJsonErrorMessage(context, "No component found with UID: does-not-exists");
     }
 
     @Test
@@ -138,17 +143,20 @@ class ComponentControllerTest {
     void testGetOne_ComponentFound() {
         final var serviceMock = mock(ComponentService.class);
         final var factoryMock = mock(ComponentFactory.class);
-        final var registryMock = mock(UIDRegistry.class);
-        final var component = new LogicComponentImpl(new LogicA());
-        doReturn(component).when(registryMock).getComponent(anyString());
+        final var component = createLogicComponent(LogicH.class);
+        final var registry = new UIDRegistry();
+        registry.register(component);
 
-        final var controller = new ComponentController(serviceMock, factoryMock, registryMock);
+        final var controller = new ComponentController(serviceMock, factoryMock, registry);
 
         final var context = contextSpy();
-        controller.getOne(context, "component-uid");
+        controller.getOne(context, component.getUid().toString());
 
         verify(context).status(HttpServletResponse.SC_OK);
-        verify(context).result(toJson(ComponentResponse.from(component)));
+        assertContextJsonResult(
+                context,
+                Path.of("responses/ComponentControllerTest-testGetOne_ComponentFound.json")
+        );
     }
 
     @Test
@@ -157,13 +165,13 @@ class ComponentControllerTest {
         final var serviceMock = mock(ComponentService.class);
         final var registryMock = mock(UIDRegistry.class);
         final var logicRepositoryMock = spy(new LogicRepository());
-        doReturn(LogicA.class).when(logicRepositoryMock).findLogicClass(anyString());
+        doReturn(AndLogic.class).when(logicRepositoryMock).findLogicClass(anyString());
         final var factory = new ComponentFactory(logicRepositoryMock);
         final var controller = new ComponentController(serviceMock, factory, registryMock);
 
         final var request = new ComponentRequest();
         request.setType("logic");
-        request.setData(Map.of("class", LogicA.class.getName()));
+        request.setData(Map.of("class", AndLogic.class.getName()));
 
         final var context = contextSpy();
         controller.create(context, request);
@@ -171,7 +179,7 @@ class ComponentControllerTest {
         verify(context).status(HttpServletResponse.SC_CREATED);
         assertContextJsonResult(
                 context,
-                toJson(ComponentResponse.from(createLogicComponent(LogicA.class)))
+                Path.of("responses/ComponentControllerTest-testCreate_Logic.json")
         );
     }
 
@@ -191,7 +199,7 @@ class ComponentControllerTest {
         controller.create(context, request);
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
-        assertContextJsonErrorMessage(context,"No Logic Class found: does.not.exists.Class");
+        assertContextJsonErrorMessage(context, "No Logic Class found: does.not.exists.Class");
         verify(serviceMock, never()).addComponent(any(Component.class));
         verify(registryMock, never()).register(any(Component.class));
     }
@@ -215,7 +223,7 @@ class ComponentControllerTest {
         verify(context).status(HttpServletResponse.SC_CREATED);
         assertContextJsonResult(
                 context,
-                toJson(ComponentResponse.from(createInboxComponent("inbox-variable")))
+                Path.of("responses/ComponentControllerTest-testCreate_Inbox.json")
         );
         verify(serviceMock).addComponent(any(Component.class));
         verify(registryMock).register(any(Component.class));
@@ -240,7 +248,7 @@ class ComponentControllerTest {
         verify(context).status(HttpServletResponse.SC_CREATED);
         assertContextJsonResult(
                 context,
-                toJson(ComponentResponse.from(createOutboxComponent("outbox-variable")))
+                Path.of("responses/ComponentControllerTest-testCreate_Outbox.json")
         );
         verify(serviceMock).addComponent(any(Component.class));
         verify(registryMock).register(any(Component.class));
@@ -261,7 +269,7 @@ class ComponentControllerTest {
         controller.create(context, request);
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
-        assertContextJsonErrorMessage(context,"Unsupported Component Type: UNKNOWN-TYPE. Supported are: logic, inbox and outbox.");
+        assertContextJsonErrorMessage(context, "Unsupported Component Type: UNKNOWN-TYPE. Supported are: logic, inbox and outbox.");
         verify(serviceMock, never()).addComponent(any(Component.class));
         verify(registryMock, never()).register(any(Component.class));
     }
@@ -279,6 +287,7 @@ class ComponentControllerTest {
         controller.delete(context, "does-not-exists");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        assertThat(context.resultString()).isNull();
         verify(serviceMock, never()).removeComponent(any(Component.class));
         verify(registryMock, never()).deregister(any(Component.class));
     }
@@ -298,6 +307,7 @@ class ComponentControllerTest {
         controller.delete(context, "component-uid");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        assertThat(context.resultString()).isNull();
         verify(serviceMock).removeComponent(any(Component.class));
         verify(registryMock).deregister(any(Component.class));
     }

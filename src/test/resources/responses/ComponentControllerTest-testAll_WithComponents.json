@@ -1,0 +1,78 @@
+[
+  {
+    "uid": "********-****-****-****-************",
+    "className": "test.components.LogicA",
+    "inputs": [],
+    "outputs": []
+  },
+  {
+    "uid": "********-****-****-****-************",
+    "className": "test.components.LogicB",
+    "inputs": [
+      {
+        "uid": "********-****-****-****-************",
+        "name": "i",
+        "dynamic": false,
+        "pinType": "java.lang.Boolean",
+        "pins": [
+          {
+            "uid": "********-****-****-****-************",
+            "value": "false"
+          }
+        ]
+      }
+    ],
+    "outputs": []
+  },
+  {
+    "uid": "********-****-****-****-************",
+    "className": "test.components.LogicC",
+    "inputs": [
+      {
+        "uid": "********-****-****-****-************",
+        "name": "i",
+        "dynamic": false,
+        "pinType": "java.lang.Boolean",
+        "pins": [
+          {
+            "uid": "********-****-****-****-************",
+            "value": "false"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "uid": "********-****-****-****-************",
+        "name": "o",
+        "dynamic": false,
+        "pinType": "java.lang.Boolean",
+        "pins": [
+          {
+            "uid": "********-****-****-****-************",
+            "value": "false"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "uid": "********-****-****-****-************",
+    "className": "test.components.LogicD",
+    "inputs": [
+      {
+        "uid": "********-****-****-****-************",
+        "name": "i",
+        "dynamic": true,
+        "pinType": "java.lang.Boolean",
+        "pins": [
+          {
+            "uid": "********-****-****-****-************",
+            "value": "false"
+          }
+        ]
+      }
+    ],
+    "outputs": []
+  }
+]
