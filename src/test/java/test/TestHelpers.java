@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
@@ -124,5 +125,30 @@ public final class TestHelpers {
             sb.append(']');
             return sb.toString();
         }
+    }
+
+    /**
+     * Asserts the given response body of {@link Context} (which is JSON) against
+     * the error {@code message}.
+     *
+     * @param ctx the {@link Context} to be verified; may not be null
+     * @param message the expected error message
+     */
+    public static void assertContextJsonErrorMessage(final Context ctx, final String message) {
+        assertThat(ctx.resultString()).isEqualTo("{\"message\":\"" + message + "\"}");
+    }
+
+    /**
+     * Asserts the given response body of {@link Context} (which is JSON) against
+     * the {@code expectedJson}. As {@link li.pitschmann.knx.logic.uid.UID} are
+     * dynamically, it will be replaced by a dummy UID for comparison.
+     *
+     * @param ctx the {@link Context} to be verified; may not be null
+     * @param expectedJson the expected JSON string
+     */
+    public static void assertContextJsonResult(final Context ctx, String expectedJson) {
+        final var expectedJsonWithDummyUid = expectedJson.replaceAll("\"uid\":\"[^\"]+\"", "\"uid\":\"dummy-uid\"");
+        final var actualJsonWithDummyUid = ctx.resultString().replaceAll("\"uid\":\"[^\"]+\"", "\"uid\":\"dummy-uid\"");
+        assertThat(actualJsonWithDummyUid).isEqualTo(expectedJsonWithDummyUid);
     }
 }

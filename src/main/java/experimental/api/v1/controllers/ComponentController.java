@@ -1,7 +1,7 @@
 package experimental.api.v1.controllers;
 
 import li.pitschmann.knx.api.UIDRegistry;
-import li.pitschmann.knx.api.ComponentFactory;
+import li.pitschmann.knx.api.v1.ComponentFactory;
 import experimental.api.v1.json.ComponentResponse;
 import experimental.api.v1.json.ComponentRequest;
 import experimental.api.v1.services.ComponentService;
@@ -27,11 +27,14 @@ public final class ComponentController {
 
     private final ComponentFactory componentFactory;
     private final ComponentService componentService;
+    private final UIDRegistry uidRegistry;
 
-    public ComponentController(final ComponentFactory componentFactory,
-                               final ComponentService componentService) {
-        this.componentFactory = Objects.requireNonNull(componentFactory);
+    public ComponentController(final ComponentService componentService,
+                               final ComponentFactory componentFactory,
+                               final UIDRegistry uidRegistry) {
         this.componentService = Objects.requireNonNull(componentService);
+        this.componentFactory = Objects.requireNonNull(componentFactory);
+        this.uidRegistry = Objects.requireNonNull(uidRegistry);
     }
 
     /**
@@ -43,7 +46,7 @@ public final class ComponentController {
         LOG.trace("Return all components");
 
         // return and find all components
-        final var components = UIDRegistry.getComponents();
+        final var components = uidRegistry.getComponents();
 
         final var responses = components.stream()
                 .map(ComponentResponse::from)
@@ -116,7 +119,7 @@ public final class ComponentController {
         componentService.addComponent(component);
 
         // register the component
-        UIDRegistry.register(component);
+        uidRegistry.register(component);
 
         LOG.debug("Component registered: {}", component);
 
@@ -136,14 +139,14 @@ public final class ComponentController {
         LOG.trace("Delete for Component UID: {}", uid);
         Preconditions.checkNonNull(uid, "UID for component delete not provided.");
 
-        final var component = UIDRegistry.getComponent(uid);
+        final var component = uidRegistry.getComponent(uid);
         if (component == null) {
             ctx.status(HttpServletResponse.SC_NO_CONTENT);
             return;
         }
 
         // TODO: check if component has at least one link -> protected?
-        UIDRegistry.deregister(component);
+        uidRegistry.deregister(component);
         componentService.removeComponent(component);
 
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
@@ -161,9 +164,9 @@ public final class ComponentController {
         Component component = null;
         if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No component UID provided."));
+            ctx.json(Map.of("message", "No component UID provided"));
         } else {
-            component = UIDRegistry.getComponent(uid);
+            component = uidRegistry.getComponent(uid);
             if (component == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(
