@@ -124,7 +124,7 @@ class ComponentControllerTest {
 
     @Test
     @DisplayName("Endpoint: Get One Component (Not Found)")
-    void testGetOne_ComponentNotFound() {
+    void testGetOne_NotFound() {
         final var serviceMock = mock(ComponentService.class);
         final var factoryMock = mock(ComponentFactory.class);
         final var registryMock = mock(UIDRegistry.class);
@@ -140,7 +140,7 @@ class ComponentControllerTest {
 
     @Test
     @DisplayName("Endpoint: Get One Component (Found)")
-    void testGetOne_ComponentFound() {
+    void testGetOne_Found() {
         final var serviceMock = mock(ComponentService.class);
         final var factoryMock = mock(ComponentFactory.class);
         final var component = createLogicComponent(LogicH.class);
@@ -155,7 +155,7 @@ class ComponentControllerTest {
         verify(context).status(HttpServletResponse.SC_OK);
         assertContextJsonResult(
                 context,
-                Path.of("responses/ComponentControllerTest-testGetOne_ComponentFound.json")
+                Path.of("responses/ComponentControllerTest-testGetOne_Found.json")
         );
     }
 
@@ -276,7 +276,7 @@ class ComponentControllerTest {
 
     @Test
     @DisplayName("Endpoint: Delete Component (Not Found)")
-    void testDelete_ComponentNotFound() {
+    void testDelete_NotFound() {
         final var serviceMock = mock(ComponentService.class);
         final var factoryMock = mock(ComponentFactory.class);
         final var registryMock = mock(UIDRegistry.class);

@@ -23,11 +23,13 @@ import java.util.Objects;
  */
 public final class ConnectorController {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectorController.class);
-
     private final ConnectorService connectorService;
+    private final UIDRegistry uidRegistry;
 
-    public ConnectorController(final ConnectorService connectorService) {
+    public ConnectorController(final ConnectorService connectorService,
+                               final UIDRegistry uidRegistry) {
         this.connectorService = Objects.requireNonNull(connectorService);
+        this.uidRegistry = Objects.requireNonNull(uidRegistry);
     }
 
     /**
@@ -69,11 +71,11 @@ public final class ConnectorController {
 
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
-            LOG.error("Connector is not dynamic: {}", connector);
+            LOG.error("Connector is not dynamic: {}", connectorUid);
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
             ctx.json(Map.of(
                     "message",
-                    String.format("Connector is not dynamic: %s", connector))
+                    String.format("Connector is not dynamic: %s", connectorUid))
             );
             return;
         }
@@ -81,7 +83,8 @@ public final class ConnectorController {
 
         try {
             if (index == null) {
-                connectorService.addPin(dynamicConnector);
+                final var newPin = connectorService.addPin(dynamicConnector);
+                uidRegistry.register(newPin);
             } else {
                 // index must be valid
                 if (index < 0 || index >= dynamicConnector.size()) {
@@ -92,11 +95,12 @@ public final class ConnectorController {
                     );
                     return;
                 }
-                connectorService.addPin(dynamicConnector, index);
+                final var newPin = connectorService.addPin(dynamicConnector, index);
+                uidRegistry.register(newPin);
             }
 
             ctx.status(HttpServletResponse.SC_OK);
-            ctx.json(ConnectorResponse.from(connector).getPins());
+            ctx.json(ConnectorResponse.from(connector));
         } catch (final MaximumBoundException e) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of("message", e.getMessage()));
@@ -122,11 +126,11 @@ public final class ConnectorController {
 
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
-            LOG.error("Connector is not dynamic: {}", connector);
+            LOG.error("Connector is not dynamic: {}", connectorUid);
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
             ctx.json(Map.of(
                     "message",
-                    String.format("Connector is not dynamic: %s", connector))
+                    String.format("Connector is not dynamic: %s", connectorUid))
             );
             return;
         }
@@ -143,7 +147,8 @@ public final class ConnectorController {
         }
 
         try {
-            connectorService.removePin(dynamicConnector, index);
+            final var deletedPin = connectorService.removePin(dynamicConnector, index);
+            uidRegistry.deregister(deletedPin);
 
             ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector));
@@ -165,9 +170,9 @@ public final class ConnectorController {
         Connector connector = null;
         if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No connector UID provided."));
+            ctx.json(Map.of("message", "No connector UID provided"));
         } else {
-            connector = UIDRegistry.getConnector(uid);
+            connector = uidRegistry.getConnector(uid);
             if (connector == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(
