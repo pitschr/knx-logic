@@ -269,7 +269,9 @@ class ComponentControllerTest {
         controller.create(context, request);
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
-        assertContextJsonErrorMessage(context, "Unsupported Component Type: UNKNOWN-TYPE. Supported are: logic, inbox and outbox.");
+        assertContextJsonErrorMessage(context,
+                "Unsupported Component Type: UNKNOWN-TYPE. Supported are: logic, inbox and outbox."
+        );
         verify(serviceMock, never()).addComponent(any(Component.class));
         verify(registryMock, never()).register(any(Component.class));
     }

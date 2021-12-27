@@ -142,7 +142,7 @@ class ConnectorControllerTest {
         controller.addPin(context, connectorUid, null);
 
         verify(context).status(HttpServletResponse.SC_FORBIDDEN);
-        assertContextJsonErrorMessage(context, "Connector is not dynamic: " + connectorUid);
+        assertContextJsonErrorMessage(context, "Connector is not dynamic: test.components.LogicB#i");
     }
 
     @Test
@@ -221,7 +221,9 @@ class ConnectorControllerTest {
         controller.addPin(context, connector.getUid().toString(), 999);
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
-        assertContextJsonErrorMessage(context, "Pin index is out of range: 999 (min=0, max=0)");
+        assertContextJsonErrorMessage(context,
+                "Index of connector 'test.components.LogicD#i' is out of range: 999 (min=0, max=0)"
+        );
         verify(serviceMock, never()).addPin(any(DynamicConnector.class), anyInt());
         verify(registrySpy, never()).register(any(DynamicPin.class));
     }
@@ -273,7 +275,7 @@ class ConnectorControllerTest {
         final var registry = new UIDRegistry();
         final var component = createLogicComponent(LogicB.class);
         registry.register(component);
-        final var connectorUid = component.getConnector("i").getUid().toString();
+        final var connector = component.getConnector("i");
 
         final var controller = new ConnectorController(
                 mock(ConnectorService.class),
@@ -281,10 +283,10 @@ class ConnectorControllerTest {
         );
 
         final var context = contextSpy();
-        controller.deletePin(context, connectorUid, 0);
+        controller.deletePin(context, connector.getUid().toString(), 0);
 
         verify(context).status(HttpServletResponse.SC_FORBIDDEN);
-        assertContextJsonErrorMessage(context, "Connector is not dynamic: " + connectorUid);
+        assertContextJsonErrorMessage(context, "Connector is not dynamic: test.components.LogicB#i");
     }
 
     @Test
@@ -335,7 +337,9 @@ class ConnectorControllerTest {
         controller.deletePin(context, connector.getUid().toString(), 999);
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
-        assertContextJsonErrorMessage(context, "Pin index is out of range: 999 (min=0, max=0)");
+        assertContextJsonErrorMessage(context,
+                "Index of connector 'test.components.LogicD#i' is out of range: 999 (min=0, max=0)"
+        );
         verify(serviceMock, never()).removePin(any(DynamicConnector.class), anyInt());
         verify(registrySpy, never()).deregister(any(DynamicPin.class));
     }

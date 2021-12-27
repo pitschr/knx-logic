@@ -75,7 +75,7 @@ public final class ConnectorController {
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
             ctx.json(Map.of(
                     "message",
-                    String.format("Connector is not dynamic: %s", connectorUid))
+                    String.format("Connector is not dynamic: %s", connector.getName()))
             );
             return;
         }
@@ -91,7 +91,8 @@ public final class ConnectorController {
                     ctx.status(HttpServletResponse.SC_BAD_REQUEST);
                     ctx.json(Map.of(
                             "message",
-                            String.format("Pin index is out of range: %s (min=0, max=%s)", index, dynamicConnector.size() - 1))
+                            String.format("Index of connector '%s' is out of range: %s (min=0, max=%s)",
+                                    connector.getName(), index, dynamicConnector.size() - 1))
                     );
                     return;
                 }
@@ -126,11 +127,11 @@ public final class ConnectorController {
 
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
-            LOG.error("Connector is not dynamic: {}", connectorUid);
+            LOG.error("Connector is not dynamic: {}", connector.getName());
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
             ctx.json(Map.of(
                     "message",
-                    String.format("Connector is not dynamic: %s", connectorUid))
+                    String.format("Connector is not dynamic: %s", connector.getName()))
             );
             return;
         }
@@ -141,7 +142,8 @@ public final class ConnectorController {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
             ctx.json(Map.of(
                     "message",
-                    String.format("Pin index is out of range: %s (min=0, max=%s)", index, dynamicConnector.size() - 1))
+                    String.format("Index of connector '%s' is out of range: %s (min=0, max=%s)",
+                            connector.getName(), index, dynamicConnector.size() - 1))
             );
             return;
         }

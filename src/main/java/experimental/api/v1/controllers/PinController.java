@@ -22,9 +22,12 @@ import java.util.Objects;
 public final class PinController {
     private static final Logger LOG = LoggerFactory.getLogger(PinController.class);
     private final PinService pinService;
+    private final UIDRegistry uidRegistry;
 
-    public PinController(final PinService pinService) {
+    public PinController(final PinService pinService,
+                         final UIDRegistry uidRegistry) {
         this.pinService = Objects.requireNonNull(pinService);
+        this.uidRegistry = Objects.requireNonNull(uidRegistry);
     }
 
     /**
@@ -41,7 +44,7 @@ public final class PinController {
             return;
         }
 
-        ctx.status(HttpServletResponse.SC_NO_CONTENT);
+        ctx.status(HttpServletResponse.SC_OK);
         ctx.json(PinResponse.from(pin));
     }
 
@@ -52,7 +55,7 @@ public final class PinController {
      * @param pinUid UID of pin to be fetched
      */
     public void getValue(final Context ctx, final String pinUid) {
-        LOG.trace("Get Value Pin by UID: {}", pinUid);
+        LOG.trace("Get Value for Pin by UID: {}", pinUid);
 
         final var pin = findPinByUID(ctx, pinUid);
         if (pin == null) {
@@ -60,7 +63,7 @@ public final class PinController {
         }
 
         ctx.status(HttpServletResponse.SC_OK);
-        ctx.json(Map.of("value", String.valueOf(pin.getValue())));
+        ctx.json(PinResponse.fromWithoutPinInfo(pin));
     }
 
     /**
@@ -71,7 +74,7 @@ public final class PinController {
      * @param request request context to update the pin
      */
     public void setValue(final Context ctx, final String pinUid, final PinSetValueRequest request) {
-        LOG.trace("Set Value Pin for UID '{}': {}", pinUid, request);
+        LOG.trace("Set Value for Pin by UID '{}': {}", pinUid, request);
 
         final var pin = findPinByUID(ctx, pinUid);
         if (pin == null) {
@@ -83,15 +86,15 @@ public final class PinController {
             ctx.status(HttpServletResponse.SC_FORBIDDEN);
             ctx.json(Map.of(
                     "message",
-                    String.format("Pin is declared as an output pin, and therefore not suitable to set the value: %s", pin))
+                    String.format("Pin is declared as an output pin, and therefore " +
+                            "not suitable to set the value: %s", pin.getName()))
             );
             return;
         }
 
-        final var valueAsString = request.getValue();
-        pinService.setValue(pin, valueAsString);
-
+        pinService.setValue(pin, request.getValue());
         ctx.status(HttpServletResponse.SC_ACCEPTED);
+        ctx.json(PinResponse.fromWithoutPinInfo(pin));
     }
 
     /**
@@ -106,9 +109,9 @@ public final class PinController {
         Pin pin = null;
         if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No pin UID provided."));
+            ctx.json(Map.of("message", "No pin UID provided"));
         } else {
-            pin = UIDRegistry.getPin(uid);
+            pin = uidRegistry.getPin(uid);
             if (pin == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(
