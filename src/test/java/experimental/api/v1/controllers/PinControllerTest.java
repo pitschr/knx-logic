@@ -170,10 +170,8 @@ class PinControllerTest {
     }
 
     /*
-     * Internal Test Method to create a new PinController with
-     * given PinService for verification/mocking
+     * Internal Test Method to create a new PinController
      */
-
     private PinController newPinController() {
         return newPinController(mock(PinService.class), pin -> {});
     }

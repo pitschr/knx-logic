@@ -41,6 +41,7 @@ import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -166,8 +167,8 @@ class ComponentControllerTest {
         final var registryMock = mock(UIDRegistry.class);
         final var logicRepositoryMock = spy(new LogicRepository());
         doReturn(AndLogic.class).when(logicRepositoryMock).findLogicClass(anyString());
-        final var factory = new ComponentFactory(logicRepositoryMock);
-        final var controller = new ComponentController(serviceMock, factory, registryMock);
+        final var factorySpy = spy(new ComponentFactory(logicRepositoryMock));
+        final var controller = new ComponentController(serviceMock, factorySpy, registryMock);
 
         final var request = new ComponentRequest();
         request.setType("logic");
@@ -181,6 +182,9 @@ class ComponentControllerTest {
                 context,
                 Path.of("responses/ComponentControllerTest-testCreate_Logic.json")
         );
+        verify(factorySpy).createLogic(anyMap());
+        verify(serviceMock).addComponent(any(Component.class));
+        verify(registryMock).register(any(Component.class));
     }
 
     @Test
@@ -208,9 +212,9 @@ class ComponentControllerTest {
     @DisplayName("Endpoint: Create Inbox Component")
     void testCreate_Inbox() {
         final var serviceMock = mock(ComponentService.class);
+        final var factorySpy = spy(new ComponentFactory(new LogicRepository()));
         final var registryMock = mock(UIDRegistry.class);
-        final var factory = new ComponentFactory(new LogicRepository());
-        final var controller = new ComponentController(serviceMock, factory, registryMock);
+        final var controller = new ComponentController(serviceMock, factorySpy, registryMock);
 
         final var request = new ComponentRequest();
         request.setType("inbox");
@@ -225,6 +229,7 @@ class ComponentControllerTest {
                 context,
                 Path.of("responses/ComponentControllerTest-testCreate_Inbox.json")
         );
+        verify(factorySpy).createInbox(anyString(), anyMap());
         verify(serviceMock).addComponent(any(Component.class));
         verify(registryMock).register(any(Component.class));
     }
@@ -233,9 +238,9 @@ class ComponentControllerTest {
     @DisplayName("Endpoint: Create Outbox Component")
     void testCreate_Outbox() {
         final var serviceMock = mock(ComponentService.class);
+        final var factorySpy = spy(new ComponentFactory(new LogicRepository()));
         final var registryMock = mock(UIDRegistry.class);
-        final var factory = new ComponentFactory(new LogicRepository());
-        final var controller = new ComponentController(serviceMock, factory, registryMock);
+        final var controller = new ComponentController(serviceMock, factorySpy, registryMock);
 
         final var request = new ComponentRequest();
         request.setType("outbox");
@@ -250,6 +255,7 @@ class ComponentControllerTest {
                 context,
                 Path.of("responses/ComponentControllerTest-testCreate_Outbox.json")
         );
+        verify(factorySpy).createOutbox(anyString(), anyMap());
         verify(serviceMock).addComponent(any(Component.class));
         verify(registryMock).register(any(Component.class));
     }
