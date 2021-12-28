@@ -33,6 +33,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static test.TestHelpers.assertContextJsonErrorMessage;
 import static test.TestHelpers.assertContextJsonResult;
@@ -50,7 +51,8 @@ class LinkControllerTest {
     @Test
     @DisplayName("Endpoint: Add Link - No Source Pin UID Provided")
     void testAddLink_Source_BadRequest() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.addLink(context, "", "");
@@ -62,154 +64,178 @@ class LinkControllerTest {
     @Test
     @DisplayName("Endpoint: Add Link - Source Pin Not Found")
     void testAddLink_Source_NotFound() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.addLink(context, "source-pin-does-not-exists", "");
 
         verify(context).status(HttpServletResponse.SC_NOT_FOUND);
         assertContextJsonErrorMessage(context, "No Source Pin found with UID: source-pin-does-not-exists");
+        verify(service, never()).addLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Add Link - No Target Pin UID Provided")
     void testAddLink_Target_BadRequest() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.addLink(context, "source-pin", "");
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
         assertContextJsonErrorMessage(context, "No Target Pin UID provided");
+        verify(service, never()).addLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Add Link - Target Pin Not Found")
     void testAddLink_Target_NotFound() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.addLink(context, "source-pin", "target-pin-does-not-exists");
 
         verify(context).status(HttpServletResponse.SC_NOT_FOUND);
         assertContextJsonErrorMessage(context, "No Target Pin found with UID: target-pin-does-not-exists");
+        verify(service, never()).addLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Add Link (OK)")
     void testAddLink_OK() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.addLink(context, "source-pin", "target-pin");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        verify(service).addLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Delete Link - No Source Pin UID Provided")
     void testDeleteLink_Source_BadRequest() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.deleteLink(context, "", "");
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
         assertContextJsonErrorMessage(context, "No Source Pin UID provided");
+        verify(service, never()).deleteLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Delete Link - Source Pin Not Found")
     void testDeleteLink_Source_NotFound() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.deleteLink(context, "source-pin-does-not-exists", "");
 
         verify(context).status(HttpServletResponse.SC_NOT_FOUND);
         assertContextJsonErrorMessage(context, "No Source Pin found with UID: source-pin-does-not-exists");
+        verify(service, never()).deleteLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Delete Link - No Target Pin UID Provided")
     void testDeleteLink_Target_BadRequest() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.deleteLink(context, "source-pin", "");
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
         assertContextJsonErrorMessage(context, "No Target Pin UID provided");
+        verify(service, never()).deleteLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Delete Link - Target Pin Not Found")
     void testDeleteLink_Target_NotFound() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.deleteLink(context, "source-pin", "target-pin-does-not-exists");
 
         verify(context).status(HttpServletResponse.SC_NOT_FOUND);
         assertContextJsonErrorMessage(context, "No Target Pin found with UID: target-pin-does-not-exists");
+        verify(service, never()).deleteLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Delete Link (OK)")
     void testDeleteLink_OK() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.deleteLink(context, "source-pin", "target-pin");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        verify(service).deleteLink(any(Pin.class), any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Delete Links - Pin Not Found")
     void testDeleteLinks_NotFound() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.deleteLinks(context, "pin-does-not-exists");
 
         verify(context).status(HttpServletResponse.SC_NOT_FOUND);
         assertContextJsonErrorMessage(context, "No Pin found with UID: pin-does-not-exists");
+        verify(service, never()).deleteLinks(any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Delete Links (OK)")
     void testDeleteLinks_OK() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.deleteLinks(context, "source-pin");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        verify(service).deleteLinks(any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Get Links - Pin Not Found")
     void testGetLinks_NotFound() {
-        final var controller = newLinkController();
+        final var service = mock(LinkService.class);
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.getLinks(context, "pin-does-not-exists");
 
         verify(context).status(HttpServletResponse.SC_NOT_FOUND);
         assertContextJsonErrorMessage(context, "No Pin found with UID: pin-does-not-exists");
+        verify(service, never()).getLinkedUIDs(any(Pin.class));
     }
 
     @Test
     @DisplayName("Endpoint: Get Links (OK)")
     void testGetLinks_OK() {
-        final var linkService = mock(LinkService.class);
+        final var service = mock(LinkService.class);
         doReturn(List.of(
                 UIDFactory.createUid("dummy-pin-1"),
                 UIDFactory.createUid("dummy-pin-2"),
                 UIDFactory.createUid("dummy-pin-3"))
-        ).when(linkService).getLinkedUIDs(any(Pin.class));
-        final var controller = newLinkController(linkService);
+        ).when(service).getLinkedUIDs(any(Pin.class));
+        final var controller = newLinkController(service);
 
         final var context = contextSpy();
         controller.getLinks(context, "source-pin");
@@ -219,13 +245,6 @@ class LinkControllerTest {
                 context,
                 Path.of("responses/LinkControllerTest-testGetLinks_OK.json")
         );
-    }
-
-    /*
-     * Internal Test Method to create a new LinkController
-     */
-    private LinkController newLinkController() {
-        return newLinkController(mock(LinkService.class));
     }
 
     /*
