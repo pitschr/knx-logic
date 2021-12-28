@@ -42,7 +42,7 @@ import java.util.stream.Stream;
  */
 public final class DynamicConnector extends AbstractConnector {
     private static final Logger LOG = LoggerFactory.getLogger(DynamicConnector.class);
-    private static final boolean FIELD_SYNC_DEEP_CHECK = !false; // true = performs a deep sync (performance!)
+    private static final boolean FIELD_SYNC_DEEP_CHECK = true; // true = performs a deep sync (performance!)
     private static final int FIELD_INITIAL_SIZE = 16; // hopefully big enough for most cases!
 
     private final AtomicReference<List<Object>> dynamicListReference = new AtomicReference<>();

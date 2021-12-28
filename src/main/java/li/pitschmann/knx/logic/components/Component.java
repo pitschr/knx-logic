@@ -1,6 +1,5 @@
 package li.pitschmann.knx.logic.components;
 
-import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.uid.UIDAware;
 
 /**

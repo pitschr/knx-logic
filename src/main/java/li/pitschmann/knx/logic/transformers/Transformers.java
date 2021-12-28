@@ -22,7 +22,7 @@ import java.util.Map;
  * and {@code char} it would be {@code 0} and {@code \}{@code u}{@code 0000}, respectively).
  */
 public final class Transformers {
-    private static final Map<Class<?>, Transformer<?>> TRANSFORMERS = Maps.newHashMap(10);
+    private static final Map<Class<?>, Transformer<?>> TRANSFORMER_MAP = Maps.newHashMap(10);
 
     static {
         registerTransformers(new BooleanTransformer());
@@ -43,7 +43,7 @@ public final class Transformers {
     }
 
     private static void registerTransformers(final Transformer<?> transformer) {
-        TRANSFORMERS.put(transformer.getTargetClass(), transformer);
+        TRANSFORMER_MAP.put(transformer.getTargetClass(), transformer);
     }
 
     /**
@@ -59,7 +59,7 @@ public final class Transformers {
         Preconditions.checkArgument(!targetClass.isPrimitive(),
                 "No transformation for primitive classes. Use wrapper classes.");
 
-        @SuppressWarnings("unchecked") final var transformer = (Transformer<T>) TRANSFORMERS.get(targetClass);
+        @SuppressWarnings("unchecked") final var transformer = (Transformer<T>) TRANSFORMER_MAP.get(targetClass);
         if (transformer == null) {
             throw new IllegalArgumentException("Could not find a matching transformer for: " + targetClass.getName());
         }

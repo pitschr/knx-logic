@@ -115,16 +115,16 @@ public final class ValueHelper {
         if (genericType instanceof ParameterizedType) {
             final var type = ((ParameterizedType) genericType).getActualTypeArguments();
             if (type[index] instanceof Class) {
-                // private List<Integer> fieldName;
+                // Example: private List<Integer> fieldName
                 clazz = (Class<?>) type[index];
             } else if (type[index] instanceof TypeVariable) {
-                // private List<T> fieldName
+                // Example: private List<T> fieldName
                 final var typeVariable = (TypeVariable<?>) type[index];
                 clazz = (Class<?>) typeVariable.getBounds()[0];
             }
         } else {
-            // private int fieldName;
-            // private Integer fieldName;
+            // Example: private int fieldName
+            // Example: private Integer fieldName
             clazz = field.getType();
         }
 

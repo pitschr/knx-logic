@@ -17,7 +17,6 @@
 
 package experimental.api.v1.services;
 
-import li.pitschmann.knx.api.UIDRegistry;
 import li.pitschmann.knx.logic.Router;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;

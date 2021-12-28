@@ -156,6 +156,14 @@ class ConnectorPersistence {
         final var pinModels = pinsDao.getByConnectorId(connectorModel.getId());
         Preconditions.checkState(pinModels.size() == 1,
                 "It is expected that static connector has only one pin, but got: " + pinModels);
+
+        final var pinStatic = connector.getPin();
+        final var pinModel = pinModels.get(0);
+        Preconditions.checkState(pinStatic.getUid().equals(pinModel.getUid()),
+                "For any reason the actual pin (name: " + pinStatic.getName() + ", uid: " + pinStatic.getUid() + ")" +
+                        " is not matched with the model (id: " + pinModel.getId() + ", uid: " + pinModel.getUid() + ")" +
+                        " anymore?!"
+        );
     }
 
     private void updateDynamicConnector(final ConnectorModel connectorModel,
