@@ -3,12 +3,12 @@ package experimental.api.v1.controllers;
 import li.pitschmann.knx.api.UIDRegistry;
 import experimental.api.v1.services.LinkService;
 import io.javalin.http.Context;
-import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.pin.Pin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -16,12 +16,15 @@ import java.util.Objects;
  *
  * @author PITSCHR
  */
-public class LinkController {
+public final class LinkController {
     private static final Logger LOG = LoggerFactory.getLogger(LinkController.class);
     private final LinkService linkService;
+    private final UIDRegistry uidRegistry;
 
-    public LinkController(final LinkService linkService) {
+    public LinkController(final LinkService linkService,
+                          final UIDRegistry uidRegistry) {
         this.linkService = Objects.requireNonNull(linkService);
+        this.uidRegistry = Objects.requireNonNull(uidRegistry);
     }
 
     /**
@@ -33,20 +36,20 @@ public class LinkController {
      * @param targetPinUid target pin UID; may not be null
      */
     public void addLink(final Context ctx, final String sourcePinUid, final String targetPinUid) {
-        LOG.debug("Add Link: {}", ctx);
+        LOG.trace("Add Link: sourceUid={} and targetUid={}", sourcePinUid, targetPinUid);
 
-        final var sourcePin = Preconditions.checkNonNull(UIDRegistry.getPin(sourcePinUid),
-                "Source Pin UID not found: {}", sourcePinUid);
-
-        final var targetPin = Preconditions.checkNonNull(UIDRegistry.getPin(targetPinUid),
-                "Target Pin UID not found: {}", targetPinUid);
-
-        try {
-            linkService.addLink(sourcePin, targetPin);
-            ctx.status(HttpServletResponse.SC_NO_CONTENT);
-        } catch (final Exception e) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+        final var sourcePin = findPinByUID(ctx, sourcePinUid, PinType.SOURCE);
+        if (sourcePin == null) {
+            return;
         }
+
+        final var targetPin = findPinByUID(ctx, targetPinUid, PinType.TARGET);
+        if (targetPin == null) {
+            return;
+        }
+
+        linkService.addLink(sourcePin, targetPin);
+        ctx.status(HttpServletResponse.SC_NO_CONTENT);
     }
 
     /**
@@ -58,20 +61,20 @@ public class LinkController {
      * @param targetPinUid target pin UID; may not be null
      */
     public void deleteLink(final Context ctx, final String sourcePinUid, final String targetPinUid) {
-        LOG.debug("Delete Link: {}", ctx);
+        LOG.trace("Delete Link: sourceUid={} and targetUid={}", sourcePinUid, targetPinUid);
 
-        final var sourcePin = Preconditions.checkNonNull(UIDRegistry.getPin(sourcePinUid),
-                "Source Pin UID not found: {}", sourcePinUid);
-
-        final var targetPin = Preconditions.checkNonNull(UIDRegistry.getPin(targetPinUid),
-                "Target Pin UID not found: {}", targetPinUid);
-
-        try {
-            linkService.deleteLink(sourcePin, targetPin);
-            ctx.status(HttpServletResponse.SC_NO_CONTENT);
-        } catch (final Exception e) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+        final var sourcePin = findPinByUID(ctx, sourcePinUid, PinType.SOURCE);
+        if (sourcePin == null) {
+            return;
         }
+
+        final var targetPin = findPinByUID(ctx, targetPinUid, PinType.TARGET);
+        if (targetPin == null) {
+            return;
+        }
+
+        linkService.deleteLink(sourcePin, targetPin);
+        ctx.status(HttpServletResponse.SC_NO_CONTENT);
     }
 
     /**
@@ -81,17 +84,15 @@ public class LinkController {
      * @param pinUid the pin UID; may not be null
      */
     public void deleteLinks(final Context ctx, final String pinUid) {
-        LOG.debug("Delete Links: {}", ctx);
+        LOG.debug("Delete Links for Pin UID: {}", pinUid);
 
-        final var pin = Preconditions.checkNonNull(UIDRegistry.getPin(pinUid),
-                "Pin UID not found: {}", pinUid);
-
-        try {
-            linkService.deleteLinks(pin);
-            ctx.status(HttpServletResponse.SC_NO_CONTENT);
-        } catch (final Exception e) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+        final var pin = findPinByUID(ctx, pinUid, PinType.UNDEFINED);
+        if (pin == null) {
+            return;
         }
+
+        linkService.deleteLinks(pin);
+        ctx.status(HttpServletResponse.SC_NO_CONTENT);
     }
 
     /**
@@ -101,17 +102,62 @@ public class LinkController {
      * @param pinUid the pin UID; may not be null
      */
     public void getLinks(final Context ctx, final String pinUid) {
-        LOG.debug("Get Links: {}", ctx);
+        LOG.debug("Get Links for Pin UID: {}", pinUid);
 
-        final var pin = Preconditions.checkNonNull(UIDRegistry.getPin(pinUid),
-                "Pin UID not found: {}", pinUid);
+        final var pin = findPinByUID(ctx, pinUid, PinType.UNDEFINED);
+        if (pin == null) {
+            return;
+        }
 
-        try {
-            final var pinUids = linkService.getLinkedUIDs(pin);
-            ctx.json(pinUids);
-            ctx.status(HttpServletResponse.SC_OK);
-        } catch (final Exception e) {
+        final var pinUids = linkService.getLinkedUIDs(pin);
+        ctx.status(HttpServletResponse.SC_OK);
+        ctx.json(pinUids);
+    }
+
+    /**
+     * Returns a {@link Pin} if found, otherwise {@code null}
+     * and error message in {@link Context}
+     *
+     * @param ctx context; may not be null
+     * @param uid UID of pin for look up; may not be null
+     * @param pinType the type of Pin; may not be null
+     * @return Pin if found, otherwise {@code null}
+     */
+    private Pin findPinByUID(final Context ctx, final String uid, final PinType pinType) {
+        Pin pin = null;
+
+        if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
+            ctx.json(
+                    Map.of("message", String.format("No %s UID provided", pinType.getFriendlyName()))
+            );
+        } else {
+            pin = uidRegistry.getPin(uid);
+            if (pin == null) {
+                ctx.status(HttpServletResponse.SC_NOT_FOUND);
+                ctx.json(
+                        Map.of("message", String.format("No %s found with UID: %s", pinType.getFriendlyName(), uid))
+                );
+            }
+        }
+        return pin;
+    }
+
+    /**
+     * Helper Enum for proper error handling
+     */
+    private enum PinType {
+        UNDEFINED("Pin"), //
+        SOURCE("Source Pin"), //
+        TARGET("Target Pin");
+
+        private final String friendlyName;
+        PinType(final String friendlyName) {
+            this.friendlyName = friendlyName;
+        }
+
+        public String getFriendlyName() {
+            return friendlyName;
         }
     }
 }
