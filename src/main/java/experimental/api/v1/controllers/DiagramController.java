@@ -24,9 +24,12 @@ import java.util.stream.Collectors;
 public final class DiagramController {
     private static final Logger LOG = LoggerFactory.getLogger(DiagramController.class);
     private final DiagramService diagramService;
+    private final UIDRegistry uidRegistry;
 
-    public DiagramController(final DiagramService diagramService) {
+    public DiagramController(final DiagramService diagramService,
+                             final UIDRegistry uidRegistry) {
         this.diagramService = Objects.requireNonNull(diagramService);
+        this.uidRegistry = Objects.requireNonNull(uidRegistry);
     }
 
 
@@ -40,7 +43,7 @@ public final class DiagramController {
 
         // returns json array of all diagram responses
         ctx.status(HttpServletResponse.SC_OK);
-        ctx.json(UIDRegistry.getDiagrams().stream().map(DiagramResponse::from).collect(Collectors.toList()));
+        ctx.json(uidRegistry.getDiagrams().stream().map(DiagramResponse::from).collect(Collectors.toList()));
     }
 
     /**
@@ -78,7 +81,7 @@ public final class DiagramController {
         diagram.setDescription(request.getDescription());
 
         diagramService.insertDiagram(diagram);
-        UIDRegistry.register(diagram);
+        uidRegistry.register(diagram);
 
         ctx.status(HttpServletResponse.SC_CREATED);
         ctx.json(DiagramResponse.from(diagram));
@@ -122,13 +125,12 @@ public final class DiagramController {
         LOG.trace("Delete Diagram by UID: {}", uid);
         Preconditions.checkNonNull(uid, "UID for diagram delete not provided.");
 
-        final var diagram = UIDRegistry.getDiagram(uid);
+        final var diagram = findDiagramByUID(ctx, uid);
         if (diagram == null) {
-            ctx.status(HttpServletResponse.SC_NO_CONTENT);
             return;
         }
 
-        UIDRegistry.deregister(diagram);
+        uidRegistry.deregister(diagram);
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
     }
 
@@ -144,9 +146,9 @@ public final class DiagramController {
         Diagram diagram = null;
         if (uid == null || uid.isBlank()) {
             ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No diagram UID provided."));
+            ctx.json(Map.of("message", "No diagram UID provided"));
         } else {
-            diagram = UIDRegistry.getDiagram(uid);
+            diagram = uidRegistry.getDiagram(uid);
             if (diagram == null) {
                 ctx.status(HttpServletResponse.SC_NOT_FOUND);
                 ctx.json(Map.of(

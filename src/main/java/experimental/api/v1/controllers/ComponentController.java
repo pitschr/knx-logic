@@ -139,9 +139,8 @@ public final class ComponentController {
         LOG.trace("Delete for Component UID: {}", uid);
         Preconditions.checkNonNull(uid, "UID for component delete not provided.");
 
-        final var component = uidRegistry.getComponent(uid);
+        final var component = findComponentByUID(ctx, uid);
         if (component == null) {
-            ctx.status(HttpServletResponse.SC_NO_CONTENT);
             return;
         }
 

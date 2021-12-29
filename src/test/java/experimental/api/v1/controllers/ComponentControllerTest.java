@@ -294,8 +294,8 @@ class ComponentControllerTest {
         final var context = contextSpy();
         controller.delete(context, "does-not-exists");
 
-        verify(context).status(HttpServletResponse.SC_NO_CONTENT);
-        assertThat(context.resultString()).isNull();
+        verify(context).status(HttpServletResponse.SC_NOT_FOUND);
+        assertContextJsonErrorMessage(context, "No component found with UID: does-not-exists");
         verify(serviceMock, never()).removeComponent(any(Component.class));
         verify(registryMock, never()).deregister(any(Component.class));
     }

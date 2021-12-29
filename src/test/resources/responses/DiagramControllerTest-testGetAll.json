@@ -1,0 +1,17 @@
+[
+  {
+    "uid": "diagram-uid-0",
+    "name": "Diagram Name 0",
+    "description": "Diagram Description 0"
+  },
+  {
+    "uid": "diagram-uid-1",
+    "name": "Diagram Name 1",
+    "description": "Diagram Description 1"
+  },
+  {
+    "uid": "diagram-uid-2",
+    "name": "Diagram Name 2",
+    "description": "Diagram Description 2"
+  }
+]
