@@ -17,12 +17,12 @@
 
 package li.pitschmann.knx.api.v1;
 
-import experimental.api.v1.strategies.CreateStrategy;
-import experimental.api.v1.strategies.KnxInboxCreateStrategy;
-import experimental.api.v1.strategies.KnxOutboxCreateStrategy;
-import experimental.api.v1.strategies.LogicCreateStrategy;
-import experimental.api.v1.strategies.VariableInboxCreateStrategy;
-import experimental.api.v1.strategies.VariableOutboxCreateStrategy;
+import li.pitschmann.knx.api.v1.strategies.CreateStrategy;
+import li.pitschmann.knx.api.v1.strategies.KnxInboxCreateStrategy;
+import li.pitschmann.knx.api.v1.strategies.KnxOutboxCreateStrategy;
+import li.pitschmann.knx.api.v1.strategies.LogicCreateStrategy;
+import li.pitschmann.knx.api.v1.strategies.VariableInboxCreateStrategy;
+import li.pitschmann.knx.api.v1.strategies.VariableOutboxCreateStrategy;
 import li.pitschmann.knx.logic.LogicRepository;
 import li.pitschmann.knx.logic.components.InboxComponent;
 import li.pitschmann.knx.logic.components.LogicComponent;
