@@ -190,6 +190,16 @@ public final class TestHelpers {
     }
 
     /**
+     * Asserts the given response body of {@link Context} (which is usually JSON)
+     * if it has no response
+     *
+     * @param ctx  the {@link Context} to be verified; may not be null
+     */
+    public static void assertContextHasNoResponse(final Context ctx) {
+        assertThat(ctx.resultString()).isNull();
+    }
+
+    /**
      * Asserts the given response body of {@link Context} (which is JSON) against
      * the content of given {@link Path}. As {@link li.pitschmann.knx.logic.uid.UID}
      * are dynamically, it will be replaced by a dummy UID pattern for comparison.

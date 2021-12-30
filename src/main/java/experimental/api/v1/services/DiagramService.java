@@ -26,7 +26,7 @@ import java.util.Objects;
 /**
  * Service for {@link Diagram}
  * <p>
- * Registers/De-registers the diagram in {@link Router} and persists in the database.
+ * Persist the diagram in the database.
  */
 public final class DiagramService {
     private final DatabaseManager databaseManager;

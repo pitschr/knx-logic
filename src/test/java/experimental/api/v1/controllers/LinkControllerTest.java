@@ -35,6 +35,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static test.TestHelpers.assertContextHasNoResponse;
 import static test.TestHelpers.assertContextJsonErrorMessage;
 import static test.TestHelpers.assertContextJsonResult;
 import static test.TestHelpers.contextSpy;
@@ -113,6 +114,7 @@ class LinkControllerTest {
         controller.addLink(context, "source-pin", "target-pin");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        assertContextHasNoResponse(context);
         verify(service).addLink(any(Pin.class), any(Pin.class));
     }
 
@@ -182,6 +184,7 @@ class LinkControllerTest {
         controller.deleteLink(context, "source-pin", "target-pin");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        assertContextHasNoResponse(context);
         verify(service).deleteLink(any(Pin.class), any(Pin.class));
     }
 
@@ -209,6 +212,7 @@ class LinkControllerTest {
         controller.deleteLinks(context, "source-pin");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        assertContextHasNoResponse(context);
         verify(service).deleteLinks(any(Pin.class));
     }
 

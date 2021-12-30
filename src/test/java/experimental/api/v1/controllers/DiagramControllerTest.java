@@ -40,6 +40,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static test.TestHelpers.assertContextHasNoResponse;
 import static test.TestHelpers.assertContextJsonErrorMessage;
 import static test.TestHelpers.assertContextJsonResult;
 import static test.TestHelpers.contextSpy;
@@ -56,8 +57,7 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Get All Diagrams")
     void testGetAll() {
-        final var service = mock(DiagramService.class);
-        final var controller = newDiagramController(service);
+        final var controller = newDiagramController();
 
         final var context = contextSpy();
         controller.getAll(context);
@@ -72,8 +72,7 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Get One Diagram (Bad Request)")
     void testGetOne_BadRequest() {
-        final var service = mock(DiagramService.class);
-        final var controller = newDiagramController(service);
+        final var controller = newDiagramController();
 
         final var context = contextSpy();
         controller.getOne(context, "");
@@ -85,8 +84,7 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Get One Diagram (Not Found)")
     void testGetOne_NotFound() {
-        final var service = mock(DiagramService.class);
-        final var controller = newDiagramController(service);
+        final var controller = newDiagramController();
 
         final var context = contextSpy();
         controller.getOne(context, "diagram-does-not-exists");
@@ -98,8 +96,7 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Get One Diagram (Found)")
     void testGetOne_Found() {
-        final var service = mock(DiagramService.class);
-        final var controller = newDiagramController(service);
+        final var controller = newDiagramController();
 
         final var context = contextSpy();
         controller.getOne(context, "diagram-uid-1");
@@ -138,8 +135,7 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Update An Existing Diagram (Not Found)")
     void testUpdate_NotFound() {
-        final var service = mock(DiagramService.class);
-        final var controller = newDiagramController(service);
+        final var controller = newDiagramController();
 
         final var request = new DiagramRequest();
         request.setName("Updated Diagram");
@@ -188,8 +184,7 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Delete Diagram (Not Found)")
     void testDelete_NotFound() {
-        final var service = mock(DiagramService.class);
-        final var controller = newDiagramController(service);
+        final var controller = newDiagramController();
 
         final var context = contextSpy();
         controller.delete(context, "diagram-does-not-exists");
@@ -201,19 +196,20 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Delete Diagram (Found)")
     void testDelete_Found() {
-        final var service = mock(DiagramService.class);
-        final var controller = newDiagramController(service);
+        final var controller = newDiagramController();
 
         final var context = contextSpy();
         controller.delete(context, "diagram-uid-1");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
+        assertContextHasNoResponse(context);
     }
 
     /*
      * Internal Test Method to create a new DiagramController
      */
-    private DiagramController newDiagramController(final DiagramService diagramService) {
+    private DiagramController newDiagramController() {
+        final var serviceMock = mock(DiagramService.class);
         final var registrySpy = spy(new UIDRegistry());
 
         final var diagrams = IntStream.range(0, 3).mapToObj(i -> {
@@ -227,7 +223,7 @@ class DiagramControllerTest {
         doReturn(diagrams).when(registrySpy).getDiagrams();
 
         return new DiagramController(
-                diagramService,
+                serviceMock,
                 registrySpy
         );
     }

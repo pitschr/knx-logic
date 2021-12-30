@@ -137,7 +137,8 @@ class PinControllerTest {
     @DisplayName("Endpoint: Set Pin Value (Found)")
     void testSetValue_OK() {
         final var service = spy(new PinService());
-        final var controller = newPinController(service, pin -> {});
+        final var controller = newPinController(service, pin -> {
+        });
 
         final var request = new PinSetValueRequest();
         request.setValue("1317");
@@ -156,7 +157,8 @@ class PinControllerTest {
     @DisplayName("Endpoint: Set Pin Value on Output Pin (Error)")
     void testSetValue_Err_OutputPin() {
         final var service = mock(PinService.class);
-        final var controller = newPinController(service, pin -> {});
+        final var controller = newPinController(service, pin -> {
+        });
 
         final var request = new PinSetValueRequest();
         request.setValue("1317");
@@ -173,14 +175,15 @@ class PinControllerTest {
      * Internal Test Method to create a new PinController
      */
     private PinController newPinController() {
-        return newPinController(mock(PinService.class), pin -> {});
+        return newPinController(mock(PinService.class), pin -> {
+        });
     }
 
     /*
      * Internal Test Method to create a new PinController with
      * given PinService for verification/mocking
      */
-    private PinController newPinController(final PinService pinService, Consumer<Pin> pinConsumer) {
+    private PinController newPinController(final PinService pinService, final Consumer<Pin> pinConsumer) {
         final var component = createLogicComponent(LogicI.class);
         final var pinInput = component.getPin("inputFirst");
         final var pinOutput = component.getPin("outputFirst");

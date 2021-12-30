@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
 import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,6 +47,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static test.TestHelpers.assertContextHasNoResponse;
 import static test.TestHelpers.assertContextJsonErrorMessage;
 import static test.TestHelpers.assertContextJsonResult;
 import static test.TestHelpers.contextSpy;
@@ -315,7 +315,7 @@ class ComponentControllerTest {
         controller.delete(context, "component-uid");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
-        assertThat(context.resultString()).isNull();
+        assertContextHasNoResponse(context);
         verify(serviceMock).removeComponent(any(Component.class));
         verify(registryMock).deregister(any(Component.class));
     }
