@@ -14,8 +14,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ComponentModelTest {
 
     @Test
-    @DisplayName("Basic Test for ComponentModel")
-    void test() {
+    @DisplayName("Conversion to ComponentModel")
+    void testBuilder() {
         final var model = ComponentModel.builder()
                 .uid(createUid("COMPONENT-UID"))
                 .className(LogicA.class.getName())
@@ -27,6 +27,7 @@ class ComponentModelTest {
         assertThat(model.getComponentType()).isSameAs(ComponentType.LOGIC);
         assertThat(model).hasToString("" + //
                 "ComponentModel{" + //
+                "id=-1, " + // -1 because of not persisted
                 "uid=COMPONENT-UID, " +
                 "className=test.components.LogicA, " + //
                 "componentType=LOGIC" + //

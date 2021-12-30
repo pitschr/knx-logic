@@ -102,11 +102,13 @@ CREATE TABLE event_keys
 CREATE TABLE diagrams -- other names: logic_scheme
 (
     id          INT            AUTO_INCREMENT PRIMARY KEY,
+    uid         VARCHAR(100)   NOT NULL DEFAULT CAST(RANDOM_UUID() AS VARCHAR),
     name        VARCHAR(100)   NOT NULL,
     description VARCHAR(4000),
     creationTs  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modifiedTs  TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT diagram_unique UNIQUE (name)
+    CONSTRAINT diagram_unique UNIQUE (name),
+    CONSTRAINT diagram_unique2 UNIQUE (uid)
 );
 
 --
@@ -139,5 +141,5 @@ CREATE TABLE diagram_links
     modifiedTs     TIMESTAMP      NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (diagramId) REFERENCES diagrams (id) ON DELETE CASCADE,
     FOREIGN KEY (pinLinkId) REFERENCES pin_links (id) ON DELETE CASCADE,
-    CONSTRAINT diagram_links_unique UNIQUE (diagramId, pinLinkId)
+    CONSTRAINT diagram_links_unique UNIQUE (pinLinkId)
 );

@@ -38,6 +38,7 @@ public final class EventKeyModel extends Model {
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
+                .add("id", getId()) //
                 .add("componentId", componentId) //
                 .add("channel", channel) //
                 .add("key", key) //

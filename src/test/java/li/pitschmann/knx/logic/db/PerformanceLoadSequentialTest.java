@@ -17,31 +17,27 @@
 
 package li.pitschmann.knx.logic.db;
 
-import experimental.api.ComponentFactory;
 import li.pitschmann.knx.logic.components.LogicComponentImpl;
-import li.pitschmann.knx.logic.db.loader.LogicComponentLoader;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import test.BaseDatabaseSuite;
+import test.components.LogicH;
 
 import java.io.File;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 /**
  * Performance test how fast the components are loaded from database
  * <p><p><p>
  * <strong>History:</strong><br>
- * [Result | 2021-03-03] Total(10000)=18.8580s / Average=1.89ms / Min=1.00ms / Max=28.00ms
+ * [Result | 2021-12-18] Total(10000)=17.7330s / Average=1.77ms / Min=1.00ms / Max=34.00ms
  * [Result | 2021-03-02] Total(10000)=17.3950s / Average=1.74ms / Min=1.00ms / Max=14.00ms
  */
 @Disabled
 class PerformanceLoadSequentialTest extends BaseDatabaseSuite {
-    private final static LogicComponentLoader LOADER =
-            new LogicComponentLoader(databaseManager, mock(ComponentFactory.class));
     private final static int TIMES = 1000;
     private final static int ITERATIONS = 10;
     private static double min = Double.MAX_VALUE;
@@ -54,7 +50,7 @@ class PerformanceLoadSequentialTest extends BaseDatabaseSuite {
 
         // warm-up
         for (int i = 0; i < 1000; i++) {
-            LOADER.loadById(1);
+            loadComponentById(1);
         }
 
         // test
@@ -63,25 +59,27 @@ class PerformanceLoadSequentialTest extends BaseDatabaseSuite {
             loadSequentiallyInternal();
         }
         final var duration = System.currentTimeMillis() - start;
-        System.out.println(
-                String.format("[Result | %s] Total(%s)=%.4fs / Average=%.2fms / Min=%.2fms / Max=%.2fms",
-                        LocalDate.now(),
-                        TIMES * ITERATIONS,
-                        (duration / 1000d),
-                        (duration / ((double) ITERATIONS * TIMES)),
-                        min,
-                        max
-                )
+        final var output = String.format("[Result | %s] Total(%s)=%.4fs / Average=%.2fms / Min=%.2fms / Max=%.2fms",
+                LocalDate.now(),
+                TIMES * ITERATIONS,
+                (duration / 1000d),
+                (duration / ((double) ITERATIONS * TIMES)),
+                min,
+                max
         );
+        System.out.println(output);
     }
 
     private void loadSequentiallyInternal() {
         long start;
         long duration;
+        Object component;
         for (int i = 0; i < TIMES; i++) {
             start = System.currentTimeMillis();
-            assertThat(LOADER.loadById(1)).isInstanceOf(LogicComponentImpl.class);
+            component = loadComponentById(1);
             duration = System.currentTimeMillis() - start;
+            assertThat(component).isInstanceOf(LogicComponentImpl.class);
+            assertThat((LogicComponentImpl.class.cast(component)).getWrappedObject()).isInstanceOf(LogicH.class);
             min = Math.min(min, duration);
             max = Math.max(max, duration);
         }

@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author PITSCHR
  */
-public class OutboxComponentPersistenceStrategy extends AbstractComponentPersistenceStrategy<OutboxComponentImpl> {
+public final class OutboxComponentPersistenceStrategy extends AbstractPersistence<ComponentModel, OutboxComponentImpl> {
     private static final Logger LOG = LoggerFactory.getLogger(OutboxComponentPersistenceStrategy.class);
     private final ConnectorPersistence connectorPersistence;
     private final EventKeyPersistence eventKeyPersistence;
@@ -49,14 +49,10 @@ public class OutboxComponentPersistenceStrategy extends AbstractComponentPersist
         final var sw = Stopwatch.createStarted();
         LOG.trace("Database write request for outbox component: {}", component);
 
-        final var componentModel = ComponentModel.builder()
-                .uid(component.getUid())
-                .className(component.getWrappedObject().getClass().getName())
-                .componentType(ComponentType.OUTBOX)
-                .build();
-
         // insert component
-        final var componentId = databaseManager.dao(ComponentsDao.class).insert(componentModel);
+        final var componentId = databaseManager.dao(ComponentsDao.class).insert(toModel(component));
+
+        // insert connectors and related pins
         connectorPersistence.insertConnectors(componentId, component.getInputConnectors());
 
         // insert event key
@@ -69,16 +65,28 @@ public class OutboxComponentPersistenceStrategy extends AbstractComponentPersist
     }
 
     @Override
-    protected int update(final ComponentModel componentModel, final OutboxComponentImpl component) {
-        final var componentId = componentModel.getId();
+    protected void update(final ComponentModel model, final OutboxComponentImpl component) {
+        final var id = model.getId();
 
         // update connectors and related pins
-        connectorPersistence.updateConnectors(componentId, component.getInputConnectors());
+        connectorPersistence.updateConnectors(id, component.getInputConnectors());
 
         // update the event key model
-        eventKeyPersistence.updateEventKey(componentId, component.getEventKey());
+        eventKeyPersistence.updateEventKey(id, component.getEventKey());
+    }
 
-        return componentId;
+    @Override
+    protected ComponentModel findModel(final OutboxComponentImpl component) {
+        return databaseManager.dao(ComponentsDao.class).find(component.getUid());
+    }
+
+    @Override
+    protected ComponentModel toModel(final OutboxComponentImpl component) {
+        return ComponentModel.builder()
+                .uid(component.getUid())
+                .className(component.getWrappedObject().getClass().getName())
+                .componentType(ComponentType.OUTBOX)
+                .build();
     }
 
     @Override

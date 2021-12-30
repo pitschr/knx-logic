@@ -70,4 +70,16 @@ public interface Pin extends UIDAware {
     default FieldDescriptor getDescriptor() {
         return getConnector().getDescriptor();
     }
+
+    /**
+     * Returns the name of {@link Pin} in following pattern:
+     * <pre>{@code
+     *      my.package.Logic#inputField
+     * }</pre>
+     *
+     * @return name of Pin
+     */
+    default String getName() {
+        return getDescriptor().getOwner().getClass().getName() + "#" + getDescriptor().getField().getName();
+    }
 }

@@ -110,9 +110,8 @@ final class RouterInternal {
     }
 
     /**
-     * Creates a link between the source {@link Pin} and
-     * the target {@link Pin}. If the link doesn't exists
-     * or has been removed previously, then it has no effect.
+     * Creates a link between the source {@link Pin} and the target {@link Pin}.
+     * If the link already exists, then it has no effect.
      *
      * @param source the source where value should come from (e.g. output pin, ...)
      * @param target the target that should receive the value (e.g. input pin, ...)

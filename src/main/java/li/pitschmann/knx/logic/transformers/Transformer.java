@@ -21,7 +21,7 @@ public interface Transformer<T> {
     /**
      * Transforms from {@link String} to {@code T}
      *
-     * @param value string value
+     * @param value string value, if {@code null} the default value is used
      * @return {@code T}
      */
     T transform(final @Nullable String value);

@@ -25,6 +25,7 @@
     <version>0.3.0-SNAPSHOT</version>
     <name>KNX Logic</name>
     <description>KNX Logic - A Java library for KNX for logic specific interactions</description>
+    <url>https://github.com/pitschr/knx-logic</url>
 
     <!-- Licenses -->
     <licenses>

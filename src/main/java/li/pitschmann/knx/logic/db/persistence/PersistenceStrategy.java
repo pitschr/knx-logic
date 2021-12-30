@@ -28,7 +28,7 @@ public interface PersistenceStrategy<T> {
      * Saves the object to database
      *
      * @param object object to be stored
-     * @return {@code R} which allows the result
+     * @return the primary key of {@code T}
      */
     int save(T object);
 

@@ -17,10 +17,7 @@
 
 package li.pitschmann.knx.logic.db;
 
-import experimental.api.ComponentFactory;
 import li.pitschmann.knx.logic.components.LogicComponent;
-import li.pitschmann.knx.logic.components.LogicComponentImpl;
-import li.pitschmann.knx.logic.db.loader.LogicComponentLoader;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,22 +27,16 @@ import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.fail;
-import static org.mockito.Mockito.mock;
 
 /**
  * Performance test how fast the components are loaded from database in parallel
  * <p><p><p>
  * <strong>History:</strong><br>
+ * [Result | 2021-12-18] Total(10000)=12.5690s / Average=1.26ms
  * [Result | 2021-03-03] Total(10000)=12.1250s / Average=1.21ms
  */
 @Disabled
 class PerformanceLoadParallelTest extends BaseDatabaseSuite {
-    private final static LogicComponentLoader LOADER =
-            new LogicComponentLoader(databaseManager, mock(ComponentFactory.class));
     private final static int TIMES = 1000;
     private final static int ITERATIONS = 10;
 
@@ -56,7 +47,7 @@ class PerformanceLoadParallelTest extends BaseDatabaseSuite {
 
         // warm-up
         for (int i = 0; i < 1000; i++) {
-            LOADER.loadById(1);
+            loadComponentById(1);
         }
 
         // test
@@ -65,20 +56,19 @@ class PerformanceLoadParallelTest extends BaseDatabaseSuite {
             loadParallelInternal();
         }
         final var duration = System.currentTimeMillis() - start;
-        System.out.println(
-                String.format("[Result | %s] Total(%s)=%.4fs / Average=%.2fms",
-                        LocalDate.now(),
-                        TIMES * ITERATIONS,
-                        (duration / 1000d),
-                        (duration / ((double) ITERATIONS * TIMES))
-                )
+        final var output = String.format("[Result | %s] Total(%s)=%.4fs / Average=%.2fms%n",
+                LocalDate.now(),
+                TIMES * ITERATIONS,
+                (duration / 1000d),
+                (duration / ((double) ITERATIONS * TIMES))
         );
+        System.out.println(output);
     }
 
     private void loadParallelInternal() {
         final var futures = new ArrayList<CompletableFuture<LogicComponent>>(TIMES);
         for (int i = 0; i < TIMES; i++) {
-            futures.add(CompletableFuture.supplyAsync(() -> LOADER.loadById(1)));
+            futures.add(CompletableFuture.supplyAsync(() -> loadComponentById(1)));
         }
 
         try {

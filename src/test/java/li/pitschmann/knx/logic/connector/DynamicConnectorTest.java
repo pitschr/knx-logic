@@ -76,11 +76,13 @@ class DynamicConnectorTest {
                 .isInstanceOf(DynamicConnector.class)
                 .hasToString( //
                         String.format("DynamicConnector{" +  //
+                                        "uid=%s, " + //
                                         "fieldName=a, " +    //
                                         "fieldType=java.lang.Integer, " + //
                                         "defaultValue=0, " + //
                                         "pins=%s}",  //
-                                Arrays.toString(connector_a.getPinStream().map(Pin::getUid).toArray())
+                                connector_a.getUid(), //
+                                Arrays.toString(connector_a.getPinStream().map(Pin::getUid).toArray()) //
                         )
                 );
 
@@ -89,11 +91,13 @@ class DynamicConnectorTest {
                 .isInstanceOf(DynamicConnector.class)
                 .hasToString( //
                         String.format("DynamicConnector{" + //
+                                        "uid=%s, " + //
                                         "fieldName=e, " +    //
                                         "fieldType=java.lang.String, " + //
                                         "defaultValue=, " + // default value is empty string
                                         "pins=%s}",         //
-                                Arrays.toString(connector_e.getPinStream().map(Pin::getUid).toArray())
+                                connector_e.getUid(), //
+                                Arrays.toString(connector_e.getPinStream().map(Pin::getUid).toArray()) //
                         )
                 );
     }

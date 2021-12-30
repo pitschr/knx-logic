@@ -1,6 +1,7 @@
 package li.pitschmann.knx.logic.db.models;
 
 import li.pitschmann.knx.core.utils.Strings;
+import li.pitschmann.knx.logic.uid.UID;
 
 /**
  * Database model for diagram
@@ -8,6 +9,7 @@ import li.pitschmann.knx.core.utils.Strings;
  * @author PITSCHR
  */
 public final class DiagramModel extends Model {
+    private UID uid;
     private String name;
     private String description;
 
@@ -18,6 +20,10 @@ public final class DiagramModel extends Model {
      */
     public static Builder builder() {
         return new Builder();
+    }
+
+    public UID getUid() {
+        return uid;
     }
 
     public String getName() {
@@ -31,6 +37,8 @@ public final class DiagramModel extends Model {
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
+                .add("id", getId()) //
+                .add("uid", uid) //
                 .add("name", name) //
                 .add("description", description) //
                 .toString();
@@ -42,8 +50,14 @@ public final class DiagramModel extends Model {
      * @author PITSCHR
      */
     public static class Builder {
+        private UID uid;
         private String name;
         private String description;
+
+        public DiagramModel.Builder uid(final UID uid) {
+            this.uid = uid;
+            return this;
+        }
 
         public Builder name(final String name) {
             this.name = name;
@@ -57,6 +71,7 @@ public final class DiagramModel extends Model {
 
         public DiagramModel build() {
             final var model = new DiagramModel();
+            model.uid = this.uid;
             model.name = this.name;
             model.description = this.description;
             return model;

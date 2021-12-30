@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @author PITSCHR
  */
-public class InboxComponentPersistenceStrategy extends AbstractComponentPersistenceStrategy<InboxComponentImpl> {
+public final class InboxComponentPersistenceStrategy extends AbstractPersistence<ComponentModel, InboxComponentImpl> {
     private static final Logger LOG = LoggerFactory.getLogger(InboxComponentPersistenceStrategy.class);
     private final ConnectorPersistence connectorPersistence;
     private final EventKeyPersistence eventKeyPersistence;
@@ -49,14 +49,8 @@ public class InboxComponentPersistenceStrategy extends AbstractComponentPersiste
         final var sw = Stopwatch.createStarted();
         LOG.trace("Database write request for inbox component: {}", component);
 
-        final var componentModel = ComponentModel.builder()
-                .uid(component.getUid())
-                .className(component.getWrappedObject().getClass().getName())
-                .componentType(ComponentType.INBOX)
-                .build();
-
         // insert component
-        final var componentId = databaseManager.dao(ComponentsDao.class).insert(componentModel);
+        final var componentId = databaseManager.dao(ComponentsDao.class).insert(toModel(component));
 
         // insert connectors and related pins
         connectorPersistence.insertConnectors(componentId, component.getOutputConnectors());
@@ -71,16 +65,28 @@ public class InboxComponentPersistenceStrategy extends AbstractComponentPersiste
     }
 
     @Override
-    protected int update(final ComponentModel componentModel, final InboxComponentImpl component) {
-        final var componentId = componentModel.getId();
+    protected void update(final ComponentModel model, final InboxComponentImpl component) {
+        final var id = model.getId();
 
         // update connectors and related pins
-        connectorPersistence.updateConnectors(componentId, component.getOutputConnectors());
+        connectorPersistence.updateConnectors(id, component.getOutputConnectors());
 
         // update the event key model
-        eventKeyPersistence.updateEventKey(componentId, component.getEventKey());
+        eventKeyPersistence.updateEventKey(id, component.getEventKey());
+    }
 
-        return componentId;
+    @Override
+    protected ComponentModel findModel(final InboxComponentImpl component) {
+        return databaseManager.dao(ComponentsDao.class).find(component.getUid());
+    }
+
+    @Override
+    protected ComponentModel toModel(final InboxComponentImpl component) {
+        return ComponentModel.builder()
+                .uid(component.getUid())
+                .className(component.getWrappedObject().getClass().getName())
+                .componentType(ComponentType.INBOX)
+                .build();
     }
 
     @Override

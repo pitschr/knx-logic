@@ -17,8 +17,8 @@
 
 package li.pitschmann.knx.logic.db.loader;
 
-import experimental.api.ComponentFactory;
 import li.pitschmann.knx.logic.Logic;
+import li.pitschmann.knx.logic.LogicRepository;
 import li.pitschmann.knx.logic.components.LogicComponent;
 import li.pitschmann.knx.logic.components.LogicComponentImpl;
 import li.pitschmann.knx.logic.db.DatabaseManager;
@@ -43,12 +43,12 @@ import java.util.Objects;
  */
 public class LogicComponentLoader extends AbstractComponentLoader<LogicComponent> {
     private static final Logger LOG = LoggerFactory.getLogger(LogicComponentLoader.class);
-    private final ComponentFactory componentFactory;
+    private final LogicRepository logicRepository;
 
     public LogicComponentLoader(final DatabaseManager databaseManager,
-                                final ComponentFactory componentFactory) {
+                                final LogicRepository logicRepository) {
         super(databaseManager);
-        this.componentFactory = Objects.requireNonNull(componentFactory);
+        this.logicRepository = Objects.requireNonNull(logicRepository);
     }
 
     @Override
@@ -75,7 +75,7 @@ public class LogicComponentLoader extends AbstractComponentLoader<LogicComponent
             return Class.forName(className);
         } catch (final ClassNotFoundException e) {
             LOG.debug("Search for logic class in the logic repository: {}", className);
-            return componentFactory.getLogicRepository().findLogicClass(className);
+            return logicRepository.findLogicClass(className);
         }
     }
 }

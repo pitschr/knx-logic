@@ -40,10 +40,9 @@ import java.util.stream.Stream;
  *
  * @author PITSCHR
  */
-public final class DynamicConnector extends AbstractConnector
-        implements DynamicConnectorAware {
+public final class DynamicConnector extends AbstractConnector {
     private static final Logger LOG = LoggerFactory.getLogger(DynamicConnector.class);
-    private static final boolean FIELD_SYNC_DEEP_CHECK = !false; // true = performs a deep sync (performance!)
+    private static final boolean FIELD_SYNC_DEEP_CHECK = true; // true = performs a deep sync (performance!)
     private static final int FIELD_INITIAL_SIZE = 16; // hopefully big enough for most cases!
 
     private final AtomicReference<List<Object>> dynamicListReference = new AtomicReference<>();
@@ -73,7 +72,11 @@ public final class DynamicConnector extends AbstractConnector
         return this.getPins().stream().map(Pin.class::cast);
     }
 
-    @Override
+    /**
+     * Returns the size of all existing {@link DynamicPin}s
+     *
+     * @return the size of {@link DynamicPin}s
+     */
     public int size() {
         return this.getPins().size();
     }
@@ -111,7 +114,11 @@ public final class DynamicConnector extends AbstractConnector
         LOG.debug("Dynamic pins for connector '{}' are: {}", getName(), list);
     }
 
-    @Override
+    /**
+     * Returns an unmodifiable list of all {@link DynamicPin}
+     *
+     * @return list of {@link DynamicPin}; may be empty; not null
+     */
     public List<DynamicPin> getPins() {
         this.readLock.lock();
         try {
@@ -122,7 +129,14 @@ public final class DynamicConnector extends AbstractConnector
         }
     }
 
-    @Override
+
+    /**
+     * Returns the {@link DynamicPin} at given {@code index}
+     *
+     * @param index the index of {@link DynamicPin} to return
+     * @return existing {@link DynamicPin}; not null
+     * @throws IndexOutOfBoundsException if the index is out of range
+     */
     @Nullable
     public DynamicPin getPin(final int index) {
         this.readLock.lock();
@@ -134,12 +148,23 @@ public final class DynamicConnector extends AbstractConnector
         }
     }
 
-    @Override
+    /**
+     * Creates a new {@link DynamicPin} and appends it at the end of the list
+     *
+     * @return newly created {@link DynamicPin}; not null
+     * @throws MaximumBoundException in case the maximum bound has already been reached
+     */
     public DynamicPin addPin() {
         return addPin(size());
     }
 
-    @Override
+    /**
+     * Creates and adds a new {@link DynamicPin} at given {@code index}
+     *
+     * @param index the index of {@link DynamicPin} to be added; must be in valid size range
+     * @return newly created {@link DynamicPin}; not null
+     * @throws MaximumBoundException in case the maximum bound has already been reached
+     */
     public DynamicPin addPin(final int index) {
         this.writeLock.lock();
         try {
@@ -173,7 +198,17 @@ public final class DynamicConnector extends AbstractConnector
         }
     }
 
-    @Override
+
+    /**
+     * Increases the size of {@link DynamicPin} to {@code desiredSize} and returns
+     * an unmodifiable list of {@link DynamicPin} that were newly created and added
+     * to the list.
+     *
+     * @param desiredSize the desired size of the {@link DynamicConnector}
+     * @return list of {@link DynamicPin} that were newly created, the list
+     * may be empty if the size could not be increased due e.g. maximum
+     * occurrence or if the component has more fields than desired size already
+     */
     public List<DynamicPin> tryIncrease(final int desiredSize) {
         this.writeLock.lock();
         try {
@@ -199,7 +234,13 @@ public final class DynamicConnector extends AbstractConnector
         }
     }
 
-    @Override
+    /**
+     * Removes the {@link DynamicPin} at given {@code index}
+     *
+     * @param index the index of {@link DynamicPin} to be removed
+     * @return the {@link DynamicPin} instance which has been removed; not null
+     * @throws MinimumBoundException in case the minimum bound has already been reached
+     */
     public DynamicPin removePin(final int index) {
         this.writeLock.lock();
         try {
@@ -228,7 +269,10 @@ public final class DynamicConnector extends AbstractConnector
         }
     }
 
-    @Override
+    /**
+     * Resets the {@link DynamicConnector} by removing all existing
+     * {@link DynamicPin}s and then re-initialize with minimum size
+     */
     public void reset() {
         this.writeLock.lock();
         try {
@@ -287,6 +331,7 @@ public final class DynamicConnector extends AbstractConnector
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
+                .add("uid", this.getUid())
                 .add("fieldName", getDescriptor().getName()) //
                 .add("fieldType", getDescriptor().getFieldType().getName()) //
                 .add("defaultValue", defaultValue) //

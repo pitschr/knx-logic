@@ -3,6 +3,7 @@ package li.pitschmann.knx.logic.db.dao;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.uid.UID;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
+import org.jdbi.v3.sqlobject.customizer.BindList;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -14,65 +15,49 @@ import java.util.List;
  *
  * @author PITSCHR
  */
-public interface ComponentsDao {
-    /**
-     * Returns the total size for all components
-     *
-     * @return the total size of components
-     */
+public interface ComponentsDao extends GenericDao<ComponentModel> {
+    @Override
     @SqlQuery("SELECT COUNT(*) FROM components")
     int size();
 
-    /**
-     * Returns all components
-     *
-     * @return list of {@link ComponentModel}
-     */
+    @Override
     @SqlQuery("SELECT * FROM components")
     List<ComponentModel> all();
 
-    /**
-     * Returns the {@link ComponentModel} for given {@code id}
-     *
-     * @param id the identifier of component
-     * @return {@link ComponentModel}
-     */
     @SqlQuery("SELECT * FROM components WHERE id = ?")
     ComponentModel find(final int id);
 
-    /**
-     * Returns the {@link ComponentModel} for given {@code uid}
-     *
-     * @param uid {@link UID} of component
-     * @return {@link ComponentModel}
-     */
+    @Override
     @SqlQuery("SELECT * FROM components WHERE uid = ?")
     ComponentModel find(final UID uid);
 
-    /**
-     * Inserts a new {@link ComponentModel} into database
-     *
-     * @param model model to be inserted
-     * @return newly generated primary key
-     */
+    @SqlQuery("SELECT * FROM components WHERE id IN (<ids>)")
+    List<ComponentModel> find(final @BindList("ids") int[] ids);
+
+    @Override
     @GetGeneratedKeys
     @SqlUpdate("INSERT INTO components (componentType, uid, className) VALUES (:componentType, :uid, :className)")
     int insert(@BindBean final ComponentModel model);
 
-    /**
-     * Updates an existing {@link ComponentModel} in database
-     *
-     * @param model model to be updated
-     * @return primary key of component model that has been updated
-     */
-    @SqlUpdate("UPDATE components SET eventKey = :eventKey WHERE id = :id")
-    int update(@BindBean final ComponentModel model);
+    @Override
+    default void update(final int id, final ComponentModel model) {
+        throw new UnsupportedOperationException("No update supported for ComponentModel");
+    }
 
-    /**
-     * Deletes an existing {@link ComponentModel} from database
-     *
-     * @param uid UID of model to be deleted
-     */
+    @Override
     @SqlUpdate("DELETE FROM components WHERE uid = ?")
     void delete(final UID uid);
+
+    /**
+     * Returns all {@link ComponentModel} for given diagram {@code id}
+     *
+     * @param id the identifier of diagram
+     * @return list of {@link ComponentModel}
+     */
+    @SqlQuery("SELECT " +
+            "    c.* " +
+            "  FROM diagram_components dc " +
+            "    INNER JOIN components c ON dc.componentId = c.id " +
+            "  WHERE dc.diagramId = ?")
+    List<ComponentModel> byDiagramId(final int id);
 }

@@ -65,6 +65,11 @@ public final class DynamicPin extends AbstractPin<DynamicConnector> {
     }
 
     @Override
+    public String getName() {
+        return getDescriptor().getOwner().getClass().getName() + "#" + getDescriptor().getField().getName() + "[" + getIndex() + "]";
+    }
+
+    @Override
     public String toString() {
         final var fieldName = String.format("%s[%s]", getDescriptor().getName(), getIndex());
 

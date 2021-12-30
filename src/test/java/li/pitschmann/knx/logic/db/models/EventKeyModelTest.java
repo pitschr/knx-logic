@@ -23,6 +23,7 @@ class EventKeyModelTest {
         assertThat(model.getKey()).isEqualTo("KEY");
         assertThat(model).hasToString("" + //
                 "EventKeyModel{" + //
+                "id=-1, " + // -1 because of not persisted
                 "componentId=6458, " + //
                 "channel=CHANNEL, " + //
                 "key=KEY" + //

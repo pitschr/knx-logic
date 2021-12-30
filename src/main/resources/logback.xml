@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console Logging (ALL) -->
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date [%-5level] [%logger{40}:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="org.eclipse" level="INFO" />
+    <logger name="com.zaxxer.hikari" level="INFO" />
+
+    <!--
+    Log Levels: ALL < TRACE < DEBUG < INFO < WARN < ERROR < OFF
+     -->
+    <root level="${root-level:-DEBUG}">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

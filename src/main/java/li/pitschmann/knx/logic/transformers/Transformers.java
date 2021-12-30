@@ -1,5 +1,6 @@
 package li.pitschmann.knx.logic.transformers;
 
+import li.pitschmann.knx.core.annotations.Nullable;
 import li.pitschmann.knx.core.utils.Maps;
 import li.pitschmann.knx.core.utils.Preconditions;
 
@@ -21,7 +22,7 @@ import java.util.Map;
  * and {@code char} it would be {@code 0} and {@code \}{@code u}{@code 0000}, respectively).
  */
 public final class Transformers {
-    private static final Map<Class<?>, Transformer<?>> TRANSFORMERS = Maps.newHashMap(10);
+    private static final Map<Class<?>, Transformer<?>> TRANSFORMER_MAP = Maps.newHashMap(10);
 
     static {
         registerTransformers(new BooleanTransformer());
@@ -42,23 +43,23 @@ public final class Transformers {
     }
 
     private static void registerTransformers(final Transformer<?> transformer) {
-        TRANSFORMERS.put(transformer.getTargetClass(), transformer);
+        TRANSFORMER_MAP.put(transformer.getTargetClass(), transformer);
     }
 
     /**
      * Transforms given {@code value}. It will look up for suitable {@link Transformer}
      * based on {@code targetClass} and returns the transformed value
      *
-     * @param value       the value to be transformed
+     * @param value       the value to be transformed; may be null
      * @param targetClass the class that should transform the value to be an instance of this class
      * @return transformed object which is an instance of {@code T}
      * @throws IllegalArgumentException if no suitable {@link Transformer} could be found
      */
-    public static <T> T transform(final String value, final Class<T> targetClass) {
+    public static <T> T transform(final @Nullable String value, final Class<T> targetClass) {
         Preconditions.checkArgument(!targetClass.isPrimitive(),
                 "No transformation for primitive classes. Use wrapper classes.");
 
-        @SuppressWarnings("unchecked") final var transformer = (Transformer<T>) TRANSFORMERS.get(targetClass);
+        @SuppressWarnings("unchecked") final var transformer = (Transformer<T>) TRANSFORMER_MAP.get(targetClass);
         if (transformer == null) {
             throw new IllegalArgumentException("Could not find a matching transformer for: " + targetClass.getName());
         }

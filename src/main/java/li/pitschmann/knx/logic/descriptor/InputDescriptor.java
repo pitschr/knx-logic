@@ -18,16 +18,16 @@ public final class InputDescriptor extends FieldDescriptor {
     InputDescriptor(final Object owner, final Input annotation, final Field field) {
         super(owner, field);
 
-        final var min = annotation.min();
-        final var max = annotation.max();
+        final var tmpMin = annotation.min();
+        final var tmpMax = annotation.max();
         final var trigger = annotation.trigger();
-        Preconditions.checkArgument(min >= 0, "Value for 'min' must be zero/positive!");
-        Preconditions.checkArgument(max >= 0, "Value for 'max' must be zero/positive!");
-        Preconditions.checkArgument(max >= min,
-                "Value for 'max' may not be smaller than 'min': min={}, max={}", min, max);
+        Preconditions.checkArgument(tmpMin >= 0, "Value for 'min' must be zero/positive!");
+        Preconditions.checkArgument(tmpMax >= 0, "Value for 'max' must be zero/positive!");
+        Preconditions.checkArgument(tmpMax >= tmpMin,
+                "Value for 'max' may not be smaller than 'min': min={}, max={}", tmpMin, tmpMax);
         Preconditions.checkNonNull(trigger, "Trigger may not be null!");
-        this.min = min;
-        this.max = max;
+        this.min = tmpMin;
+        this.max = tmpMax;
         alwaysTrigger = trigger == Trigger.ALWAYS;
     }
 

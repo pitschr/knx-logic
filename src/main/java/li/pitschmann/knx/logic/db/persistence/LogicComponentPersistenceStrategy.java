@@ -34,15 +34,13 @@ import java.util.concurrent.TimeUnit;
  *
  * @author PITSCHR
  */
-public class LogicComponentPersistenceStrategy extends AbstractComponentPersistenceStrategy<LogicComponentImpl> {
+public final class LogicComponentPersistenceStrategy extends AbstractPersistence<ComponentModel, LogicComponentImpl> {
     private static final Logger LOG = LoggerFactory.getLogger(LogicComponentPersistenceStrategy.class);
     private final ConnectorPersistence connectorPersistence;
-    private final EventKeyPersistence eventKeyPersistence;
 
     public LogicComponentPersistenceStrategy(final DatabaseManager databaseManager) {
         super(databaseManager);
         this.connectorPersistence = new ConnectorPersistence(databaseManager);
-        this.eventKeyPersistence = new EventKeyPersistence(databaseManager);
     }
 
     @Override
@@ -50,14 +48,8 @@ public class LogicComponentPersistenceStrategy extends AbstractComponentPersiste
         final var sw = Stopwatch.createStarted();
         LOG.trace("Database write request for logic component: {}", component);
 
-        final var componentModel = ComponentModel.builder()
-                .uid(component.getUid())
-                .className(component.getWrappedObject().getClass().getName())
-                .componentType(ComponentType.LOGIC)
-                .build();
-
         // insert component
-        final var componentId = databaseManager.dao(ComponentsDao.class).insert(componentModel);
+        final var componentId = databaseManager.dao(ComponentsDao.class).insert(toModel(component));
 
         // insert connectors and related pins
         connectorPersistence.insertConnectors(componentId, component.getConnectors());
@@ -69,13 +61,23 @@ public class LogicComponentPersistenceStrategy extends AbstractComponentPersiste
     }
 
     @Override
-    protected int update(final ComponentModel componentModel, final LogicComponentImpl component) {
-        final var componentId = componentModel.getId();
-
+    protected void update(final ComponentModel model, final LogicComponentImpl component) {
         // update connectors and related pins
-        connectorPersistence.updateConnectors(componentId, component.getConnectors());
+        connectorPersistence.updateConnectors(model.getId(), component.getConnectors());
+    }
 
-        return componentId;
+    @Override
+    protected ComponentModel findModel(final LogicComponentImpl component) {
+        return databaseManager.dao(ComponentsDao.class).find(component.getUid());
+    }
+
+    @Override
+    protected ComponentModel toModel(final LogicComponentImpl component) {
+        return ComponentModel.builder()
+                .uid(component.getUid())
+                .className(component.getWrappedObject().getClass().getName())
+                .componentType(ComponentType.LOGIC)
+                .build();
     }
 
     @Override

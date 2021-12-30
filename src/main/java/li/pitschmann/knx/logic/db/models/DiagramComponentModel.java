@@ -41,6 +41,7 @@ public final class DiagramComponentModel extends Model {
     @Override
     public String toString() {
         return Strings.toStringHelper(this) //
+                .add("id", getId()) //
                 .add("diagramId", diagramId) //
                 .add("componentId", componentId) //
                 .add("positionX", positionX) //

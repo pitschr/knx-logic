@@ -1,0 +1,19 @@
+{
+  "uid": "********-****-****-****-************",
+  "className": "li.pitschmann.knx.logic.components.inbox.VariableInbox",
+  "inputs": [],
+  "outputs": [
+    {
+      "uid": "********-****-****-****-************",
+      "name": "data",
+      "dynamic": false,
+      "pinType": "java.lang.Object",
+      "pins": [
+        {
+          "uid": "********-****-****-****-************",
+          "value": "null"
+        }
+      ]
+    }
+  ]
+}

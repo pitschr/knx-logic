@@ -54,7 +54,15 @@ class StaticConnectorTest {
         assertThat(pin.getValue()).isEqualTo(false); // default instantiated value
 
         assertThat(connector).hasToString(
-                String.format("StaticConnector{fieldName=i, fieldType=java.lang.Boolean, pin=%s}", pin.getUid())
+                String.format("StaticConnector{" +
+                        "uid=%s, " + //
+                        "fieldName=i, " + //
+                        "fieldType=java.lang.Boolean, " + //
+                        "pin=%s" + //
+                        "}",
+                        connector.getUid(),
+                        pin.getUid()
+                )
         );
     }
 

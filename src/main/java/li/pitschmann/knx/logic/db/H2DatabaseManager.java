@@ -21,6 +21,7 @@ import li.pitschmann.knx.logic.db.models.EventKeyModel;
 import li.pitschmann.knx.logic.db.models.PinLinkModel;
 import li.pitschmann.knx.logic.db.models.PinModel;
 import li.pitschmann.knx.logic.db.persistence.ConnectorPersistenceStrategy;
+import li.pitschmann.knx.logic.db.persistence.DiagramPersistenceStrategy;
 import li.pitschmann.knx.logic.db.persistence.InboxComponentPersistenceStrategy;
 import li.pitschmann.knx.logic.db.persistence.LogicComponentPersistenceStrategy;
 import li.pitschmann.knx.logic.db.persistence.OutboxComponentPersistenceStrategy;
@@ -78,6 +79,7 @@ public final class H2DatabaseManager implements DatabaseManager {
         persistenceManager.addPersistenceStrategy(new InboxComponentPersistenceStrategy(this));
         persistenceManager.addPersistenceStrategy(new OutboxComponentPersistenceStrategy(this));
         persistenceManager.addPersistenceStrategy(new ConnectorPersistenceStrategy(this));
+        persistenceManager.addPersistenceStrategy(new DiagramPersistenceStrategy(this));
     }
 
     @Override

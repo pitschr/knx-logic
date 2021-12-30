@@ -44,19 +44,16 @@ public final class ConnectorPersistenceStrategy implements PersistenceStrategy<C
         this.connectorPersistence = new ConnectorPersistence(databaseManager);
     }
 
-
     @Override
     public int save(final Connector connector) {
         final var connectorModel = databaseManager.dao(ConnectorsDao.class).find(connector.getUid());
 
         Preconditions.checkNonNull(connectorModel,
                 "This persistence class is suitable for update of connector only. " +
-                        "For insert please use a component persistence strategy.");
+                        "The component persistence strategy includes the insert of connector.");
 
-        connectorPersistence.updateConnectors(
-                connectorModel.getComponentId(),
-                List.of(connector)
-        );
+        final var connectorId = connectorModel.getId();
+        connectorPersistence.updateConnectors(connectorId, List.of(connector));
 
         LOG.debug("Connector saved: {}", connector);
         return connectorModel.getId();

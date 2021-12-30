@@ -295,11 +295,11 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // ---------------------------------
         // Remove the 'totalTextLength' static connector
         // ---------------------------------
-        final var connectorIdToBeRemoved = connectorsDao.byComponentId(newComponentId)
+        final var connectorUidToBeRemoved = connectorsDao.byComponentId(newComponentId)
                 .stream()
                 .filter(c -> "totalTextLength".equalsIgnoreCase(c.getConnectorName()))
-                .findFirst().orElseThrow().getId();
-        connectorsDao.delete(connectorIdToBeRemoved);
+                .findFirst().orElseThrow().getUid();
+        connectorsDao.delete(connectorUidToBeRemoved);
 
         assertThat(componentsDao.size()).isEqualTo(1);
         assertThat(connectorsDao.size()).isEqualTo(3); // 4-1 (one connector removed)
@@ -366,11 +366,11 @@ class LogicComponentPersistenceStrategyTest extends BaseDatabaseSuite {
         // Remove the 'texts' connector
         //   This will also remove the associated pins: texts[0] and texts[1]
         // ---------------------------------
-        final var connectorIdToBeRemoved = connectorsDao.byComponentId(newComponentId)
+        final var connectorUidToBeRemoved = connectorsDao.byComponentId(newComponentId)
                 .stream()
                 .filter(c -> "texts".equalsIgnoreCase(c.getConnectorName()))
-                .findFirst().orElseThrow().getId();
-        connectorsDao.delete(connectorIdToBeRemoved);
+                .findFirst().orElseThrow().getUid();
+        connectorsDao.delete(connectorUidToBeRemoved);
 
         assertThat(componentsDao.size()).isEqualTo(1);
         assertThat(connectorsDao.size()).isEqualTo(3); // 4-1 (one connector removed)
