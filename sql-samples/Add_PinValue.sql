@@ -1,0 +1,1 @@
+INSERT INTO pin_values (pinid, value, valueType) VALUES (1, 'true', 'java.lang.Boolean');
