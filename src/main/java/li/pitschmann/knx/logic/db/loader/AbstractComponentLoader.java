@@ -25,6 +25,7 @@ import li.pitschmann.knx.logic.connector.StaticConnector;
 import li.pitschmann.knx.logic.db.DatabaseManager;
 import li.pitschmann.knx.logic.db.dao.ComponentsDao;
 import li.pitschmann.knx.logic.db.dao.ConnectorsDao;
+import li.pitschmann.knx.logic.db.dao.PinValuesDao;
 import li.pitschmann.knx.logic.db.dao.PinsDao;
 import li.pitschmann.knx.logic.db.jdbi.mappers.BindingType;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
@@ -177,6 +178,9 @@ abstract class AbstractComponentLoader<T extends Component> {
         final var uid = Objects.requireNonNull(pinModel.getUid());
         pin.setUid(uid);
 
+        pin.setValue(databaseManager.dao(PinValuesDao.class).lastValueByPinId(pinModel.getId()));
+        pin.clearRefresh();
+
         // log
         LOG.trace("Static Pin {} (connectorId: {}, fieldId: {})", //
                 pin.getUid(), connectorModel.getId(), pinModel.getId());
@@ -202,9 +206,12 @@ abstract class AbstractComponentLoader<T extends Component> {
             final var pin = connector.getPin(i);
             final var pinModel = pinModels.get(i);
 
-            // override the UID
+            // override the UID and value
             final var uid = Objects.requireNonNull(pinModel.getUid());
             pin.setUid(uid);
+
+            pin.setValue(databaseManager.dao(PinValuesDao.class).lastValueByPinId(pinModel.getId()));
+            pin.clearRefresh();
 
             // log
             LOG.trace("Dynamic Pin {} (connectorId: {}, fieldId: {}, index: {})", //
