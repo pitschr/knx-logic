@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
  *
  * @author PITSCHR
  */
-public final class ComponentController {
+public final class ComponentController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(ComponentController.class);
 
     private final ComponentFactory componentFactory;
@@ -93,8 +92,7 @@ public final class ComponentController {
                 component = componentFactory.createLogic(request.getData());
                 LOG.debug("Logic Component added: {}", component);
             } catch (final NoLogicClassFound ex) {
-                ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-                ctx.json(Map.of("message", ex.getMessage()));
+                setBadRequest(ctx, ex.getMessage());
                 return;
             }
         } else if ("inbox".equalsIgnoreCase(request.getType())) {
@@ -107,11 +105,10 @@ public final class ComponentController {
             LOG.debug("Outbox Component added: {}", component);
         } else {
             LOG.error("Unsupported Component Type: {}", request.getType());
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of(
-                            "message",
-                            String.format("Unsupported Component Type: %s. Supported are: logic, inbox and outbox.", request.getType())
-                    )
+            setBadRequest(
+                    ctx,
+                    "Unsupported Component Type: %s. Supported are: logic, inbox and outbox.",
+                    request.getType()
             );
             return;
         }
@@ -162,16 +159,11 @@ public final class ComponentController {
     private Component findComponentByUID(final Context ctx, final String uid) {
         Component component = null;
         if (uid == null || uid.isBlank()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No component UID provided"));
+            setBadRequest(ctx, "No component UID provided");
         } else {
             component = uidRegistry.getComponent(uid);
             if (component == null) {
-                ctx.status(HttpServletResponse.SC_NOT_FOUND);
-                ctx.json(Map.of(
-                        "message",
-                        String.format("No component found with UID: %s", uid))
-                );
+                setNotFound(ctx, "No component found with UID: %s", uid);
             }
         }
         return component;
