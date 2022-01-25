@@ -21,7 +21,7 @@ import java.util.Objects;
  *
  * @author PITSCHR
  */
-public final class ConnectorController {
+public final class ConnectorController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(ConnectorController.class);
     private final ConnectorService connectorService;
     private final UIDRegistry uidRegistry;
@@ -72,11 +72,7 @@ public final class ConnectorController {
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
             LOG.error("Connector is not dynamic: {}", connectorUid);
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("Connector is not dynamic: %s", connector.getName()))
-            );
+            setForbidden(ctx, "Connector is not dynamic: %s", connector.getName());
             return;
         }
         final var dynamicConnector = (DynamicConnector) connector;
@@ -88,11 +84,10 @@ public final class ConnectorController {
             } else {
                 // index must be valid
                 if (index < 0 || index >= dynamicConnector.size()) {
-                    ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-                    ctx.json(Map.of(
-                            "message",
-                            String.format("Index of connector '%s' is out of range: %s (min=0, max=%s)",
-                                    connector.getName(), index, dynamicConnector.size() - 1))
+                    setBadRequest(
+                            ctx,
+                            "Index of connector '%s' is out of range: %s (min=0, max=%s)",
+                            connector.getName(), index, dynamicConnector.size() - 1
                     );
                     return;
                 }
@@ -103,8 +98,7 @@ public final class ConnectorController {
             ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector));
         } catch (final MaximumBoundException e) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", e.getMessage()));
+            setBadRequest(ctx, e.getMessage());
         }
     }
 
@@ -128,22 +122,16 @@ public final class ConnectorController {
         // verify if connector is dynamic
         if (!(connector instanceof DynamicConnector)) {
             LOG.error("Connector is not dynamic: {}", connector.getName());
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("Connector is not dynamic: %s", connector.getName()))
-            );
+            setForbidden(ctx, "Connector is not dynamic: %s", connector.getName());
             return;
         }
         final var dynamicConnector = (DynamicConnector) connector;
 
         // index must be provided and valid
         if (index == null || index < 0 || index >= dynamicConnector.size()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("Index of connector '%s' is out of range: %s (min=0, max=%s)",
-                            connector.getName(), index, dynamicConnector.size() - 1))
+            setBadRequest(ctx,
+                    "Index of connector '%s' is out of range: %s (min=0, max=%s)",
+                    connector.getName(), index, dynamicConnector.size() - 1
             );
             return;
         }
@@ -155,8 +143,7 @@ public final class ConnectorController {
             ctx.status(HttpServletResponse.SC_OK);
             ctx.json(ConnectorResponse.from(connector));
         } catch (final MinimumBoundException e) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", e.getMessage()));
+            setBadRequest(ctx, e.getMessage());
         }
     }
 
@@ -171,16 +158,11 @@ public final class ConnectorController {
     private Connector findConnectorByUID(final Context ctx, final String uid) {
         Connector connector = null;
         if (uid == null || uid.isBlank()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No connector UID provided"));
+            setBadRequest(ctx, "No connector UID provided");
         } else {
             connector = uidRegistry.getConnector(uid);
             if (connector == null) {
-                ctx.status(HttpServletResponse.SC_NOT_FOUND);
-                ctx.json(Map.of(
-                        "message",
-                        String.format("No connector found with UID: %s", uid))
-                );
+                setNotFound(ctx, "No connector found with UID: %s", uid);
             }
         }
         return connector;

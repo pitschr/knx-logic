@@ -32,25 +32,27 @@ abstract class AbstractController {
         // NO-OP
     }
 
-    public static void setBadRequest(final Context ctx, final String message) {
-        setErrorResponse(ctx, HttpServletResponse.SC_BAD_REQUEST, message);
-    }
-
-    public static void setBadRequest(final Context ctx, final String message, final String... args) {
+    public static void setBadRequest(final Context ctx, final String message, final Object... args) {
         setErrorResponse(ctx, HttpServletResponse.SC_BAD_REQUEST, message, args);
     }
 
-    public static void setNotFound(final Context ctx, final String message, final String... args) {
+    public static void setNotFound(final Context ctx, final String message, final Object... args) {
         setErrorResponse(ctx, HttpServletResponse.SC_NOT_FOUND, message, args);
     }
 
-    public static void setErrorResponse(final Context ctx, final int httpStatus, final String message) {
-        ctx.status(httpStatus);
-        ctx.json(Map.of("message", message));
+    public static void setForbidden(final Context ctx, final String message, final Object... args) {
+        setErrorResponse(ctx, HttpServletResponse.SC_FORBIDDEN, message, args);
     }
 
-    public static void setErrorResponse(final Context ctx, final int httpStatus, final String message, final String... args) {
+    public static void setErrorResponse(final Context ctx, final int httpStatus, final String message, final Object... args) {
+        final String finalMessage;
+        if (args == null || args.length == 0) {
+            finalMessage = message;
+        } else {
+            finalMessage = String.format(message, args);
+        }
+
         ctx.status(httpStatus);
-        ctx.json(Map.of("message", String.format(message, (Object[]) args)));
+        ctx.json(Map.of("message", finalMessage));
     }
 }
