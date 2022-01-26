@@ -32,19 +32,19 @@ abstract class AbstractController {
         // NO-OP
     }
 
-    public static void setBadRequest(final Context ctx, final String message, final Object... args) {
+    protected static void setBadRequest(final Context ctx, final String message, final Object... args) {
         setErrorResponse(ctx, HttpServletResponse.SC_BAD_REQUEST, message, args);
     }
 
-    public static void setNotFound(final Context ctx, final String message, final Object... args) {
+    protected static void setNotFound(final Context ctx, final String message, final Object... args) {
         setErrorResponse(ctx, HttpServletResponse.SC_NOT_FOUND, message, args);
     }
 
-    public static void setForbidden(final Context ctx, final String message, final Object... args) {
+    protected static void setForbidden(final Context ctx, final String message, final Object... args) {
         setErrorResponse(ctx, HttpServletResponse.SC_FORBIDDEN, message, args);
     }
 
-    public static void setErrorResponse(final Context ctx, final int httpStatus, final String message, final Object... args) {
+    protected static void setErrorResponse(final Context ctx, final int httpStatus, final String message, final Object... args) {
         final String finalMessage;
         if (args == null || args.length == 0) {
             finalMessage = message;

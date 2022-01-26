@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
  *
  * @author PITSCHR
  */
-public final class DiagramController {
+public final class DiagramController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(DiagramController.class);
     private final DiagramService diagramService;
     private final UIDRegistry uidRegistry;
@@ -145,16 +144,11 @@ public final class DiagramController {
     private Diagram findDiagramByUID(final Context ctx, final String uid) {
         Diagram diagram = null;
         if (uid == null || uid.isBlank()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No diagram UID provided"));
+            setBadRequest(ctx, "No diagram UID provided");
         } else {
             diagram = uidRegistry.getDiagram(uid);
             if (diagram == null) {
-                ctx.status(HttpServletResponse.SC_NOT_FOUND);
-                ctx.json(Map.of(
-                        "message",
-                        String.format("No diagram found with UID: %s", uid))
-                );
+                setNotFound(ctx, "No diagram found with UID: %s", uid);
             }
         }
         return diagram;
