@@ -395,7 +395,8 @@ final class RouterInternal {
                 convertedValue = Boolean.TRUE.equals(value) ? 1 : 0;
             }
             // Number (1, 1.0) -> Boolean
-            else if (Number.class.isAssignableFrom(valueType) && targetFieldType == Boolean.class) {
+            else if (Number.class.isAssignableFrom(valueType)
+                    && targetFieldType == Boolean.class) {
                 final var iValue = (int)value;
                 if (iValue == 0) {
                     convertedValue = Boolean.FALSE;

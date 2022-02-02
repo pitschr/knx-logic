@@ -19,7 +19,7 @@ import java.util.Objects;
  *
  * @author PITSCHR
  */
-public final class PinController {
+public final class PinController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(PinController.class);
     private final PinService pinService;
     private final UIDRegistry uidRegistry;
@@ -83,11 +83,9 @@ public final class PinController {
 
         if (pin.getDescriptor() instanceof OutputDescriptor) {
             LOG.error("Pin is declared as an Output: {}", pin);
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("Pin is declared as an output pin, and therefore " +
-                            "not suitable to set the value: %s", pin.getName()))
+            setForbidden(ctx,
+                    "Pin is declared as an output pin, and therefore " +
+                            "not suitable to set the value: %s", pin.getName()
             );
             return;
         }
@@ -108,16 +106,11 @@ public final class PinController {
     private Pin findPinByUID(final Context ctx, final String uid) {
         Pin pin = null;
         if (uid == null || uid.isBlank()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No pin UID provided"));
+            setBadRequest(ctx, "No pin UID provided");
         } else {
             pin = uidRegistry.getPin(uid);
             if (pin == null) {
-                ctx.status(HttpServletResponse.SC_NOT_FOUND);
-                ctx.json(Map.of(
-                        "message",
-                        String.format("No pin found with UID: %s", uid))
-                );
+                setNotFound(ctx, "No pin found with UID: %s", uid);
             }
         }
         return pin;
