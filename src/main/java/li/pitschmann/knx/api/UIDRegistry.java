@@ -28,6 +28,7 @@ import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.pin.PinAware;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -45,8 +46,8 @@ import java.util.stream.Collectors;
  * @author PITSCHR
  */
 public final class UIDRegistry {
-    private final Map<String, Diagram> diagramMap = new HashMap<>();
-    private final Map<String, Component> componentMap = new HashMap<>();
+    private final Map<String, Diagram> diagramMap = new LinkedHashMap<>(); // because of order-guarantee
+    private final Map<String, Component> componentMap = new LinkedHashMap<>(); // because of order-guarantee
     private final Map<String, Connector> connectorMap = new HashMap<>();
     private final Map<String, Pin> pinMap = new HashMap<>();
 

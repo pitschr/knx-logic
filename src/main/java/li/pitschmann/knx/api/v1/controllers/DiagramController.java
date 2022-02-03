@@ -2,6 +2,7 @@ package li.pitschmann.knx.api.v1.controllers;
 
 import io.javalin.http.Context;
 import li.pitschmann.knx.api.UIDRegistry;
+import li.pitschmann.knx.api.v1.json.ComponentResponse;
 import li.pitschmann.knx.api.v1.json.DiagramRequest;
 import li.pitschmann.knx.api.v1.json.DiagramResponse;
 import li.pitschmann.knx.api.v1.services.DiagramService;
@@ -40,9 +41,18 @@ public final class DiagramController extends AbstractController {
     public void getAll(final Context ctx) {
         LOG.trace("Get all diagrams");
 
+        // find all diagrams
+        // if specified, start / limit parameters are used to slice the returned list
+        final var diagrams = limitAndGetAsList(ctx, uidRegistry.getDiagrams());
+
+        final var responses = diagrams.stream()
+                .map(DiagramResponse::from)
+                .collect(Collectors.toUnmodifiableList());
+        LOG.debug("Diagrams: {}", responses);
+
         // returns json array of all diagram responses
         ctx.status(HttpServletResponse.SC_OK);
-        ctx.json(uidRegistry.getDiagrams().stream().map(DiagramResponse::from).collect(Collectors.toList()));
+        ctx.json(responses);
     }
 
     /**

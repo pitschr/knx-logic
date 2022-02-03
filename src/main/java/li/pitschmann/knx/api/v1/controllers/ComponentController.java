@@ -44,14 +44,14 @@ public final class ComponentController extends AbstractController {
     public void getAll(final Context ctx) {
         LOG.trace("Return all components");
 
-        // return and find all components
-        final var components = uidRegistry.getComponents();
+        // find all components
+        // if specified, start / limit parameters are used to slice the returned list
+        final var components = limitAndGetAsList(ctx, uidRegistry.getComponents());
 
         final var responses = components.stream()
                 .map(ComponentResponse::from)
                 .collect(Collectors.toUnmodifiableList());
-
-        // TODO: filter? limit?
+        LOG.debug("Components: {}", responses);
 
         ctx.status(HttpServletResponse.SC_OK);
         ctx.json(responses);
