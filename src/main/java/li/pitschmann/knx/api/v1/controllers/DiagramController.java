@@ -2,7 +2,6 @@ package li.pitschmann.knx.api.v1.controllers;
 
 import io.javalin.http.Context;
 import li.pitschmann.knx.api.UIDRegistry;
-import li.pitschmann.knx.api.v1.json.ComponentResponse;
 import li.pitschmann.knx.api.v1.json.DiagramRequest;
 import li.pitschmann.knx.api.v1.json.DiagramResponse;
 import li.pitschmann.knx.api.v1.services.DiagramService;
@@ -139,7 +138,17 @@ public final class DiagramController extends AbstractController {
             return;
         }
 
+        // delete components (and corresponding connectors, pins, ...) first
+        diagramService.getDiagramComponents(diagram, u -> uidRegistry.getComponent(u.toString()))
+                .forEach(component -> {
+                    diagramService.deleteDiagramComponent(component);
+                    uidRegistry.deregister(component);
+                });
+
+        // then delete diagram
+        diagramService.deleteDiagram(diagram);
         uidRegistry.deregister(diagram);
+
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
     }
 
