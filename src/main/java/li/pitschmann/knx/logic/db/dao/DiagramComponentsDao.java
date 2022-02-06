@@ -1,6 +1,7 @@
 package li.pitschmann.knx.logic.db.dao;
 
 import li.pitschmann.knx.logic.db.models.DiagramComponentModel;
+import li.pitschmann.knx.logic.uid.UID;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.GetGeneratedKeys;
@@ -17,16 +18,17 @@ import java.util.List;
 public interface DiagramComponentsDao {
 
     /**
-     * Returns all diagram component models by diagramId
+     * Returns all diagram component models by diagram {@link UID}
      *
      * @return list of {@link DiagramComponentModel}
      */
     @SqlQuery("SELECT " +
             "    dc.* " +
             "  FROM diagram_components dc " +
+            "    INNER JOIN diagrams d ON dc.diagramId = d.id " +
             "    INNER JOIN components c ON dc.componentId = c.id " +
-            "  WHERE dc.diagramId = ?")
-    List<DiagramComponentModel> byDiagramId(final int diagramId);
+            "  WHERE d.uid = ?")
+    List<DiagramComponentModel> byDiagramUid(final UID uid);
 
     /**
      * Inserts a new {@link DiagramComponentModel} into database
