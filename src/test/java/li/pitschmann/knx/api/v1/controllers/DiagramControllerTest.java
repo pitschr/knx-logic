@@ -20,6 +20,7 @@ package li.pitschmann.knx.api.v1.controllers;
 import li.pitschmann.knx.api.UIDRegistry;
 import li.pitschmann.knx.api.v1.json.DiagramRequest;
 import li.pitschmann.knx.api.v1.services.DiagramService;
+import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.diagram.Diagram;
 import li.pitschmann.knx.logic.diagram.DiagramImpl;
 import li.pitschmann.knx.logic.uid.UIDFactory;
@@ -31,14 +32,18 @@ import test.TestHelpers;
 
 import javax.servlet.http.HttpServletResponse;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static test.TestHelpers.assertContextHasNoResponse;
 import static test.TestHelpers.assertContextJsonErrorMessage;
@@ -196,22 +201,37 @@ class DiagramControllerTest {
     @Test
     @DisplayName("Endpoint: Delete Diagram (Found)")
     void testDelete_Found() {
-        final var controller = newDiagramController();
+        final var registrySpy = spy(new UIDRegistry());
+        final var serviceMock = mock(DiagramService.class);
+        final var controller = newDiagramController(serviceMock, registrySpy);
+
+        // two components are associated with the diagram
+        doReturn(List.of(mock(Component.class), mock(Component.class))).when(serviceMock).getDiagramComponents(any(Diagram.class), any());
+        doReturn(mock(Component.class), mock(Component.class)).when(registrySpy).getComponent(anyString());
+        doNothing().when(registrySpy).deregister(any(Component.class));
 
         final var context = contextSpy();
         controller.delete(context, "diagram-uid-1");
 
         verify(context).status(HttpServletResponse.SC_NO_CONTENT);
         assertContextHasNoResponse(context);
+        verify(serviceMock).deleteDiagram(any(Diagram.class));
+        verify(serviceMock).getDiagramComponents(any(Diagram.class), any());
+        verify(serviceMock, times(2)).deleteDiagramComponent(any(Component.class));
+        verify(registrySpy, times(2)).deregister(any(Component.class));
     }
 
     /*
      * Internal Test Method to create a new DiagramController
      */
     private DiagramController newDiagramController() {
-        final var serviceMock = mock(DiagramService.class);
-        final var registrySpy = spy(new UIDRegistry());
+        return newDiagramController(
+                mock(DiagramService.class),
+                spy(new UIDRegistry())
+        );
+    }
 
+    private DiagramController newDiagramController(final DiagramService service, final UIDRegistry registry) {
         final var diagrams = IntStream.range(0, 3).mapToObj(i -> {
             final var diagram = new DiagramImpl();
             diagram.setUid(UIDFactory.createUid("diagram-uid-" + i));
@@ -219,12 +239,12 @@ class DiagramControllerTest {
             diagram.setDescription("Diagram Description " + i);
             return diagram;
         }).collect(Collectors.toList());
-        diagrams.forEach(registrySpy::register);
-        doReturn(diagrams).when(registrySpy).getDiagrams();
+        diagrams.forEach(registry::register);
+        doReturn(diagrams).when(registry).getDiagrams();
 
         return new DiagramController(
-                serviceMock,
-                registrySpy
+                service,
+                registry
         );
     }
 }
