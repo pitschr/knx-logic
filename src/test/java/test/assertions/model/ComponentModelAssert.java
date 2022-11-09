@@ -17,7 +17,7 @@
 
 package test.assertions.model;
 
-import li.pitschmann.knx.logic.components.ComponentType;
+import li.pitschmann.knx.logic.db.jdbi.mappers.ComponentType;
 import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.uid.UIDAware;
 
