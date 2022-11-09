@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2022 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package li.pitschmann.knx.logic.components;
 
 import org.junit.jupiter.api.DisplayName;
@@ -10,11 +27,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 /**
  * Test for {@link AbstractExecutableComponent}
  */
-public class AbstractExecutableComponentTest {
+class AbstractExecutableComponentTest {
 
     @Test
     @DisplayName("OK: AbstractExecutableComponent")
-    public void testSuccessful() {
+    void testSuccessful() {
         final var logic = new LogicA();
         final var component = new AbstractExecutableComponent<>(logic) {
             @Override
@@ -38,7 +55,7 @@ public class AbstractExecutableComponentTest {
 
     @Test
     @DisplayName("ERROR: AbstractExecutableComponent with issue in execution")
-    public void testFailure() {
+    void testFailure() {
         final var logic = new LogicA();
         final var component = new AbstractExecutableComponent<>(logic) {
             @Override
