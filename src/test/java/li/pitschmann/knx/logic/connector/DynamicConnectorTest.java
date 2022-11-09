@@ -206,7 +206,7 @@ class DynamicConnectorTest {
         // try to remove one more pin
         assertThatThrownBy(() -> connector.removePin(0))
                 .isInstanceOf(MinimumBoundException.class)
-            .hasMessageStartingWith("Minimum number of pins already reached for connector");
+                .hasMessageStartingWith("Minimum number of pins already reached for connector");
     }
 
     @Test

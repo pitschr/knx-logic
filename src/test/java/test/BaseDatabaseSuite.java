@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2022 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package test;
 
 import li.pitschmann.knx.logic.LogicRepository;
@@ -28,8 +45,8 @@ import static org.mockito.Mockito.mock;
 public class BaseDatabaseSuite {
     protected static final DatabaseManager databaseManager = new H2DatabaseManager("localhost", 9093, "junit");
     protected static final LogicComponentLoader logicLoader = new LogicComponentLoader(databaseManager, mock(LogicRepository.class));
-    protected static final InboxComponentLoader inboxLoader =  new InboxComponentLoader(databaseManager);
-    protected static final OutboxComponentLoader outboxLoader =  new OutboxComponentLoader(databaseManager);
+    protected static final InboxComponentLoader inboxLoader = new InboxComponentLoader(databaseManager);
+    protected static final OutboxComponentLoader outboxLoader = new OutboxComponentLoader(databaseManager);
 
     /**
      * Returns the DAO for JUnit Database Manager
@@ -88,9 +105,13 @@ public class BaseDatabaseSuite {
         return dao(EventKeyDao.class);
     }
 
-    protected PinValuesDao pinValuesDao()  { return dao(PinValuesDao.class); }
+    protected PinValuesDao pinValuesDao() {
+        return dao(PinValuesDao.class);
+    }
 
-    protected PinLinksDao pinLinksDao() { return dao(PinLinksDao.class); }
+    protected PinLinksDao pinLinksDao() {
+        return dao(PinLinksDao.class);
+    }
 
     /**
      * Loads all components from the database
@@ -109,7 +130,7 @@ public class BaseDatabaseSuite {
      */
     @SuppressWarnings("unchecked")
     protected <T extends Component> T loadComponentById(final int id) {
-        return (T)loadComponent(componentsDao().find(id));
+        return (T) loadComponent(componentsDao().find(id));
     }
 
     private Component loadComponent(final ComponentModel model) {

@@ -5,12 +5,10 @@ import li.pitschmann.knx.logic.annotations.Input;
 import li.pitschmann.knx.logic.annotations.Output;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.StaticConnector;
-import li.pitschmann.knx.logic.exceptions.LoaderException;
 import li.pitschmann.knx.logic.pin.DynamicPin;
 import li.pitschmann.knx.logic.pin.StaticPin;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import test.components.LogicA;
 
 import java.util.List;
 

@@ -28,7 +28,7 @@ class DPT3InboxTest {
     @DisplayName("[KNX] DPT3: Controlled, Step Interval = PERCENT_25")
     void testControlledStepCode3() {
         final var inbox = createInboxComponent(new DPT3Inbox());
-        inbox.onNext(new byte[]{ 0b0000_1011 });
+        inbox.onNext(new byte[]{0b0000_1011});
         assertThat(inbox.getOutputPin("controlled").getValue()).isEqualTo(true);
         assertThat(inbox.getOutputPin("stepInterval").getValue()).isEqualTo(StepInterval.PERCENT_25);
     }
@@ -38,7 +38,7 @@ class DPT3InboxTest {
     @DisplayName("[KNX] DPT3: Not Controlled, Step Interval = 7")
     void testNotControlledStepCode7() {
         final var inbox = createInboxComponent(new DPT3Inbox());
-        inbox.onNext(new byte[]{ 0b0000_0111 });
+        inbox.onNext(new byte[]{0b0000_0111});
         assertThat(inbox.getOutputPin("controlled").getValue()).isEqualTo(false);
         assertThat(inbox.getOutputPin("stepInterval").getValue()).isEqualTo(StepInterval.PERCENT_1);
 

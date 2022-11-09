@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Pitschmann Christoph
+ * Copyright (C) 2022 Pitschmann Christoph
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ class PerformanceLoadSequentialTest extends BaseDatabaseSuite {
             component = loadComponentById(1);
             duration = System.currentTimeMillis() - start;
             assertThat(component).isInstanceOf(LogicComponentImpl.class);
-            assertThat((LogicComponentImpl.class.cast(component)).getWrappedObject()).isInstanceOf(LogicH.class);
+            assertThat(((LogicComponentImpl) component).getWrappedObject()).isInstanceOf(LogicH.class);
             min = Math.min(min, duration);
             max = Math.max(max, duration);
         }
