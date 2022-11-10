@@ -5,6 +5,7 @@ import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.core.utils.Sleeper;
 import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.components.InboxComponent;
+import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.event.Event;
 import li.pitschmann.knx.logic.event.EventChannel;
 import li.pitschmann.knx.logic.event.EventKey;
@@ -188,8 +189,39 @@ public final class Router {
      * @param pin the given pin to gather linked pins
      * @return an immutable list of linked pins
      */
-    public List<Pin> getLinkedPins(final Pin pin) {
-        return routerInternal.getLinkedPins(pin);
+    public List<Pin> findLinkedPins(final Pin pin) {
+        return routerInternal.findLinkedPins(pin);
+    }
+
+    /**
+     * Returns the {@link Component} that owns the given {@link Connector}
+     *
+     * @param connector a connector; may not be null
+     * @return the {@link Component} that owns the connector
+     */
+    public Component findComponent(final Connector connector) {
+        return routerInternal.findComponent(connector);
+    }
+
+
+    /**
+     * Returns the {@link Component} that owns the given {@link Pin}
+     *
+     * @param pin a pin; may not be null
+     * @return the {@link Component} that owns the pin
+     */
+    public Component findComponent(final Pin pin) {
+        return routerInternal.findComponent(pin);
+    }
+
+    /**
+     * Returns the {@link Connector} that owns the given {@link Pin}
+     *
+     * @param pin a pin; may not be null
+     * @return the {@link Connector} owns the pin
+     */
+    public Connector findConnector(final Pin pin) {
+        return routerInternal.findConnector(pin);
     }
 
     /**

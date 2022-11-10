@@ -40,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -214,12 +215,43 @@ final class RouterInternal {
      * @param pin the given pin to gather linked pins
      * @return an immutable list of linked pins, or empty list if no links found
      */
-    public List<Pin> getLinkedPins(final Pin pin) {
+    List<Pin> findLinkedPins(final Pin pin) {
         final var linkedPins = linkMap.get(pin);
         if (linkedPins != null && !linkedPins.isEmpty()) {
             return List.copyOf(linkedPins);
         }
         return List.of();
+    }
+
+    /**
+     * Returns the {@link Component} that owns the given {@link Connector}
+     *
+     * @param connector a connector; may not be null
+     * @return the {@link Component} that owns the connector; cannot be null
+     */
+    Component findComponent(final Connector connector) {
+        return Objects.requireNonNull(this.connectorComponentMap.get(connector));
+    }
+
+    /**
+     * Returns the {@link Component} that owns the given {@link Pin}
+     *
+     * @param pin a pin; may not be null
+     * @return the {@link Component} that owns the pin; cannot be null
+     */
+    Component findComponent(final Pin pin) {
+        return findComponent(findConnector(pin));
+    }
+
+
+    /**
+     * Returns the {@link Connector} that owns the given {@link Pin}
+     *
+     * @param pin a pin; may not be null
+     * @return the {@link Connector} owns the pin; cannot be null
+     */
+    Connector findConnector(final Pin pin) {
+        return Objects.requireNonNull(pin.getConnector());
     }
 
     /**
