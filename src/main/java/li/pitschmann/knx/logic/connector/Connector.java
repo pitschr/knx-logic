@@ -57,12 +57,24 @@ public interface Connector extends UIDAware {
     /**
      * Returns the name of {@link Connector} in following pattern:
      * <pre>{@code
-     *      my.package.Logic#inputField
+     *      inputField
      * }</pre>
      *
      * @return name of Connector
      */
     default String getName() {
-        return getDescriptor().getOwner().getClass().getName() + "#" + getDescriptor().getName();
+        return getDescriptor().getName();
+    }
+
+    /**
+     * Returns the absolute name of {@link Connector} in following pattern:
+     * <pre>{@code
+     *      my.package.Logic#inputField
+     * }</pre>
+     *
+     * @return name of Connector
+     */
+    default String getAbsoluteName() {
+        return getDescriptor().getOwner().getClass().getName() + "#" + getName();
     }
 }
