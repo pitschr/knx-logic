@@ -36,6 +36,15 @@ class AbstractComponentTest {
         assertThat(component.getUid()).isSameAs(uidMock);
     }
 
+    @Test
+    @DisplayName("Test with getName() / getAbsoluteName()")
+    void testName() {
+        final var component = new TestComponent(mock(Object.class));
+
+        assertThat(component.getName()).isEqualTo("Object");
+        assertThat(component.getAbsoluteName()).isEqualTo("java.lang.Object");
+    }
+
     /**
      * Implementation of AbstractComponent for testing purposes
      */
