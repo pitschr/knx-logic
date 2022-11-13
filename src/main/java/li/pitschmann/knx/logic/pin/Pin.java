@@ -74,12 +74,24 @@ public interface Pin extends UIDAware {
     /**
      * Returns the name of {@link Pin} in following pattern:
      * <pre>{@code
-     *      my.package.Logic#inputField
+     *      inputField
      * }</pre>
      *
      * @return name of Pin
      */
     default String getName() {
-        return getDescriptor().getOwner().getClass().getName() + "#" + getDescriptor().getField().getName();
+        return getDescriptor().getField().getName();
+    }
+
+    /**
+     * Returns the absolute name of {@link Pin} in following pattern:
+     * <pre>{@code
+     *      my.package.Logic#inputField
+     * }</pre>
+     *
+     * @return name of Pin
+     */
+    default String getAbsoluteName() {
+        return getDescriptor().getOwner().getClass().getName() + "#" + getName();
     }
 }

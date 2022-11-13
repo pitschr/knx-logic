@@ -113,6 +113,6 @@ public final class LinkService {
      */
     public List<UID> getLinkedUIDs(final Pin pin) {
         Preconditions.checkNonNull(pin, "Pin is required.");
-        return router.getLinkedPins(pin).stream().map(Pin::getUid).collect(Collectors.toList());
+        return router.findLinkedPins(pin).stream().map(Pin::getUid).collect(Collectors.toList());
     }
 }

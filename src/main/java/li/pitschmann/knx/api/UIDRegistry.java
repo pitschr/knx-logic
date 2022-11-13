@@ -227,8 +227,8 @@ public final class UIDRegistry {
     public String toString() {
         final var diagramMapNames = toStringHelper(diagramMap, e -> e.getKey() + "=" + e.getValue().getName());
         final var componentMapNames = toStringHelper(componentMap, e -> e.getKey() + "=" + e.getValue().getName());
-        final var connectorMapNames = toStringHelper(connectorMap, e -> e.getKey() + "=" + e.getValue().getName());
-        final var pinMapNames = toStringHelper(pinMap, e -> e.getKey() + "=" + e.getValue().getName());
+        final var connectorMapNames = toStringHelper(connectorMap, e -> e.getKey() + "=" + e.getValue().getAbsoluteName());
+        final var pinMapNames = toStringHelper(pinMap, e -> e.getKey() + "=" + e.getValue().getAbsoluteName());
 
         return Strings.toStringHelper(this)
                 .add("\n\tdiagramMap", diagramMapNames)
