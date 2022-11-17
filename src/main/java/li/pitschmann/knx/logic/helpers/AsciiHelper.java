@@ -17,20 +17,12 @@
 
 package li.pitschmann.knx.logic.helpers;
 
-import experimental.api.AndLogic;
 import li.pitschmann.knx.core.utils.Preconditions;
 import li.pitschmann.knx.logic.components.Component;
-import li.pitschmann.knx.logic.components.InboxComponentImpl;
-import li.pitschmann.knx.logic.components.LogicComponentImpl;
-import li.pitschmann.knx.logic.components.OutboxComponentImpl;
-import li.pitschmann.knx.logic.components.inbox.DPT10Inbox;
-import li.pitschmann.knx.logic.components.outbox.DPT10Outbox;
-import li.pitschmann.knx.logic.components.outbox.DPT3Outbox;
 import li.pitschmann.knx.logic.connector.Connector;
 import li.pitschmann.knx.logic.connector.DynamicConnector;
 import li.pitschmann.knx.logic.connector.InputConnectorAware;
 import li.pitschmann.knx.logic.connector.OutputConnectorAware;
-import li.pitschmann.knx.logic.event.EventKey;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -284,12 +276,6 @@ public final class AsciiHelper {
         newChar[connectorHeight - 1] = footer;
 
         return newChar;
-    }
-
-    public static void main(String[] args) {
-        System.out.println(toAsciiString(new LogicComponentImpl(new AndLogic())));
-        System.out.println(toAsciiString(new InboxComponentImpl(new EventKey("x", "y"), new DPT10Inbox())));
-        System.out.println(toAsciiString(new OutboxComponentImpl(new EventKey("x", "y"), new DPT3Outbox())));
     }
 
     /**
