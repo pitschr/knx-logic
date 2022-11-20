@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2022 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package li.pitschmann.knx.logic;
 
 import li.pitschmann.knx.core.annotations.Nullable;
@@ -23,6 +40,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -197,12 +215,43 @@ final class RouterInternal {
      * @param pin the given pin to gather linked pins
      * @return an immutable list of linked pins, or empty list if no links found
      */
-    public List<Pin> getLinkedPins(final Pin pin) {
+    List<Pin> findLinkedPins(final Pin pin) {
         final var linkedPins = linkMap.get(pin);
         if (linkedPins != null && !linkedPins.isEmpty()) {
             return List.copyOf(linkedPins);
         }
         return List.of();
+    }
+
+    /**
+     * Returns the {@link Component} that owns the given {@link Connector}
+     *
+     * @param connector a connector; may not be null
+     * @return the {@link Component} that owns the connector; cannot be null
+     */
+    Component findComponent(final Connector connector) {
+        return Objects.requireNonNull(this.connectorComponentMap.get(connector));
+    }
+
+    /**
+     * Returns the {@link Component} that owns the given {@link Pin}
+     *
+     * @param pin a pin; may not be null
+     * @return the {@link Component} that owns the pin; cannot be null
+     */
+    Component findComponent(final Pin pin) {
+        return findComponent(findConnector(pin));
+    }
+
+
+    /**
+     * Returns the {@link Connector} that owns the given {@link Pin}
+     *
+     * @param pin a pin; may not be null
+     * @return the {@link Connector} owns the pin; cannot be null
+     */
+    Connector findConnector(final Pin pin) {
+        return Objects.requireNonNull(pin.getConnector());
     }
 
     /**
@@ -358,8 +407,8 @@ final class RouterInternal {
      * In case the value could not be converted a {@link RouterException} will be thrown.
      *
      * @param source the pin where the value comes from
-     * @param target   the pin that should set with the value
-     * @param value     the given value; may be null
+     * @param target the pin that should set with the value
+     * @param value  the given value; may be null
      * @return the value; may not be null
      * @throws RouterException in case the conversion was not possible
      */
@@ -395,8 +444,9 @@ final class RouterInternal {
                 convertedValue = Boolean.TRUE.equals(value) ? 1 : 0;
             }
             // Number (1, 1.0) -> Boolean
-            else if (Number.class.isAssignableFrom(valueType) && targetFieldType == Boolean.class) {
-                final var iValue = (int)value;
+            else if (Number.class.isAssignableFrom(valueType)
+                    && targetFieldType == Boolean.class) {
+                final var iValue = (int) value;
                 if (iValue == 0) {
                     convertedValue = Boolean.FALSE;
                 } else if (iValue == 1) {

@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2022 Pitschmann Christoph
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package li.pitschmann.knx.api.v1.controllers;
 
 import io.javalin.http.Context;
@@ -11,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -19,7 +35,7 @@ import java.util.Objects;
  *
  * @author PITSCHR
  */
-public final class PinController {
+public final class PinController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(PinController.class);
     private final PinService pinService;
     private final UIDRegistry uidRegistry;
@@ -83,11 +99,9 @@ public final class PinController {
 
         if (pin.getDescriptor() instanceof OutputDescriptor) {
             LOG.error("Pin is declared as an Output: {}", pin);
-            ctx.status(HttpServletResponse.SC_FORBIDDEN);
-            ctx.json(Map.of(
-                    "message",
-                    String.format("Pin is declared as an output pin, and therefore " +
-                            "not suitable to set the value: %s", pin.getName()))
+            setForbidden(ctx,
+                    "Pin is declared as an output pin, and therefore " +
+                            "not suitable to set the value: %s", pin.getName()
             );
             return;
         }
@@ -108,16 +122,11 @@ public final class PinController {
     private Pin findPinByUID(final Context ctx, final String uid) {
         Pin pin = null;
         if (uid == null || uid.isBlank()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No pin UID provided"));
+            setBadRequest(ctx, "No pin UID provided");
         } else {
             pin = uidRegistry.getPin(uid);
             if (pin == null) {
-                ctx.status(HttpServletResponse.SC_NOT_FOUND);
-                ctx.json(Map.of(
-                        "message",
-                        String.format("No pin found with UID: %s", uid))
-                );
+                setNotFound(ctx, "No pin found with UID: %s", uid);
             }
         }
         return pin;

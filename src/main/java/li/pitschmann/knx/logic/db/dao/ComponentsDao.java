@@ -49,15 +49,16 @@ public interface ComponentsDao extends GenericDao<ComponentModel> {
     void delete(final UID uid);
 
     /**
-     * Returns all {@link ComponentModel} for given diagram {@code id}
+     * Returns all {@link ComponentModel} for given diagram {@link UID}
      *
-     * @param id the identifier of diagram
+     * @param uid the unique identifier of diagram
      * @return list of {@link ComponentModel}
      */
     @SqlQuery("SELECT " +
             "    c.* " +
             "  FROM diagram_components dc " +
+            "    INNER JOIN diagrams d ON dc.diagramId = d.id " +
             "    INNER JOIN components c ON dc.componentId = c.id " +
-            "  WHERE dc.diagramId = ?")
-    List<ComponentModel> byDiagramId(final int id);
+            "  WHERE d.uid = ?")
+    List<ComponentModel> byDiagramUid(final UID uid);
 }

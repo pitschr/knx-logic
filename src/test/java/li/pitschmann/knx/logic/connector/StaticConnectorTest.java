@@ -25,6 +25,7 @@ class StaticConnectorTest {
                     private boolean i;
                     @Output
                     private boolean o;
+
                     @Override
                     public void logic() {
                         // NO-OP (not a part of test)
@@ -55,11 +56,11 @@ class StaticConnectorTest {
 
         assertThat(connector).hasToString(
                 String.format("StaticConnector{" +
-                        "uid=%s, " + //
-                        "fieldName=i, " + //
-                        "fieldType=java.lang.Boolean, " + //
-                        "pin=%s" + //
-                        "}",
+                                "uid=%s, " + //
+                                "fieldName=i, " + //
+                                "fieldType=java.lang.Boolean, " + //
+                                "pin=%s" + //
+                                "}",
                         connector.getUid(),
                         pin.getUid()
                 )

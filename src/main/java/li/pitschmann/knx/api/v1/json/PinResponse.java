@@ -33,7 +33,7 @@ public final class PinResponse {
                 pin.getUid().toString(),
                 null,
                 null,
-                String.valueOf(pin.getValue())
+                pin.getValue() == null ? null : pin.getValue().toString()
         );
     }
 
@@ -42,7 +42,7 @@ public final class PinResponse {
                 null,
                 null,
                 pin.getDescriptor().getFieldType().getName(),
-                String.valueOf(pin.getValue())
+                pin.getValue() == null ? null : pin.getValue().toString()
         );
     }
 
@@ -51,7 +51,7 @@ public final class PinResponse {
                 pin.getUid().toString(),
                 pin.getConnector().getUid().toString(),
                 pin.getDescriptor().getFieldType().getName(),
-                String.valueOf(pin.getValue())
+                pin.getValue() == null ? null : pin.getValue().toString()
         );
     }
 

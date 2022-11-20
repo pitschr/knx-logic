@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
  *
  * @author PITSCHR
  */
-public final class DiagramController {
+public final class DiagramController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(DiagramController.class);
     private final DiagramService diagramService;
     private final UIDRegistry uidRegistry;
@@ -41,9 +40,18 @@ public final class DiagramController {
     public void getAll(final Context ctx) {
         LOG.trace("Get all diagrams");
 
+        // find all diagrams
+        // if specified, start / limit parameters are used to slice the returned list
+        final var diagrams = limitAndGetAsList(ctx, uidRegistry.getDiagrams());
+
+        final var responses = diagrams.stream()
+                .map(DiagramResponse::from)
+                .collect(Collectors.toUnmodifiableList());
+        LOG.debug("Diagrams: {}", responses);
+
         // returns json array of all diagram responses
         ctx.status(HttpServletResponse.SC_OK);
-        ctx.json(uidRegistry.getDiagrams().stream().map(DiagramResponse::from).collect(Collectors.toList()));
+        ctx.json(responses);
     }
 
     /**
@@ -130,7 +138,17 @@ public final class DiagramController {
             return;
         }
 
+        // delete components (and corresponding connectors, pins, ...) first
+        diagramService.getDiagramComponents(diagram, u -> uidRegistry.getComponent(u.toString()))
+                .forEach(component -> {
+                    diagramService.deleteDiagramComponent(component);
+                    uidRegistry.deregister(component);
+                });
+
+        // then delete diagram
+        diagramService.deleteDiagram(diagram);
         uidRegistry.deregister(diagram);
+
         ctx.status(HttpServletResponse.SC_NO_CONTENT);
     }
 
@@ -145,16 +163,11 @@ public final class DiagramController {
     private Diagram findDiagramByUID(final Context ctx, final String uid) {
         Diagram diagram = null;
         if (uid == null || uid.isBlank()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(Map.of("message", "No diagram UID provided"));
+            setBadRequest(ctx, "No diagram UID provided");
         } else {
             diagram = uidRegistry.getDiagram(uid);
             if (diagram == null) {
-                ctx.status(HttpServletResponse.SC_NOT_FOUND);
-                ctx.json(Map.of(
-                        "message",
-                        String.format("No diagram found with UID: %s", uid))
-                );
+                setNotFound(ctx, "No diagram found with UID: %s", uid);
             }
         }
         return diagram;

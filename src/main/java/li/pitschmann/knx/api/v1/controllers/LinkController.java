@@ -8,7 +8,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -16,7 +15,7 @@ import java.util.Objects;
  *
  * @author PITSCHR
  */
-public final class LinkController {
+public final class LinkController extends AbstractController {
     private static final Logger LOG = LoggerFactory.getLogger(LinkController.class);
     private final LinkService linkService;
     private final UIDRegistry uidRegistry;
@@ -127,17 +126,11 @@ public final class LinkController {
         Pin pin = null;
 
         if (uid == null || uid.isBlank()) {
-            ctx.status(HttpServletResponse.SC_BAD_REQUEST);
-            ctx.json(
-                    Map.of("message", String.format("No %s UID provided", pinType.getFriendlyName()))
-            );
+            setBadRequest(ctx, "No %s UID provided", pinType.getFriendlyName());
         } else {
             pin = uidRegistry.getPin(uid);
             if (pin == null) {
-                ctx.status(HttpServletResponse.SC_NOT_FOUND);
-                ctx.json(
-                        Map.of("message", String.format("No %s found with UID: %s", pinType.getFriendlyName(), uid))
-                );
+                setNotFound(ctx, "No %s found with UID: %s", pinType.getFriendlyName(), uid);
             }
         }
         return pin;

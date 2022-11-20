@@ -28,6 +28,7 @@ import li.pitschmann.knx.logic.pin.Pin;
 import li.pitschmann.knx.logic.pin.PinAware;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,7 +37,7 @@ import java.util.stream.Collectors;
 
 /**
  * UID Registry (application wide)
- *
+ * <p>
  * This registry maps UIDs in string format with an object and
  * is used for a fast look-up for API endpoints. It does not
  * contain any logic / behavior, all those needs to be done
@@ -45,10 +46,22 @@ import java.util.stream.Collectors;
  * @author PITSCHR
  */
 public final class UIDRegistry {
-    private final Map<String, Diagram> diagramMap = new HashMap<>();
-    private final Map<String, Component> componentMap = new HashMap<>();
+    private final Map<String, Diagram> diagramMap = new LinkedHashMap<>(); // because of order-guarantee
+    private final Map<String, Component> componentMap = new LinkedHashMap<>(); // because of order-guarantee
     private final Map<String, Connector> connectorMap = new HashMap<>();
     private final Map<String, Pin> pinMap = new HashMap<>();
+
+    private static <T> String toStringHelper(final Map<String, T> map, final Function<Map.Entry<String, T>, String> function) {
+        return "{\n\t\t" + map.entrySet().stream().map(function).sorted(
+                // input is: <uid>=<name>
+                // the comparison should be based on name (after "=" char)
+                (String o1, String o2) -> {
+                    var o1Str = o1.substring(o1.indexOf("="));
+                    var o2Str = o2.substring(o2.indexOf("="));
+                    return o1Str.compareTo(o2Str);
+                }
+        ).collect(Collectors.joining(", \n\t\t")) + "\n\t}";
+    }
 
     /**
      * Returns all diagrams that is known to the {@link UIDRegistry}
@@ -145,6 +158,7 @@ public final class UIDRegistry {
      * <p>
      * This method should be called only when you added a dynamic pin from
      * a component.
+     *
      * @param pin the dynamic pin to be registered; may not be null
      */
     public void register(final DynamicPin pin) {
@@ -193,6 +207,7 @@ public final class UIDRegistry {
      * <p>
      * This method should be called only when you removed a dynamic pin from
      * a component.
+     *
      * @param pin the dynamic pin to be de-registered; may not be null
      */
     public void deregister(final DynamicPin pin) {
@@ -211,9 +226,9 @@ public final class UIDRegistry {
     @Override
     public String toString() {
         final var diagramMapNames = toStringHelper(diagramMap, e -> e.getKey() + "=" + e.getValue().getName());
-        final var componentMapNames = toStringHelper(componentMap, e -> e.getKey() + "=" + e.getValue().getName());
-        final var connectorMapNames = toStringHelper(connectorMap, e -> e.getKey() + "=" + e.getValue().getName());
-        final var pinMapNames = toStringHelper(pinMap, e -> e.getKey() + "=" + e.getValue().getName());
+        final var componentMapNames = toStringHelper(componentMap, e -> e.getKey() + "=" + e.getValue().getAbsoluteName());
+        final var connectorMapNames = toStringHelper(connectorMap, e -> e.getKey() + "=" + e.getValue().getAbsoluteName());
+        final var pinMapNames = toStringHelper(pinMap, e -> e.getKey() + "=" + e.getValue().getAbsoluteName());
 
         return Strings.toStringHelper(this)
                 .add("\n\tdiagramMap", diagramMapNames)
@@ -221,17 +236,5 @@ public final class UIDRegistry {
                 .add("\n\tconnectorMap", connectorMapNames)
                 .add("\n\tpinMap", pinMapNames + '\n')
                 .toString();
-    }
-
-    private static <T> String toStringHelper(final Map<String, T> map, final Function<Map.Entry<String, T>, String> function) {
-        return "{\n\t\t" + map.entrySet().stream().map(function).sorted(
-                // input is: <uid>=<name>
-                // the comparison should be based on name (after "=" char)
-                (String o1, String o2) -> {
-                    var o1Str = o1.substring(o1.indexOf("="));
-                    var o2Str = o2.substring(o2.indexOf("="));
-                    return o1Str.compareTo(o2Str);
-                }
-        ).collect(Collectors.joining(", \n\t\t")) + "\n\t}";
     }
 }

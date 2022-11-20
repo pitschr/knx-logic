@@ -142,7 +142,7 @@ class ConnectorControllerTest {
         controller.addPin(context, connectorUid, null);
 
         verify(context).status(HttpServletResponse.SC_FORBIDDEN);
-        assertContextJsonErrorMessage(context, "Connector is not dynamic: test.components.LogicB#i");
+        assertContextJsonErrorMessage(context, "Connector is not dynamic: i");
     }
 
     @Test
@@ -222,7 +222,7 @@ class ConnectorControllerTest {
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
         assertContextJsonErrorMessage(context,
-                "Index of connector 'test.components.LogicD#i' is out of range: 999 (min=0, max=0)"
+                "Index of connector 'i' is out of range: 999 (min=0, max=0)"
         );
         verify(serviceMock, never()).addPin(any(DynamicConnector.class), anyInt());
         verify(registrySpy, never()).register(any(DynamicPin.class));
@@ -248,7 +248,7 @@ class ConnectorControllerTest {
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
         assertContextJsonErrorMessage(context,
                 "Maximum number of pin already reached for connector " +
-                        "'test.components.logic.AndLogic#inputs': maximum=2, actual=2"
+                        "'inputs': maximum=2, actual=2"
         );
         verify(serviceSpy).addPin(any(DynamicConnector.class));
         verify(registrySpy, never()).register(any(DynamicPin.class));
@@ -286,7 +286,7 @@ class ConnectorControllerTest {
         controller.deletePin(context, connector.getUid().toString(), 0);
 
         verify(context).status(HttpServletResponse.SC_FORBIDDEN);
-        assertContextJsonErrorMessage(context, "Connector is not dynamic: test.components.LogicB#i");
+        assertContextJsonErrorMessage(context, "Connector is not dynamic: i");
     }
 
     @Test
@@ -338,7 +338,7 @@ class ConnectorControllerTest {
 
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
         assertContextJsonErrorMessage(context,
-                "Index of connector 'test.components.LogicD#i' is out of range: 999 (min=0, max=0)"
+                "Index of connector 'i' is out of range: 999 (min=0, max=0)"
         );
         verify(serviceMock, never()).removePin(any(DynamicConnector.class), anyInt());
         verify(registrySpy, never()).deregister(any(DynamicPin.class));
@@ -364,7 +364,7 @@ class ConnectorControllerTest {
         verify(context).status(HttpServletResponse.SC_BAD_REQUEST);
         assertContextJsonErrorMessage(context,
                 "Minimum number of pins already reached for connector " +
-                        "'test.components.logic.AndLogic#inputs': minimum=2, actual=2"
+                        "'inputs': minimum=2, actual=2"
         );
         verify(serviceSpy).removePin(connector, 0);
         verify(registrySpy, never()).deregister(any(DynamicPin.class));

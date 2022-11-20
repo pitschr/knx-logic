@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Pitschmann Christoph
+ * Copyright (C) 2022 Pitschmann Christoph
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,7 +167,7 @@ class PinControllerTest {
 
         verify(context).status(HttpServletResponse.SC_FORBIDDEN);
         assertContextJsonErrorMessage(context, "Pin is declared as an output pin, " +
-                "and therefore not suitable to set the value: test.components.LogicI#outputFirst");
+                "and therefore not suitable to set the value: outputFirst");
         verify(service, never()).setValue(any(Pin.class), anyString());
     }
 

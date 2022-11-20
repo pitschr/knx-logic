@@ -17,14 +17,26 @@ public interface Component extends UIDAware {
     Object getWrappedObject();
 
     /**
-     * Returns the name of wrapped {@link Component} in following pattern:
+     * Returns the simple name of wrapped {@link Component} in following pattern:
+     * <pre>{@code
+     *      Logic
+     * }</pre>
+     *
+     * @return simple name of Component
+     */
+    default String getName() {
+        return getWrappedObject().getClass().getSimpleName();
+    }
+
+    /**
+     * Returns the absolute name of wrapped {@link Component} in following pattern:
      * <pre>{@code
      *      my.package.Logic
      * }</pre>
      *
-     * @return name of Component
+     * @return absolute name of Component
      */
-    default String getName() {
+    default String getAbsoluteName() {
         return getWrappedObject().getClass().getName();
     }
 }

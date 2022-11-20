@@ -15,11 +15,11 @@ import static org.mockito.Mockito.when;
 /**
  * Test for {@link Connector}
  */
-public class ConnectorTest {
+class ConnectorTest {
 
     @Test
     @DisplayName("Test for compatibility")
-    public void testCompatibility() {
+    void testCompatibility() {
         final var descriptorMock = mock(FieldDescriptor.class);
         doReturn(Number.class).when(descriptorMock).getFieldType();
 
@@ -50,7 +50,7 @@ public class ConnectorTest {
 
     @Test
     @DisplayName("Test for #getName()")
-    public void testGetName() {
+    void testGetName() {
         final var descriptorMock = mock(FieldDescriptor.class);
         when(descriptorMock.getOwner()).thenReturn(new ArrayList<>());
         when(descriptorMock.getName()).thenReturn("myFieldName");
@@ -58,7 +58,9 @@ public class ConnectorTest {
         final var connector = mock(Connector.class);
         when(connector.getDescriptor()).thenReturn(descriptorMock);
         when(connector.getName()).thenCallRealMethod();
+        when(connector.getAbsoluteName()).thenCallRealMethod();
 
-        assertThat(connector.getName()).isEqualTo("java.util.ArrayList#myFieldName");
+        assertThat(connector.getName()).isEqualTo("myFieldName");
+        assertThat(connector.getAbsoluteName()).isEqualTo("java.util.ArrayList#myFieldName");
     }
 }

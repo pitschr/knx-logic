@@ -943,19 +943,19 @@ class RouterTest {
         router.link(pipe3OutputPin, outbox2Pin);
 
         // verification (after linking)
-        assertThat(router.getLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
-        assertThat(router.getLinkedPins(inbox2Pin)).containsExactly(pipe2InputPin);
-        assertThat(router.getLinkedPins(inbox3Pin)).containsExactlyInAnyOrder(pipe2InputPin, pipe3InputPin);
-        assertThat(router.getLinkedPins(inbox4Pin)).containsExactly(pipe3InputPin);
-        assertThat(router.getLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
-        assertThat(router.getLinkedPins(pipe2InputPin)).containsExactlyInAnyOrder(inbox2Pin, inbox3Pin); // reverse
-        assertThat(router.getLinkedPins(pipe3InputPin)).containsExactlyInAnyOrder(inbox3Pin, inbox4Pin); // reverse
+        assertThat(router.findLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
+        assertThat(router.findLinkedPins(inbox2Pin)).containsExactly(pipe2InputPin);
+        assertThat(router.findLinkedPins(inbox3Pin)).containsExactlyInAnyOrder(pipe2InputPin, pipe3InputPin);
+        assertThat(router.findLinkedPins(inbox4Pin)).containsExactly(pipe3InputPin);
+        assertThat(router.findLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
+        assertThat(router.findLinkedPins(pipe2InputPin)).containsExactlyInAnyOrder(inbox2Pin, inbox3Pin); // reverse
+        assertThat(router.findLinkedPins(pipe3InputPin)).containsExactlyInAnyOrder(inbox3Pin, inbox4Pin); // reverse
 
-        assertThat(router.getLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
-        assertThat(router.getLinkedPins(pipe2OutputPin)).containsExactlyInAnyOrder(outbox1Pin, outbox2Pin);
-        assertThat(router.getLinkedPins(pipe3OutputPin)).containsExactly(outbox2Pin);
-        assertThat(router.getLinkedPins(outbox1Pin)).containsExactlyInAnyOrder(pipe1OutputPin, pipe2OutputPin); // reverse
-        assertThat(router.getLinkedPins(outbox2Pin)).containsExactlyInAnyOrder(pipe2OutputPin, pipe3OutputPin); // reverse
+        assertThat(router.findLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
+        assertThat(router.findLinkedPins(pipe2OutputPin)).containsExactlyInAnyOrder(outbox1Pin, outbox2Pin);
+        assertThat(router.findLinkedPins(pipe3OutputPin)).containsExactly(outbox2Pin);
+        assertThat(router.findLinkedPins(outbox1Pin)).containsExactlyInAnyOrder(pipe1OutputPin, pipe2OutputPin); // reverse
+        assertThat(router.findLinkedPins(outbox2Pin)).containsExactlyInAnyOrder(pipe2OutputPin, pipe3OutputPin); // reverse
 
         // --------------------------------------------------
         // Test #1 (Remove Pipe Logic #2)
@@ -963,19 +963,19 @@ class RouterTest {
         router.deregister(throughputLogic2);
 
         // verification
-        assertThat(router.getLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
-        assertThat(router.getLinkedPins(inbox2Pin)).isEmpty();
-        assertThat(router.getLinkedPins(inbox3Pin)).containsExactly(pipe3InputPin);
-        assertThat(router.getLinkedPins(inbox4Pin)).containsExactly(pipe3InputPin);
-        assertThat(router.getLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin);                      // reverse
-        assertThat(router.getLinkedPins(pipe2InputPin)).isEmpty();                                       // reverse
-        assertThat(router.getLinkedPins(pipe3InputPin)).containsExactlyInAnyOrder(inbox3Pin, inbox4Pin); // reverse
+        assertThat(router.findLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
+        assertThat(router.findLinkedPins(inbox2Pin)).isEmpty();
+        assertThat(router.findLinkedPins(inbox3Pin)).containsExactly(pipe3InputPin);
+        assertThat(router.findLinkedPins(inbox4Pin)).containsExactly(pipe3InputPin);
+        assertThat(router.findLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin);                      // reverse
+        assertThat(router.findLinkedPins(pipe2InputPin)).isEmpty();                                       // reverse
+        assertThat(router.findLinkedPins(pipe3InputPin)).containsExactlyInAnyOrder(inbox3Pin, inbox4Pin); // reverse
 
-        assertThat(router.getLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
-        assertThat(router.getLinkedPins(pipe2OutputPin)).isEmpty();
-        assertThat(router.getLinkedPins(pipe3OutputPin)).containsExactly(outbox2Pin);
-        assertThat(router.getLinkedPins(outbox1Pin)).containsExactly(pipe1OutputPin); // reverse
-        assertThat(router.getLinkedPins(outbox2Pin)).containsExactly(pipe3OutputPin); // reverse
+        assertThat(router.findLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
+        assertThat(router.findLinkedPins(pipe2OutputPin)).isEmpty();
+        assertThat(router.findLinkedPins(pipe3OutputPin)).containsExactly(outbox2Pin);
+        assertThat(router.findLinkedPins(outbox1Pin)).containsExactly(pipe1OutputPin); // reverse
+        assertThat(router.findLinkedPins(outbox2Pin)).containsExactly(pipe3OutputPin); // reverse
 
         // --------------------------------------------------
         // Test #2 (Remove Inbox #3)
@@ -983,19 +983,19 @@ class RouterTest {
         router.deregister(inbox3);
 
         // verification
-        assertThat(router.getLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
-        assertThat(router.getLinkedPins(inbox2Pin)).isEmpty();
-        assertThat(router.getLinkedPins(inbox3Pin)).isEmpty();
-        assertThat(router.getLinkedPins(inbox4Pin)).containsExactly(pipe3InputPin);
-        assertThat(router.getLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
-        assertThat(router.getLinkedPins(pipe2InputPin)).isEmpty();                  // reverse
-        assertThat(router.getLinkedPins(pipe3InputPin)).containsExactly(inbox4Pin); // reverse
+        assertThat(router.findLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
+        assertThat(router.findLinkedPins(inbox2Pin)).isEmpty();
+        assertThat(router.findLinkedPins(inbox3Pin)).isEmpty();
+        assertThat(router.findLinkedPins(inbox4Pin)).containsExactly(pipe3InputPin);
+        assertThat(router.findLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
+        assertThat(router.findLinkedPins(pipe2InputPin)).isEmpty();                  // reverse
+        assertThat(router.findLinkedPins(pipe3InputPin)).containsExactly(inbox4Pin); // reverse
 
-        assertThat(router.getLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
-        assertThat(router.getLinkedPins(pipe2OutputPin)).isEmpty();
-        assertThat(router.getLinkedPins(pipe3OutputPin)).containsExactly(outbox2Pin);
-        assertThat(router.getLinkedPins(outbox1Pin)).containsExactly(pipe1OutputPin); // reverse
-        assertThat(router.getLinkedPins(outbox2Pin)).containsExactly(pipe3OutputPin); // reverse
+        assertThat(router.findLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
+        assertThat(router.findLinkedPins(pipe2OutputPin)).isEmpty();
+        assertThat(router.findLinkedPins(pipe3OutputPin)).containsExactly(outbox2Pin);
+        assertThat(router.findLinkedPins(outbox1Pin)).containsExactly(pipe1OutputPin); // reverse
+        assertThat(router.findLinkedPins(outbox2Pin)).containsExactly(pipe3OutputPin); // reverse
 
         // --------------------------------------------------
         // Test #3 (Remove Pipe Logic #3)
@@ -1003,19 +1003,19 @@ class RouterTest {
         router.deregister(throughputLogic3);
 
         // verification
-        assertThat(router.getLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
-        assertThat(router.getLinkedPins(inbox2Pin)).isEmpty();
-        assertThat(router.getLinkedPins(inbox3Pin)).isEmpty();
-        assertThat(router.getLinkedPins(inbox4Pin)).isEmpty();
-        assertThat(router.getLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
-        assertThat(router.getLinkedPins(pipe2InputPin)).isEmpty();                  // reverse
-        assertThat(router.getLinkedPins(pipe3InputPin)).isEmpty();                  // reverse
+        assertThat(router.findLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
+        assertThat(router.findLinkedPins(inbox2Pin)).isEmpty();
+        assertThat(router.findLinkedPins(inbox3Pin)).isEmpty();
+        assertThat(router.findLinkedPins(inbox4Pin)).isEmpty();
+        assertThat(router.findLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
+        assertThat(router.findLinkedPins(pipe2InputPin)).isEmpty();                  // reverse
+        assertThat(router.findLinkedPins(pipe3InputPin)).isEmpty();                  // reverse
 
-        assertThat(router.getLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
-        assertThat(router.getLinkedPins(pipe2OutputPin)).isEmpty();
-        assertThat(router.getLinkedPins(pipe3OutputPin)).isEmpty();
-        assertThat(router.getLinkedPins(outbox1Pin)).containsExactly(pipe1OutputPin); // reverse
-        assertThat(router.getLinkedPins(outbox2Pin)).isEmpty();                       // reverse
+        assertThat(router.findLinkedPins(pipe1OutputPin)).containsExactly(outbox1Pin);
+        assertThat(router.findLinkedPins(pipe2OutputPin)).isEmpty();
+        assertThat(router.findLinkedPins(pipe3OutputPin)).isEmpty();
+        assertThat(router.findLinkedPins(outbox1Pin)).containsExactly(pipe1OutputPin); // reverse
+        assertThat(router.findLinkedPins(outbox2Pin)).isEmpty();                       // reverse
 
         // --------------------------------------------------
         // Test #4 (Remove Outbox)
@@ -1023,19 +1023,19 @@ class RouterTest {
         router.deregister(outbox1);
 
         // verification
-        assertThat(router.getLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
-        assertThat(router.getLinkedPins(inbox2Pin)).isEmpty();
-        assertThat(router.getLinkedPins(inbox3Pin)).isEmpty();
-        assertThat(router.getLinkedPins(inbox4Pin)).isEmpty();
-        assertThat(router.getLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
-        assertThat(router.getLinkedPins(pipe2InputPin)).isEmpty();                  // reverse
-        assertThat(router.getLinkedPins(pipe3InputPin)).isEmpty();                  // reverse
+        assertThat(router.findLinkedPins(inbox1Pin)).containsExactly(pipe1InputPin);
+        assertThat(router.findLinkedPins(inbox2Pin)).isEmpty();
+        assertThat(router.findLinkedPins(inbox3Pin)).isEmpty();
+        assertThat(router.findLinkedPins(inbox4Pin)).isEmpty();
+        assertThat(router.findLinkedPins(pipe1InputPin)).containsExactly(inbox1Pin); // reverse
+        assertThat(router.findLinkedPins(pipe2InputPin)).isEmpty();                  // reverse
+        assertThat(router.findLinkedPins(pipe3InputPin)).isEmpty();                  // reverse
 
-        assertThat(router.getLinkedPins(pipe1OutputPin)).isEmpty();
-        assertThat(router.getLinkedPins(pipe2OutputPin)).isEmpty();
-        assertThat(router.getLinkedPins(pipe3OutputPin)).isEmpty();
-        assertThat(router.getLinkedPins(outbox1Pin)).isEmpty();      // reverse
-        assertThat(router.getLinkedPins(outbox2Pin)).isEmpty();      // reverse
+        assertThat(router.findLinkedPins(pipe1OutputPin)).isEmpty();
+        assertThat(router.findLinkedPins(pipe2OutputPin)).isEmpty();
+        assertThat(router.findLinkedPins(pipe3OutputPin)).isEmpty();
+        assertThat(router.findLinkedPins(outbox1Pin)).isEmpty();      // reverse
+        assertThat(router.findLinkedPins(outbox2Pin)).isEmpty();      // reverse
     }
 
     /**
@@ -1099,15 +1099,15 @@ class RouterTest {
         // ---------------------------------------
         // Test
         // ---------------------------------------
-        assertThat(router.getLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
-        assertThat(router.getLinkedPins(inbox2.getOutputPin("data"))).containsExactlyInAnyOrder(outbox1.getInputPin("data"), outbox2.getInputPin("data"));
-        assertThat(router.getLinkedPins(inbox3.getOutputPin("data"))).containsExactly(outbox2.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox2.getOutputPin("data"))).containsExactlyInAnyOrder(outbox1.getInputPin("data"), outbox2.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox3.getOutputPin("data"))).containsExactly(outbox2.getInputPin("data"));
 
         router.unlink(inbox2.getOutputPin("data")); // remove pin of Inbox #2
 
-        assertThat(router.getLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
-        assertThat(router.getLinkedPins(inbox2.getOutputPin("data"))).isEmpty();
-        assertThat(router.getLinkedPins(inbox3.getOutputPin("data"))).containsExactly(outbox2.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox2.getOutputPin("data"))).isEmpty();
+        assertThat(router.findLinkedPins(inbox3.getOutputPin("data"))).containsExactly(outbox2.getInputPin("data"));
     }
 
     /**
@@ -1171,15 +1171,15 @@ class RouterTest {
         // ---------------------------------------
         // Test
         // ---------------------------------------
-        assertThat(router.getLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
-        assertThat(router.getLinkedPins(inbox2.getOutputPin("data"))).containsExactlyInAnyOrder(outbox1.getInputPin("data"), outbox2.getInputPin("data"));
-        assertThat(router.getLinkedPins(inbox3.getOutputPin("data"))).containsExactly(outbox2.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox2.getOutputPin("data"))).containsExactlyInAnyOrder(outbox1.getInputPin("data"), outbox2.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox3.getOutputPin("data"))).containsExactly(outbox2.getInputPin("data"));
 
         router.unlink(outbox2.getInputPin("data")); // remove pin of Outbox #2
 
-        assertThat(router.getLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
-        assertThat(router.getLinkedPins(inbox2.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
-        assertThat(router.getLinkedPins(inbox3.getOutputPin("data"))).isEmpty();
+        assertThat(router.findLinkedPins(inbox1.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox2.getOutputPin("data"))).containsExactly(outbox1.getInputPin("data"));
+        assertThat(router.findLinkedPins(inbox3.getOutputPin("data"))).isEmpty();
     }
 
     /**
@@ -1316,6 +1316,37 @@ class RouterTest {
                 .isInstanceOf(ExecutionException.class)
                 .hasRootCauseInstanceOf(RouterException.class)
                 .hasRootCauseMessage("Dead End because of unsupported component: " + componentMock);
+    }
+
+    @Test
+    @DisplayName("Find owner of pins and connectors")
+    void findOwners() {
+        final var router = Router.createDefault();
+
+        // --------------------------------------------------
+        // create components
+        // --------------------------------------------------
+        final var andLogic = createLogicComponent(AndLogic.class);
+
+        // --------------------------------------------------
+        // registering components
+        // --------------------------------------------------
+        router.register(andLogic);
+
+        // --------------------------------------------------
+        // 1) find component owner of pin
+        // 2) find component owner of connector
+        // 3) find connector owner of pin
+        // --------------------------------------------------
+        for (var pin : andLogic.getPins()) {
+            assertThat(router.findComponent(pin)).isSameAs(andLogic);
+        }
+        for (var connector : andLogic.getConnectors()) {
+            assertThat(router.findComponent(connector)).isSameAs(andLogic);
+            for (var pin : connector.getPinStream().collect(Collectors.toList())) {
+                assertThat(router.findConnector(pin)).isSameAs(connector);
+            }
+        }
     }
 
     /*

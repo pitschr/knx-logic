@@ -207,7 +207,7 @@ class LinkServiceTest extends BaseDatabaseSuite {
         when(pin2Mock.getUid()).thenReturn(createUid("UID-2"));
 
         final var routerMock = mock(Router.class);
-        when(routerMock.getLinkedPins(any(Pin.class))).thenReturn(List.of(pin1Mock, pin2Mock));
+        when(routerMock.findLinkedPins(any(Pin.class))).thenReturn(List.of(pin1Mock, pin2Mock));
 
         final var linkService = new LinkService(databaseManager, routerMock);
 

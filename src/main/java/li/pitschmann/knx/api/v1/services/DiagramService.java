@@ -17,10 +17,19 @@
 
 package li.pitschmann.knx.api.v1.services;
 
+import li.pitschmann.knx.logic.Router;
+import li.pitschmann.knx.logic.components.Component;
 import li.pitschmann.knx.logic.db.DatabaseManager;
+import li.pitschmann.knx.logic.db.dao.ComponentsDao;
+import li.pitschmann.knx.logic.db.dao.DiagramsDao;
+import li.pitschmann.knx.logic.db.models.ComponentModel;
 import li.pitschmann.knx.logic.diagram.Diagram;
+import li.pitschmann.knx.logic.uid.UID;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Service for {@link Diagram}
@@ -29,9 +38,12 @@ import java.util.Objects;
  */
 public final class DiagramService {
     private final DatabaseManager databaseManager;
+    private final Router router;
 
-    public DiagramService(final DatabaseManager databaseManager) {
+    public DiagramService(final DatabaseManager databaseManager,
+                          final Router router) {
         this.databaseManager = Objects.requireNonNull(databaseManager);
+        this.router = Objects.requireNonNull(router);
     }
 
     public void insertDiagram(final Diagram diagram) {
@@ -40,5 +52,24 @@ public final class DiagramService {
 
     public void updateDiagram(final Diagram diagram) {
         databaseManager.save(diagram);
+    }
+
+    public void deleteDiagram(final Diagram diagram) {
+        databaseManager.dao(DiagramsDao.class).delete(diagram.getUid());
+    }
+
+    public List<Component> getDiagramComponents(final Diagram diagram,
+                                                final Function<UID, Component> uidComponentMapper) {
+        return databaseManager.dao(ComponentsDao.class)
+                .byDiagramUid(diagram.getUid())
+                .stream()
+                .map(ComponentModel::getUid)
+                .map(uidComponentMapper)
+                .collect(Collectors.toUnmodifiableList());
+    }
+
+    public void deleteDiagramComponent(final Component component) {
+        databaseManager.dao(ComponentsDao.class).delete(component.getUid());
+        router.deregister(component);
     }
 }
